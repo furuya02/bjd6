@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 本プロジェクトを再コンパイルしてBJD/bin/pluginsの下にjarファイルを生成する -->
 <project name="build" default="default" basedir="./">
    	<property name="target" value="SampleServer"/>
-   	<property name="dev" value="C:/dev/bjd6"/>
+	<property name="dev" value="C:/dev/bjd6"/>
    	<property name="project" value="${dev}/${target}"/>
 	<property name="out" value="${dev}/BJD/bin/plugins"/>
+
 	<target name="default">
-		
-  		<!-- プラグインフォルダの作成 -->
+  		
+		<!-- 出力フォルダの作成 -->
    		<mkdir dir="${out}"/>
   		
 		<!-- コンパイル class生成 -->
@@ -15,18 +17,9 @@
   			destdir="${project}/bin" includeantruntime="false" classpath="${dev}/BJD/bin">
   			<compilerarg value="-J-Dfile.encoding=UTF8"/>
   		</javac>
-		
-		<!-- プラグインフォルダにjarファイルを生成 -->
+		<!-- 出力フォルダにjarファイルを生成 -->
 		<jar destfile="${out}/${target}.jar" filesetmanifest="mergewithoutmain">
-            <!--
-            <manifest>
-                <attribute name="Main-Class" value="bjd.MainForm"/>
-                <attribute name="Class-Path" value="."/>
-	        </manifest>
-	        -->
 	        <fileset dir="${project}/bin"/>
         </jar>
-		
-		
 	</target>
 </project>

@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--BJD及び各プラグインを再構築し、outフォルダにリリースバージョンを生成する -->
+<project name="build" default="main" basedir="./">
+   	
+	<property name="target" value="BJD"/>
+	
+   	<property name="dev" value="C:/dev/bjd6"/>
+   	<property name="project" value="${dev}/${target}"/>
+	<property name="out" value="${dev}/out"/>
+	<target name="main">
+
+				
+  		<!--【出力フォルダの初期化】-->
+		<delete dir="${out}"/>
+   		<mkdir dir="${out}"/> 
+		
+		<!--【BJDの構築】 -->
+		<!-- BJD/binの初期化 -->
+		<delete dir="${project}/bin"/>
+		<!-- コンパイル class生成 -->
+		<mkdir dir="${project}/bin"/>
+  		<javac fork="true" encoding="utf-8" srcdir="${project}/src" 
+  			destdir="${project}/bin" includeantruntime="false">
+  			<compilerarg value="-J-Dfile.encoding=UTF8"/>
+			<classpath>
+				<pathelement path="${project}/lib/*"/>
+			</classpath>
+  		</javac>
+		<!-- jarファイルの作成 -->
+		<jar destfile="${out}/${target}.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="bjd.MainForm"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="${project}/bin"/>
+			<zipfileset src="${project}/lib/mail.jar"/>
+			<zipfileset src="${project}/lib/commons-codec-1.6.jar"/>
+			<zipfileset src="${project}/lib/jfontchooser-1.0.5.jar"/>
+		</jar>
+		
+  		
+		<!--【プラグインの構築】 -->
+		<!-- BJD/bin/pluginの下に各プラグインサーバのjarファイルが生成される -->
+		<ant antfile="${dev}/SampleServer/build.xml" target="default" inheritAll="false" />
+		
+		
+		<!--【プラグインのコピー】-->
+		<copy todir="${out}/plugins">
+		    <fileset dir="${dev}/BJD/bin/plugins"/>
+		</copy>
+		
+		<!-- 【Test再構築】-->
+		<property  name="junit.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
+		<property  name="hamcrest.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+		
+		<javac fork="true" encoding="utf-8" srcdir="${project}/test" 
+	  		destdir="${project}/bin" includeantruntime="false" >
+	  		<compilerarg value="-J-Dfile.encoding=UTF8" />
+			<classpath>
+				<pathelement location="${junit.jar}" />
+				<pathelement location="${hamcrest.jar}" />
+				<pathelement path="${project}/lib/*"/>
+			</classpath>
+	  	</javac>
+		
+	</target>
+</project>
