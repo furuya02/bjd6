@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project name="build" default="default" basedir="./">
+   	<property name="target" value="SampleServer"/>
+   	<property name="dev" value="C:/dev/bjd6"/>
+   	<property name="project" value="${dev}/${target}"/>
+	<property name="out" value="${dev}/BJD/bin/plugins"/>
+	<target name="default">
+		
+  		<!-- プラグインフォルダの作成 -->
+   		<mkdir dir="${out}"/>
+  		
+		<!-- コンパイル class生成 -->
+   		<mkdir dir="${project}/bin"/>
+  		<javac fork="true" encoding="utf-8" srcdir="${project}/src" 
+  			destdir="${project}/bin" includeantruntime="false" classpath="${dev}/BJD/bin">
+  			<compilerarg value="-J-Dfile.encoding=UTF8"/>
+  		</javac>
+		
+		<!-- プラグインフォルダにjarファイルを生成 -->
+		<jar destfile="${out}/${target}.jar" filesetmanifest="mergewithoutmain">
+            <!--
+            <manifest>
+                <attribute name="Main-Class" value="bjd.MainForm"/>
+                <attribute name="Class-Path" value="."/>
+	        </manifest>
+	        -->
+	        <fileset dir="${project}/bin"/>
+        </jar>
+		
+		
+	</target>
+</project>
