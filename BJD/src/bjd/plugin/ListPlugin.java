@@ -45,8 +45,8 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 					if (index != -1) {
 						className = className.substring(0, index);
 					}
-					//package.Server
-					ar.add(String.format("%s.%s", packageName, className));
+					className = className.replace("/", ".");
+					ar.add(className);
 				}
 			}
 			return (String[]) ar.toArray(new String[0]);

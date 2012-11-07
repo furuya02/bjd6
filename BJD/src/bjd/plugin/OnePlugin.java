@@ -3,8 +3,6 @@ package bjd.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -71,8 +69,9 @@ public final class OnePlugin implements IDispose {
 			 //URL url = file.getCanonicalFile().toURI().toURL();
              //URLClassLoader loader = new URLClassLoader( new URL[] { url });
            	 //Class cobj = loader.loadClass(classNameOption);
+             //return null;
              
-             //TODO Debug Print
+			//TODO Debug Print
              //System.out.println(String.format("OnePlugin() cobj = %s",cobj));
              //return null;
 			
