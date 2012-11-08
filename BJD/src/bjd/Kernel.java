@@ -43,12 +43,12 @@ public final class Kernel implements IDispose {
 	private Menu menu = null;
 
 	//サーバ起動時に最初期化さえる変数
-	private ListPlugin listPlugin = null;
 	private ListOption listOption = null;
 	private ListServer listServer = null;
 	private LogFile logFile = null;
 	private Lang lang = Lang.JP;
 	private Logger logger = null;
+
 	//private MailBox mailBox = null; //実際に必要になった時に生成される(SMTPサーバ若しくはPOP3サーバの起動時)
 
 	public View getView() {
@@ -71,9 +71,9 @@ public final class Kernel implements IDispose {
 		return listServer;
 	}
 
-	public ListPlugin getListPlugin() {
-		return listPlugin;
-	}
+	//	public ListPlugin getListPlugin() {
+	//		return listPlugin;
+	//	}
 
 	public boolean isJp() {
 		return (lang == Lang.JP) ? true : false;
@@ -82,7 +82,7 @@ public final class Kernel implements IDispose {
 	public RunMode getRunMode() {
 		return runMode;
 	}
-	
+
 	public boolean getEditBrowse() {
 		Conf conf = createConf("Basic");
 		if (conf != null) {
@@ -197,10 +197,10 @@ public final class Kernel implements IDispose {
 		//		if(mailBox!=null){
 		//			mailBox = null;
 		//		}
-		if (listPlugin != null) {
-			listPlugin.dispose();
-			listPlugin = null;
-		}
+		//		if (listPlugin != null) {
+		//			listPlugin.dispose();
+		//			listPlugin = null;
+		//		}
 		if (logFile != null) {
 			logFile.dispose();
 			logFile = null;
@@ -209,9 +209,10 @@ public final class Kernel implements IDispose {
 		//************************************************************
 		// 初期化
 		//************************************************************
-		listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
+		//ListPlugin は。ListOptionとListServerを初期化する間だけ生存する
+		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
 
-		listOption = new ListOption(this);
+		listOption = new ListOption(this, listPlugin);
 
 		//OptionLog
 		Conf conf = new Conf(listOption.get("Log"));
@@ -238,10 +239,10 @@ public final class Kernel implements IDispose {
 			}
 		}
 		logger = createLogger("kernel", true, null);
-		
-		listServer = new ListServer(this,listOption);
+
+		listServer = new ListServer(this, listPlugin);
 		//listTool = new ListTool(this);
-		
+
 		//mailBox初期化
 		//        foreach (var o in ListOption) {
 		//            //SmtpServer若しくは、Pop3Serverが使用される場合のみメールボックスを初期化する                
@@ -256,7 +257,7 @@ public final class Kernel implements IDispose {
 
 		view.setLang();
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）
-		
+
 	}
 
 	/**
@@ -415,63 +416,63 @@ public final class Kernel implements IDispose {
 			//            dlg.ShowDialog();
 		} else if (cmd.indexOf("StartStop_") == 0) {
 			switch (cmd) {
-				case "StartStop_Start":
-					//Start();
-					break;
-				case "StartStop_Stop":
-					//Stop();
-					break;
-				case "StartStop_Restart":
-					//Stop();
-					//Thread.Sleep(100);
-					//Start();
-					break;
-				case "StartStop_Reload":
-					//Stop();
-					listInitialize();
-					//Start();
-					break;
-				case "StartStop_Service":
-					//SetupService(); //サービスの設定
-					break;
-				default:
-					Util.runtimeException(String.format("cmd=%s", cmd));
-					break;
+			case "StartStop_Start":
+				//Start();
+				break;
+			case "StartStop_Stop":
+				//Stop();
+				break;
+			case "StartStop_Restart":
+				//Stop();
+				//Thread.Sleep(100);
+				//Start();
+				break;
+			case "StartStop_Reload":
+				//Stop();
+				listInitialize();
+				//Start();
+				break;
+			case "StartStop_Service":
+				//SetupService(); //サービスの設定
+				break;
+			default:
+				Util.runtimeException(String.format("cmd=%s", cmd));
+				break;
 
 			}
 			view.setColor(); //ウインドのカラー初期化
 			//menu.setEnable(); //状態に応じた有効・無効
 		} else {
 			switch (cmd) {
-				case "File_LogClear":
-					logView.clear();
-					break;
-				case "File_LogCopy":
-					logView.setClipboard();
-					break;
-				case "File_Trace":
-					traceDlg.open();
-					break;
-				case "File_Exit":
-					view.getMainForm().exit();
-					break;
-				case "Help_Version":
+			case "File_LogClear":
+				logView.clear();
+				break;
+			case "File_LogCopy":
+				logView.setClipboard();
+				break;
+			case "File_Trace":
+				traceDlg.open();
+				break;
+			case "File_Exit":
+				view.getMainForm().exit();
+				break;
+			case "Help_Version":
 
-					view.getMainForm().test();
-					break;
-				case "Help_Homepage":
-					view.getMainForm().test2();
-					//Process.Start(Define.WebHome());
-					break;
-				case "Help_Document":
-					//Process.Start(Define.WebDocument());
-					break;
-				case "Help_Support":
-					//Process.Start(Define.WebSupport());
-					break;
-				default:
-					Util.runtimeException(String.format("cmd=%s", cmd));
-					break;
+				view.getMainForm().test();
+				break;
+			case "Help_Homepage":
+				view.getMainForm().test2();
+				//Process.Start(Define.WebHome());
+				break;
+			case "Help_Document":
+				//Process.Start(Define.WebDocument());
+				break;
+			case "Help_Support":
+				//Process.Start(Define.WebSupport());
+				break;
+			default:
+				Util.runtimeException(String.format("cmd=%s", cmd));
+				break;
 			}
 		}
 

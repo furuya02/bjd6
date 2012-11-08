@@ -3,6 +3,7 @@ package bjd.option;
 import bjd.Kernel;
 import bjd.menu.ListMenu;
 import bjd.menu.OneMenu;
+import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
 import bjd.util.ListBase;
 import bjd.util.Util;
@@ -17,9 +18,9 @@ public final class ListOption extends ListBase<OneOption> {
 
 	private Kernel kernel;
 
-	public ListOption(Kernel kernel) {
+	public ListOption(Kernel kernel, ListPlugin listPlugin) {
 		this.kernel = kernel;
-		initialize();
+		initialize(listPlugin);
 	}
 
 	public OneOption get(String nameTag) {
@@ -61,7 +62,7 @@ public final class ListOption extends ListBase<OneOption> {
 	/**
 	 * オプションリストの初期化
 	 */
-	private void initialize() {
+	private void initialize(ListPlugin listPlugin) {
 
 		getAr().clear();
 
@@ -70,7 +71,7 @@ public final class ListOption extends ListBase<OneOption> {
 		add(new OptionBasic(kernel, executePath)); //「基本」オプション
 		add(new OptionLog(kernel, executePath)); //「ログ」オプション
 
-		for (OnePlugin onePlugin : kernel.getListPlugin()) {
+		for (OnePlugin onePlugin : listPlugin) {
 			//TODO Debug Print
 			System.out.println(String.format("onePlugin.getName() = %s", onePlugin.getName()));
 			OneOption oneOption = onePlugin.createOption(kernel);

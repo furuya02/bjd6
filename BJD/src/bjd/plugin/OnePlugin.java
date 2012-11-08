@@ -27,11 +27,11 @@ public final class OnePlugin implements IDispose {
 
 	@Override
 	public void dispose() {
-		
+
 	}
 
 	public String getName() {
-		return classNameOption;
+		return file.getName().replaceAll("Server.jar", "");
 	}
 
 	/**
@@ -66,16 +66,17 @@ public final class OnePlugin implements IDispose {
 	 */
 	public OneOption createOption(Kernel kernel) {
 		try {
-			 //URL url = file.getCanonicalFile().toURI().toURL();
-             //URLClassLoader loader = new URLClassLoader( new URL[] { url });
-           	 //Class cobj = loader.loadClass(classNameOption);
-             //return null;
-             
+			//URL url = file.getCanonicalFile().toURI().toURL();
+			//URLClassLoader loader = new URLClassLoader( new URL[] { url });
+			//Class cobj = loader.loadClass(classNameOption);
+			//return null;
+
 			//TODO Debug Print
-             //System.out.println(String.format("OnePlugin() cobj = %s",cobj));
-             //return null;
-			
-			Constructor constructor = createConstructor(file, classNameOption, new Class[] { Kernel.class, String.class });
+			//System.out.println(String.format("OnePlugin() cobj = %s",cobj));
+			//return null;
+
+			Constructor constructor = createConstructor(file, classNameOption,
+					new Class[] { Kernel.class, String.class });
 			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath() });
 		} catch (Exception e) {
 			//何の例外が発生しても、プラグインとしては受け付けない
@@ -93,7 +94,8 @@ public final class OnePlugin implements IDispose {
 	 */
 	public OneServer createServer(Kernel kernel, Conf conf, OneBind oneBind) {
 		try {
-			Constructor constructor = createConstructor(file, classNameServer, new Class[] { Kernel.class, Conf.class, OneBind.class });
+			Constructor constructor = createConstructor(file, classNameServer, new Class[] { Kernel.class, Conf.class,
+					OneBind.class });
 			return (OneServer) constructor.newInstance(new Object[] { kernel, conf, oneBind });
 		} catch (Exception e) {
 			//何の例外が発生しても、プラグインとしては受け付けない
@@ -102,18 +104,17 @@ public final class OnePlugin implements IDispose {
 		}
 	}
 
-	
-//	private OneOption createOption(File file, String className, Kernel kernel) {
-//		try {
-//			URL url = file.getCanonicalFile().toURI().toURL();
-//			URLClassLoader loader = new URLClassLoader(new URL[] { url });
-//			Class cobj = loader.loadClass(className);
-//			Constructor constructor = cobj.getConstructor(new Class[] { Kernel.class, String.class });
-//			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath() });
-//		} catch (Exception e) {
-//			//何の例外が発生しても、プラグインとしては受け付けない
-//			return null;
-//		}
-//	}
+	//	private OneOption createOption(File file, String className, Kernel kernel) {
+	//		try {
+	//			URL url = file.getCanonicalFile().toURI().toURL();
+	//			URLClassLoader loader = new URLClassLoader(new URL[] { url });
+	//			Class cobj = loader.loadClass(className);
+	//			Constructor constructor = cobj.getConstructor(new Class[] { Kernel.class, String.class });
+	//			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath() });
+	//		} catch (Exception e) {
+	//			//何の例外が発生しても、プラグインとしては受け付けない
+	//			return null;
+	//		}
+	//	}
 
 }

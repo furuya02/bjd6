@@ -8,6 +8,7 @@ import java.util.jar.JarInputStream;
 
 import bjd.util.FileSearch;
 import bjd.util.ListBase;
+import bjd.util.Util;
 
 /**
  * プラグインフォルダ内のjarファイルを列挙するクラス
@@ -15,6 +16,60 @@ import bjd.util.ListBase;
  *
  */
 public final class ListPlugin extends ListBase<OnePlugin> {
+
+	/**
+	 * @param dir 検索対象となるpluginsフォルダ
+	 */
+	public ListPlugin(String dir) {
+		//フォルダが存在しない場合、初期化終了
+		if (!(new File(dir)).exists()) {
+			return;
+		}
+
+		FileSearch fileSearch = new FileSearch(dir);
+
+		//pluginsの中のjarファイルの検索
+		for (File file : fileSearch.listFiles("*.jar")) {
+
+			//jarファイルに含まれるクラスを列挙する
+			String[] classNameList = getClassNameList(file);
+
+			String classNameOption = null;
+			String classNameServer = null;
+
+			for (String className : classNameList) {
+				if (className.indexOf("Option") != -1) {
+					classNameOption = className;
+				} else if (className.indexOf("Server") != -1) {
+					classNameServer = className;
+				}
+			}
+			if (classNameOption != null && classNameServer != null) {
+				getAr().add(new OnePlugin(file, classNameOption, classNameServer));
+			}
+		}
+
+		//TODO Debug Print
+		System.out.println(String.format("■new ListPlugin(%s) => size()=%d", dir, size()));
+
+	}
+
+	/**
+	 * 名前によるプラグイン情報オブジェクト（OnePlugin）の検索<br>
+	 * <font color=red>一覧に存在しない名前で検索を行った場合、設計上の問題として処理される</font>
+	 * 
+	 * @param name 名前
+	 * @return プラグイン情報(OnePlugin)
+	 */
+	public OnePlugin get(String name) {
+		for (OnePlugin o : getAr()) {
+			if (o.getName().equals(name)) {
+				return o;
+			}
+		}
+		Util.runtimeException(String.format("ListPlugin.get(%s)==null", name));
+		return null;
+	}
 
 	/**
 	 * jarファイルに梱包されているクラスの列挙
@@ -54,43 +109,6 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 			ex.printStackTrace();
 		}
 		return new String[0];
-	}
-
-	/**
-	 * @param dir 検索対象となるpluginsフォルダ
-	 */
-	public ListPlugin(String dir) {
-		//フォルダが存在しない場合、初期化終了
-		if (!(new File(dir)).exists()) {
-			return;
-		}
-
-		FileSearch fileSearch = new FileSearch(dir);
-
-		//pluginsの中のjarファイルの検索
-		for (File file : fileSearch.listFiles("*.jar")) {
-
-			//jarファイルに含まれるクラスを列挙する
-			String[] classNameList = getClassNameList(file);
-
-			String classNameOption = null;
-			String classNameServer = null;
-
-			for (String className : classNameList) {
-				if (className.indexOf("Option") != -1) {
-					classNameOption = className;
-				} else if (className.indexOf("Server") != -1) {
-					classNameServer = className;
-				}
-			}
-			if (classNameOption != null && classNameServer != null) {
-				getAr().add(new OnePlugin(file, classNameOption, classNameServer));
-			}
-		}
-
-		//TODO Debug Print
-		System.out.println(String.format("■new ListPlugin(%s) => size()=%d", dir, size()));
-
 	}
 
 }

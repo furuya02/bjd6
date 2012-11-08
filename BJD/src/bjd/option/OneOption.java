@@ -159,7 +159,7 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	 */
 	protected final OneVal createServerOption(ProtocolKind protocolKind, int port, int timeout, int multiple) {
 		ListVal list = new ListVal();
-		list.add(new OneVal("protocolKind", (protocolKind == protocolKind.Tcp) ? 0 : 1, Crlf.CONTINUE, new CtrlComboBox(isJp ? "プロトコル" : "Protocol", new String[] { "TCP", "UDP" }, 80)));
+		list.add(new OneVal("protocolKind", protocolKind.getIntValue(), Crlf.CONTINUE, new CtrlComboBox(isJp ? "プロトコル" : "Protocol", new String[] { "TCP", "UDP" }, 80)));
 		list.add(new OneVal("port", port, Crlf.NEXTLINE, new CtrlInt(isJp ? "クライアントから見たポート" : "Port (from client side)", 5)));
 		LocalAddress localAddress = LocalAddress.getInstance();
 		Ip[] v4 = localAddress.getV4();

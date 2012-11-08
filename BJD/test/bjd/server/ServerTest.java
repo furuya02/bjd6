@@ -90,7 +90,7 @@ public final class ServerTest {
 		}
 		OneBind oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		Conf conf = TestUtil.createConf("OptionSample");
-		conf.set("protocolKind", 0); //TCP=0 UDP=1
+		conf.set("protocolKind", ProtocolKind.Tcp.getIntValue());
 		conf.set("port", 8888);
 		conf.set("multiple", 10);
 		conf.set("acl", new Dat(new CtrlType[0]));
