@@ -15,15 +15,17 @@ import bjd.option.OneVal;
 import bjd.option.OptionIni;
 
 public final class Option extends OneOption {
-	
+
 	@Override
 	public String getJpMenu() {
 		return "SAMPLEサーバ";
 	}
+
 	@Override
 	public String getEnMenu() {
 		return "Sample Server";
 	}
+
 	@Override
 	public char getMnemonic() {
 		return 'Z';
@@ -42,16 +44,17 @@ public final class Option extends OneOption {
 
 		read(OptionIni.getInstance()); //　レジストリからの読み込み
 	}
+
 	private OnePage page1(String name, String title) {
 		OnePage onePage = new OnePage(name, title);
 		onePage.add(createServerOption(ProtocolKind.Tcp, 9999, 30, 10)); //サーバ基本設定
 		onePage.add(new OneVal("sampleText", "Sample Server", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "サンプルメッセージ" : "SampleMessage", 30)));
 		return onePage;
 	}
+
 	@Override
 	protected void abstractOnChange(OneCtrl oneCtrl) {
 		boolean b = (boolean) getCtrl("useServer").read();
-		getCtrl("Basic").setEnable(b);
+		getCtrl("tab").setEnable(b);
 	}
-	
 }

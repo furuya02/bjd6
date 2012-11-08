@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import javax.swing.JMenuBar;
 
 import bjd.ctrl.ListView;
@@ -21,7 +22,6 @@ import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.ListOption;
 import bjd.option.OneOption;
-import bjd.option.OptionBasic;
 import bjd.option.OptionIni;
 import bjd.plugin.ListPlugin;
 import bjd.server.ListServer;
@@ -239,7 +239,7 @@ public final class Kernel implements IDispose {
 		}
 		logger = createLogger("kernel", true, null);
 		
-		listServer = new ListServer(listOption);
+		listServer = new ListServer(this,listOption);
 		//listTool = new ListTool(this);
 		
 		//mailBox初期化

@@ -61,6 +61,14 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 		return (boolean) oneVal.getValue();
 	}
 	
+	/**
+	 * プラグインファイルのパス取得
+	 * @return
+	 */
+	public String getPath(){
+		return path;
+	}
+	
     public abstract String getJpMenu();
     public abstract String getEnMenu();	
     public abstract char getMnemonic();	
