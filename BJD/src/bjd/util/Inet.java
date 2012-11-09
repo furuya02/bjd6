@@ -175,7 +175,7 @@ public final class Inet {
 	//            //TcpObj tcpObj = new TcpObj(kernel, logger, ip, port, fff, ssl);
 	//            var tcpObj = new TcpObj(kernel, logger, ip, port, ssl);
 	//
-	//            Thread.Sleep(0);
+	//            Util.sleep(0);
 	//            while (iLife.isLife()) {
 	//                if (tcpObj.State == SocketObjState.Connect) {
 	//                    return tcpObj;
@@ -190,8 +190,7 @@ public final class Inet {
 	//                    return null;
 	//                }
 	//                //Ver5.0.0-a11 勝負
-	//                //Thread.Sleep(100);
-	//                Thread.Sleep(10);
+	//                Util.sleep(10);
 	//            }
 	//            tcpObj.Close();//2009.06.01追加
 	//            return null;

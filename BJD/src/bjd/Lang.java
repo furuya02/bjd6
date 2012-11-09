@@ -5,9 +5,9 @@ package bjd;
  * @author SIN
  *
  */
-public enum Lang {
-	/**日本語*/
-	JP,
-	/**英語*/
-	EN
-}
+//public enum Lang {
+//	/**日本語*/
+//	JP,
+//	/**英語*/
+//	EN
+//}

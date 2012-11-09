@@ -1,20 +1,25 @@
 package bjd.sock;
 
+import java.io.UnsupportedEncodingException;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import bjd.ILife;
 import bjd.ThreadBase;
 import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
+import bjd.util.Inet;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 //**************************************************
 // Echoサーバを使用したテスト
 //**************************************************
-public final class TcpObjTest {
+public final class TcpObjTest implements ILife {
 	class EchoServer extends ThreadBase {
 		private SockServer sockServer;
 		private String addr;
@@ -62,7 +67,7 @@ public final class TcpObjTest {
 						int len = child.length();
 						if (len > 0) {
 							//System.out.println(String.format("EchoServer len=%d", len));
-							byte[] buf = child.recv(len, 100);
+							byte[] buf = child.recv(len, 100, this);
 							child.send(buf);
 						}
 					}
@@ -102,11 +107,7 @@ public final class TcpObjTest {
 
 			//送信データが到着するまで、少し待機する
 			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
-			try {
-				Thread.sleep(sleep);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(sleep);
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
 
 			TestUtil.dispPrompt(this, String.format("tcpObj.length()=%d", sockTcp.length()));
@@ -153,15 +154,10 @@ public final class TcpObjTest {
 			Assert.assertEquals(len, tmp.length);
 
 			int sleep = 100;
-			try {
-				Thread.sleep(sleep);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(sleep);
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
-		
-			
-			byte[] b = sockTcp.recv(len, timeout);
+
+			byte[] b = sockTcp.recv(len, timeout, this);
 			recvCount += b.length;
 			TestUtil.dispPrompt(this, String.format("len=%d  recv()=%d", len, b.length));
 			for (int m = 0; m < max; m += 10) {
@@ -174,5 +170,65 @@ public final class TcpObjTest {
 		TestUtil.dispPrompt(this, String.format("tcpObj.close()"));
 		sockTcp.close();
 		echoServer.stop();
+	}
+
+	@Test
+	public void a003() {
+
+		TestUtil.dispHeader("a003 EchoサーバにlineSend(1行送信)して、lineRecv(1行受信)する");
+
+		String addr = "127.0.0.1";
+		int port = 9993;
+
+		EchoServer echoServer = new EchoServer(addr, port);
+		echoServer.start();
+
+		int timeout = 100;
+		Ssl ssl = null;
+		Ip ip = null;
+		try {
+			ip = new Ip(addr);
+		} catch (ValidObjException ex) {
+			Assert.fail(ex.getMessage());
+		}
+		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
+		TestUtil.dispPrompt(this, "tcpObj = new TcpObj()");
+
+		String sendStr = "本日は晴天なり";
+		byte[] buf = null;
+		try {
+			buf = sendStr.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			Assert.fail();
+		}
+
+		TestUtil.dispPrompt(this, String.format("tcpObj.lineSend(%s)", sendStr));
+		int len = sockTcp.lineSend(buf);
+		Assert.assertEquals(len, buf.length + 2);
+
+		int sleep = 100;
+		Util.sleep(sleep);
+		TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
+
+		buf = sockTcp.lineRecv(1000, this);
+		String recvStr = "";
+		try {
+			recvStr = new String(buf, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			Assert.fail();
+		}
+
+		recvStr = Inet.trimCrlf(recvStr);
+		Assert.assertEquals(sendStr, recvStr);
+		TestUtil.dispPrompt(this, String.format("tcpObj.lineRecv()=%s", recvStr));
+
+		TestUtil.dispPrompt(this, String.format("tcpObj.close()"));
+		sockTcp.close();
+		echoServer.stop();
+	}
+
+	@Override
+	public boolean isLife() {
+		return true;
 	}
 }

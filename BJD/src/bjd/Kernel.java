@@ -24,6 +24,7 @@ import bjd.option.ListOption;
 import bjd.option.OneOption;
 import bjd.option.OptionIni;
 import bjd.plugin.ListPlugin;
+import bjd.plugin.OnePlugin;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
 import bjd.util.IDispose;
@@ -41,12 +42,14 @@ public final class Kernel implements IDispose {
 	private LogView logView = null;
 	private WindowSize windowSize = null;
 	private Menu menu = null;
+	private boolean isTest = false; //TEST用のKernelを生成する場合、trueに設定される
 
 	//サーバ起動時に最初期化さえる変数
 	private ListOption listOption = null;
 	private ListServer listServer = null;
 	private LogFile logFile = null;
-	private Lang lang = Lang.JP;
+	//private Lang lang = Lang.JP;
+	private boolean isJp = true;
 	private Logger logger = null;
 
 	//private MailBox mailBox = null; //実際に必要になった時に生成される(SMTPサーバ若しくはPOP3サーバの起動時)
@@ -76,7 +79,8 @@ public final class Kernel implements IDispose {
 	//	}
 
 	public boolean isJp() {
-		return (lang == Lang.JP) ? true : false;
+		return isJp;
+		//return (lang == Lang.JP) ? true : false;
 	}
 
 	public RunMode getRunMode() {
@@ -99,6 +103,7 @@ public final class Kernel implements IDispose {
 	 * テスト用コンストラクタ
 	 */
 	public Kernel() {
+		isTest = true;
 		defaultInitialize(null, null, null);
 	}
 
@@ -118,6 +123,7 @@ public final class Kernel implements IDispose {
 	 * @param mainForm メインフォーム
 	 * @param listViewLog ログ表示用のビュー
 	 * @param menuBar メニューバー
+	 * @param isTest テスト用かどうか（テスト用の場合プラグインの初期化は行わない）
 	 */
 	private void defaultInitialize(MainForm mainForm, ListView listViewLog, JMenuBar menuBar) {
 
@@ -156,9 +162,21 @@ public final class Kernel implements IDispose {
 		try {
 			//ウインドウの外観を保存・復元(Viewより前に初期化する)
 			windowSize = new WindowSize(new Conf(listOption.get("Basic")), path);
+			view.read(windowSize);
 		} catch (IOException e) {
+			windowSize = null;
 			// 指定されたWindow情報保存ファイル(BJD.ini)にIOエラーが発生している
 			logger.set(LogKind.ERROR, null, 9000022, path);
+		}
+
+		switch (runMode) {
+		case Normal:
+			menuOnClick("StartStop_Start"); //メニュー選択イベント
+			break;
+		case Remote:
+			//                RemoteClient = new RemoteClient(this);
+			//                RemoteClient.Start();
+			break;
 		}
 
 		//        switch (RunMode){
@@ -210,23 +228,31 @@ public final class Kernel implements IDispose {
 		// 初期化
 		//************************************************************
 		//ListPlugin は。ListOptionとListServerを初期化する間だけ生存する
-		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
+		//isTest=trueの場合、パスを""にして、プラグイン0個で初期化さあせる
+		ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
+		for (OnePlugin o : listPlugin) {
+			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
+		}
 
 		listOption = new ListOption(this, listPlugin);
 
-		//OptionLog
-		Conf conf = new Conf(listOption.get("Log"));
-		if (conf != null) {
+		//OptionBasic
+		Conf confBasic = new Conf(listOption.get("Basic"));
+		isJp = ((int) confBasic.get("lang") == 0) ? true : false;
 
-			logView.setFont((Font) conf.get("font"));
+		//OptionLog
+		Conf confOption = new Conf(listOption.get("Log"));
+		if (confOption != null) {
+
+			logView.setFont((Font) confOption.get("font"));
 
 			if (runMode == RunMode.Normal || runMode == RunMode.Service) {
 				//LogFileの初期化
-				String saveDirectory = (String) conf.get("saveDirectory");
-				int normalLogKind = (int) conf.get("normalLogKind");
-				int secureLogKind = (int) conf.get("secureLogKind");
-				int saveDays = (int) conf.get("saveDays");
-				boolean useLogClear = (boolean) conf.get("useLogClear");
+				String saveDirectory = (String) confOption.get("saveDirectory");
+				int normalLogKind = (int) confOption.get("normalLogKind");
+				int secureLogKind = (int) confOption.get("secureLogKind");
+				int saveDays = (int) confOption.get("saveDays");
+				boolean useLogClear = (boolean) confOption.get("useLogClear");
 				if (!useLogClear) {
 					saveDays = 0; //ログの自動削除が無効な場合、saveDaysに0をセットする
 				}
@@ -239,6 +265,7 @@ public final class Kernel implements IDispose {
 			}
 		}
 		logger = createLogger("kernel", true, null);
+		tmpLogger.release(logger);
 
 		listServer = new ListServer(this, listPlugin);
 		//listTool = new ListTool(this);
@@ -337,8 +364,10 @@ public final class Kernel implements IDispose {
 		if (menu != null) {
 			menu.dispose();
 		}
-
-		windowSize.dispose(); //DisposeしないとReg.Dispose(保存)されない
+		if (windowSize != null) {
+			view.save(windowSize);
+			windowSize.dispose(); //DisposeしないとReg.Dispose(保存)されない
+		}
 	}
 
 	/**
@@ -387,6 +416,36 @@ public final class Kernel implements IDispose {
 		return str.replaceAll("%ExecutablePath%", getProgDir());
 	}
 
+	private void start() {
+
+		//サービス登録されている場合の処理
+		if (runMode == RunMode.NormalRegist) {
+			//            var setupService = new SetupService(this);
+			//            if (setupService.Status != ServiceControllerStatus.Running) {
+			//                setupService.Job(ServiceCmd.Start);
+			//            }
+		} else {
+			if (listServer.size() == 0) {
+				logger.set(LogKind.ERROR, null, 9000030, "");
+			} else {
+				listServer.start();
+			}
+		}
+	}
+
+	private void stop() {
+
+		//サービス登録されている場合の処理
+		if (runMode == RunMode.NormalRegist) {
+			//            var setupService = new SetupService(this);
+			//            if (setupService.Status == ServiceControllerStatus.Running) {
+			//                setupService.Job(ServiceCmd.Stop);
+			//            }
+		} else {
+			listServer.stop();
+		}
+	}
+
 	/**
 	 * メニュー選択時の処理<br>
 	 * RemoteClientの場合は、このファンクションはフックされない<br>
@@ -401,7 +460,7 @@ public final class Kernel implements IDispose {
 				OptionDlg dlg = new OptionDlg(view.getMainForm().getFrame(), oneOption);
 				if (dlg.showDialog()) {
 					oneOption.save(OptionIni.getInstance());
-					//Menu.EnqueueMenu("StartStop_Reload",true/*synchro*/);
+					menuOnClick("StartStop_Reload");
 				}
 			}
 		} else if (cmd.indexOf("Tool_") == 0) {
@@ -417,20 +476,20 @@ public final class Kernel implements IDispose {
 		} else if (cmd.indexOf("StartStop_") == 0) {
 			switch (cmd) {
 			case "StartStop_Start":
-				//Start();
+				start();
 				break;
 			case "StartStop_Stop":
-				//Stop();
+				stop();
 				break;
 			case "StartStop_Restart":
-				//Stop();
-				//Thread.Sleep(100);
-				//Start();
+				stop();
+				Util.sleep(300);
+				start();
 				break;
 			case "StartStop_Reload":
-				//Stop();
+				stop();
 				listInitialize();
-				//Start();
+				start();
 				break;
 			case "StartStop_Service":
 				//SetupService(); //サービスの設定

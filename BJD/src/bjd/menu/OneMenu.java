@@ -22,9 +22,9 @@ public final class OneMenu implements IDispose {
 		this.subMenu = subMenu;
 	}
 	
-	public String getTitle(boolean jp) {
+	public String getTitle(boolean isJp) {
 		String title = enTitle;
-		if (jp) {
+		if (isJp) {
 			title = String.format("%s(%c)", jpTitle, mnemonic);
 		}
 		return title;

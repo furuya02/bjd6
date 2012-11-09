@@ -15,6 +15,7 @@ import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 public final class ServerTest {
 	
@@ -47,11 +48,7 @@ public final class ServerTest {
 //				}
 //
 //				TestUtil.dispPrompt(this, String.format("接続中...あと%d回待機", i));
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
+//				Util.sleep(1000);
 //			}
 //		}
 
@@ -70,11 +67,7 @@ public final class ServerTest {
 				}
 
 				TestUtil.dispPrompt(this, String.format("接続中...あと%d回待機", i));
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(1000);
 			}
 		}
 
@@ -101,12 +94,7 @@ public final class ServerTest {
 		myServer.start();
 		for (int i = 10; i > 0; i--) {
 			TestUtil.dispPrompt(this, String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            Util.sleep(1);
 		}
 		myServer.dispose();
 	}

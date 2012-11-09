@@ -49,17 +49,16 @@ public abstract class OneServer extends ThreadBase {
 	protected final Conf getConf() {
 		return conf;
 	}
+
 	protected final String getNameTag() {
 		return nameTag;
 	}
 
 	protected final boolean isJp() {
 		return isJp;
-	}	
-	
-	
-	public abstract String getMsg(int messageNo);
+	}
 
+	public abstract String getMsg(int messageNo);
 
 	//子スレッド管理
 	private Object lock = new Object(); //排他制御用オブジェクト
@@ -73,8 +72,8 @@ public abstract class OneServer extends ThreadBase {
 		if (!isRunnig()) {
 			stat = isJp() ? "- 停止 " : "- Initialization failure ";
 		}
-		return String.format("%s\t%20s\t[%s\t:%s %s]\tThread %d/%d", stat, getNameTag(), oneBind.getAddr(), oneBind.getProtocol().toString().toUpperCase(),
-				(int) conf.get("port"), count(), multiple);
+		return String.format("%s\t%20s\t[%s\t:%s %s]\tThread %d/%d", stat, getNameTag(), oneBind.getAddr(), oneBind
+				.getProtocol().toString().toUpperCase(), (int) conf.get("port"), count(), multiple);
 	}
 
 	public final int count() {
@@ -102,12 +101,12 @@ public abstract class OneServer extends ThreadBase {
 	//コンストラクタ
 	protected OneServer(Kernel kernel, String nameTag, Conf conf, OneBind oneBind) {
 		super(kernel.createLogger(nameTag, true, null));
-		
+
 		this.nameTag = nameTag;
 		this.conf = conf;
 		this.oneBind = oneBind;
 		this.isJp = kernel.isJp();
-		
+
 		//DEBUG用
 		if (this.conf == null) {
 			OptionSample optionSample = new OptionSample(kernel, "");
@@ -124,7 +123,7 @@ public abstract class OneServer extends ThreadBase {
 			try {
 				ip = new Ip("127.0.0.1");
 			} catch (ValidObjException ex) {
-				//127.0.0.1で例外となるようなら実行時例外とするしかない
+				//127.0.0.1で例外となるようなら設計問題とするしかない
 				Util.runtimeException("new Ip(127.0.0.1)");
 			}
 			this.oneBind = new OneBind(ip, ProtocolKind.Tcp);
@@ -146,11 +145,7 @@ public abstract class OneServer extends ThreadBase {
 
 		//bindが完了するまで待機する
 		while (sockServer == null || sockServer.getSockState() == SockState.IDLE) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(100);
 		}
 	}
 
@@ -164,11 +159,7 @@ public abstract class OneServer extends ThreadBase {
 
 		// 全部の子スレッドが終了するのを待つ
 		while (count() > 0) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(500);
 		}
 		sockServer = null;
 
@@ -219,6 +210,8 @@ public abstract class OneServer extends ThreadBase {
 				runUdpServer(port);
 			}
 		}
+		logger.set(LogKind.NORMAL, (SockObj) null, 9000001, bindStr);
+
 	}
 
 	private void runTcpServer(int port) {
@@ -226,7 +219,7 @@ public abstract class OneServer extends ThreadBase {
 		int listenMax = 5;
 
 		if (!sockServer.bind(oneBind.getAddr(), port, listenMax)) {
-			System.out.println(String.format("bind()=false %s", sockServer.getLastEror()));
+			logger.set(LogKind.ERROR, sockServer, 9000006, sockServer.getLastEror());
 		} else {
 			while (isLife()) {
 				final SockTcp child = (SockTcp) sockServer.select(this);
@@ -234,7 +227,8 @@ public abstract class OneServer extends ThreadBase {
 					break;
 				}
 				if (count() >= multiple) {
-					logger.set(LogKind.SECURE, sockServer, 9000004, String.format("count:%d/multiple:%d", count(), multiple));
+					logger.set(LogKind.SECURE, sockServer, 9000004,
+							String.format("count:%d/multiple:%d", count(), multiple));
 					//同時接続数を超えたのでリクエストをキャンセルします
 					child.close();
 					continue;
@@ -267,7 +261,6 @@ public abstract class OneServer extends ThreadBase {
 
 	private void runUdpServer(int port) {
 
-
 		if (!sockServer.bind(oneBind.getAddr(), port)) {
 			System.out.println(String.format("bind()=false %s", sockServer.getLastEror()));
 		} else {
@@ -278,7 +271,8 @@ public abstract class OneServer extends ThreadBase {
 					break;
 				}
 				if (count() >= multiple) {
-					logger.set(LogKind.SECURE, sockServer, 9000004, String.format("count:%d/multiple:%d", count(), multiple));
+					logger.set(LogKind.SECURE, sockServer, 9000004,
+							String.format("count:%d/multiple:%d", count(), multiple));
 					//同時接続数を超えたのでリクエストをキャンセルします
 					child.close();
 					continue;
@@ -319,24 +313,19 @@ public abstract class OneServer extends ThreadBase {
 	 */
 	public final void subThread(SockObj sockObj) {
 
-		try {
+		//クライアントのホスト名を逆引きする
+		sockObj.resolve((boolean) conf.get("useResolve"), logger);
 
-			//クライアントのホスト名を逆引きする
-			sockObj.resolve((boolean) conf.get("useResolve"), logger);
+		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
+		logger.set(LogKind.DETAIL, sockObj, 9000002, String.format("count=%d Local=%s Remote=%s", count(), sockObj
+				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
-			//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
-			logger.set(LogKind.DETAIL, sockObj, 9000002,
-					String.format("count=%d Local=%s Remote=%s", count(), sockObj.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
+		onSubThread(sockObj); //接続単位の処理
+		sockObj.close();
 
-			onSubThread(sockObj); //接続単位の処理
-			sockObj.close();
+		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
+				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
-			logger.set(LogKind.DETAIL, sockObj, 9000003,
-					String.format("count=%d Local=%s Remote=%s", count(), sockObj.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
-
-		} catch (Exception ex) {
-			logger.set(LogKind.ERROR, sockObj, 9000037, ex.getMessage());
-		}
 	}
 
 	//RemoteServerでのみ使用される
@@ -363,11 +352,7 @@ public abstract class OneServer extends ThreadBase {
 			if (c.compareTo(Calendar.getInstance()) < 0) {
 				return null;
 			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(100);
 		}
 		return null;
 	}
@@ -382,7 +367,7 @@ public abstract class OneServer extends ThreadBase {
 		if (sockTcp.getSockState() != SockState.CONNECT) { //切断されている
 			return null;
 		}
-		byte[] recvbuf = sockTcp.lineRecv(timeout, OperateCrlf.Yes, this);
+		byte[] recvbuf = sockTcp.lineRecv(timeout, this);
 		if (recvbuf == null) {
 			return null; //切断された
 		}

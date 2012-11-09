@@ -1,11 +1,13 @@
 package bjd;
 
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 public class ThreadBaseTest {
 
@@ -23,11 +25,7 @@ public class ThreadBaseTest {
 		@Override
 		protected void onRunThread() {
 			while (isLife()) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(100);
 			}
 		}
 

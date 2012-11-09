@@ -40,6 +40,7 @@ public final class LogView implements IDispose {
 				return;
 			}
 			timer.cancel(); //一時停止
+			timer = null;
 			synchronized (lock) {
 				//TODO 適当な方法が分からないのでコメントアウト	listView.BeginUpdate();
 
@@ -56,6 +57,7 @@ public final class LogView implements IDispose {
 			}
 			//最終行が見えるようにスクロールする
 			listView.displayLastLine();
+			timer = new Timer();
 			timer.schedule(new MyTimer(), 0, 100); //再開
 		}
 
@@ -101,7 +103,7 @@ public final class LogView implements IDispose {
 			sb.append("\t");
 		}
 		sb.append("\r\n");
-		int [] rows = listView.getSelectedRows();
+		int[] rows = listView.getSelectedRows();
 		for (int i = 0; i < rows.length; i++) {
 			for (int c = 0; c < colMax; c++) {
 				sb.append(listView.getText(rows[i], c));
@@ -131,7 +133,7 @@ public final class LogView implements IDispose {
 					break;
 				}
 				//リストビューへの出力       
-				String [] s = new String[8];
+				String[] s = new String[8];
 				s[0] = oneLog.getCalendar();
 				s[1] = oneLog.getLogKind();
 				s[2] = oneLog.getThreadId();
@@ -141,7 +143,7 @@ public final class LogView implements IDispose {
 				s[6] = oneLog.getMessage();
 				s[7] = oneLog.getDetailInfomation();
 				listView.itemAdd(s);
-				
+
 			}
 		} catch (Exception ex) {
 			StringBuilder sb = new StringBuilder();

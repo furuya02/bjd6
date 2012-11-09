@@ -153,4 +153,20 @@ public final class View implements IDispose {
 		}
 	}
 
+	public void save(WindowSize windowSize) {
+		if (mainForm == null || listView == null || windowSize == null) {
+			return;
+		}
+		windowSize.save(mainForm.getFrame());
+		windowSize.save(listView);
+	}
+
+	public void read(WindowSize windowSize) {
+		if (mainForm == null || listView == null || windowSize == null) {
+			return;
+		}
+		windowSize.read(mainForm.getFrame());
+		windowSize.read(listView);
+	}
+
 }

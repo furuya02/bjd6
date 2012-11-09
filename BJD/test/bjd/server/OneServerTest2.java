@@ -2,10 +2,12 @@ package bjd.server;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import bjd.ILife;
 import bjd.Kernel;
 import bjd.ValidObjException;
 import bjd.ctrl.CtrlType;
@@ -19,8 +21,9 @@ import bjd.sock.SockState;
 import bjd.sock.SockTcp;
 import bjd.sock.SockUdp;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
-public class OneServerTest2 {
+public class OneServerTest2 implements ILife{
 	class EchoServer extends OneServer {
 		private ProtocolKind protocolKind;
 
@@ -55,15 +58,11 @@ public class OneServerTest2 {
 
 		private void tcp(SockTcp sockTcp) {
 			while (isLife() && sockTcp.getSockState() == SockState.CONNECT) {
-				try {
-					Thread.sleep(0); //これが無いと、別スレッドでlifeをfalseにできない
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(0); //これが無いと、別スレッドでlifeをfalseにできない
 				int len = sockTcp.length();
 				if (0 < len) {
 					int timeout = 10;
-					byte[] buf = sockTcp.recv(len, timeout);
+					byte[] buf = sockTcp.recv(len, timeout, this);
 					sockTcp.send(buf);
 					break; //echoしたらセッションを閉じる
 				}
@@ -76,6 +75,7 @@ public class OneServerTest2 {
 			//echoしたらセッションを閉じる
 		}
 	}
+	
 
 	@Test
 	public final void a001() {
@@ -115,17 +115,13 @@ public class OneServerTest2 {
 			TestUtil.dispPrompt(this, String.format("sockTcp.send(%dbyte)", len));
 
 			while (sockTcp.length() == 0) {
-				try {
-					Thread.sleep(100);
-					TestUtil.dispPrompt("Thread.sleep(100)");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(100);
+				TestUtil.dispPrompt("Thread.sleep(100)");
 			}
 
 			len = sockTcp.length();
 			if (0 < len) {
-				byte[] b = sockTcp.recv(len, timeout);
+				byte[] b = sockTcp.recv(len, timeout,this);
 				TestUtil.dispPrompt(this, String.format("sockTcp.recv()=%dbyte", b.length));
 				assertThat(b[8], is(buf[8])); //CheckData
 			}
@@ -169,18 +165,15 @@ public class OneServerTest2 {
 		int max = 1600;
 		byte[] buf = new byte[max];
 		buf[8] = 100; //CheckData
-		
+
 		for (int i = 0; i < 3; i++) {
 			SockUdp sockUdp = new SockUdp(ip, port, timeout, null, buf);
-			TestUtil.dispPrompt(this, String.format("[%d] sockUdp = new SockUdp(%s,%d,%dbytes)", i, addr, port, buf.length));
+			TestUtil.dispPrompt(this,
+					String.format("[%d] sockUdp = new SockUdp(%s,%d,%dbytes)", i, addr, port, buf.length));
 
 			while (sockUdp.length() == 0) {
-				try {
-					Thread.sleep(100);
-					TestUtil.dispPrompt("Thread.sleep(100)");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(100);
+				TestUtil.dispPrompt("Thread.sleep(100)");
 			}
 
 			byte[] b = sockUdp.recv();
@@ -193,6 +186,11 @@ public class OneServerTest2 {
 
 		echoServer.dispose();
 
+	}
+
+	@Override
+	public boolean isLife() {
+		return true;
 	}
 
 }

@@ -10,6 +10,7 @@ import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 //**************************************************
 // Echoサーバを使用したテスト
@@ -126,11 +127,7 @@ public final class UdpObjTest {
 		//EchoServer echoServer = new EchoServer(conf,oneBind);
 		echoServer.start();
 		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Util.sleep(1000);
 		
 		int max = 1000;
 		byte[] tmp = new byte[max];
@@ -146,11 +143,7 @@ public final class UdpObjTest {
 
 			//送信データが到着するまで、少し待機する
 			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
-			try {
-				Thread.sleep(sleep);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(sleep);
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
 
 			TestUtil.dispPrompt(this, String.format("sock.length()=%d", sock.length()));
@@ -203,11 +196,7 @@ public final class UdpObjTest {
 			int len = 0;
 			while (len == 0) {
 				len = sockUdp.length();
-				try {
-					Thread.sleep(0);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(0);
 			}
 			TestUtil.dispPrompt(this, String.format("len=%d", len));
 			byte[] b = sockUdp.recv();

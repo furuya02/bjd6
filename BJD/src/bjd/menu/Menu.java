@@ -47,6 +47,8 @@ public final class Menu implements ActionListener, IDispose {
 		addListMenu(m, subMenu);
 	}
 	
+	
+	
 	//メニュー構築（内部テーブルの初期化）
 	public void initialize() {
 		if (menuBar == null) {
@@ -54,8 +56,13 @@ public final class Menu implements ActionListener, IDispose {
 		}
 
 		//全削除
-		menuBar.removeAll();
-
+		//menuBar.removeAll();
+		//while (menuBar.getMenuCount() > 0) {
+		//	JMenu m =  menuBar.getMenu(0);
+		//	m.removeAll();
+			//menuBar.remove(m);
+		//}
+		
 		//「ファイル」メニュー
 		JMenu m = addOneMenu(new OneMenu("File", "ファイル", "File", 'F', null));
 		addListMenu(m, fileMenu());
@@ -76,7 +83,7 @@ public final class Menu implements ActionListener, IDispose {
 		m = addOneMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null));
 		addListMenu(m, helpMenu());
 
-		setJang();
+		//setJang();
 		setEnable(); //状況に応じた有効無効
 	}
 
@@ -104,7 +111,7 @@ public final class Menu implements ActionListener, IDispose {
 	//ListMenuの追加
 	void addListMenu(JMenu owner, ListMenu subMenu) {
 		for (OneMenu o : subMenu) {
-			addOneMenu(owner, o);
+			addOneMenu(owner, o); 
 		}
 	}
 	//OneMenuの追加
@@ -150,11 +157,18 @@ public final class Menu implements ActionListener, IDispose {
 	}
 
 	//言語設定
-	void setJang() {
-//		foreach (var o in _ar) {
+	//void setJang() {
+		//while (menuBar.getMenuCount() > 0) {
+			//JMenu m =  menuBar.getMenu(0);
+			//m.set
+			//m.removeAll();
+			//menuBar.remove(m);
+		//}
+//
+//		for (OneMenu oneMenu : subar) {
 //			o.Value.Text = kernel.Jp?o.Key.JpTitle:o.Key.EnTitle;
 //		}
-	}
+	//}
 	
 	//状況に応じた有効/無効
 	public void setEnable() {

@@ -9,6 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Calendar;
 import java.util.Iterator;
 
+import bjd.ILife;
 import bjd.net.Ip;
 import bjd.net.OperateCrlf;
 import bjd.net.Ssl;
@@ -55,7 +56,7 @@ public final class SockTcp extends SockObj {
 			channel.connect(address);
 			int msec = timeout;
 			while (!channel.finishConnect()) {
-				Thread.sleep(10);
+				Util.sleep(10);
 				msec -= 10;
 				if (msec < 0) {
 					setError("timeout");
@@ -69,7 +70,8 @@ public final class SockTcp extends SockObj {
 		//************************************************
 		//ここまでくると接続が完了している
 		//************************************************
-		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), (InetSocketAddress) channel.socket().getRemoteSocketAddress());
+		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(),
+				(InetSocketAddress) channel.socket().getRemoteSocketAddress());
 
 		//************************************************
 		//read待機
@@ -106,7 +108,8 @@ public final class SockTcp extends SockObj {
 		//************************************************
 		//ここまでくると接続が完了している
 		//************************************************
-		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), (InetSocketAddress) channel.socket().getRemoteSocketAddress());
+		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(),
+				(InetSocketAddress) channel.socket().getRemoteSocketAddress());
 
 		//************************************************
 		//read待機
@@ -170,16 +173,20 @@ public final class SockTcp extends SockObj {
 	}
 
 	public int length() {
-		try {
-			Thread.sleep(1); //次の動作が実行されるようにsleepを置く
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return 0;
-		}
+		Util.sleep(1); //次の動作が実行されるようにsleepを置く
 		return sockQueue.length();
 	}
 
-	public byte[] recv(int len, int timeout) {
+	/**
+	 * 受信<br>
+	 * 切断・タイムアウトでnullが返される
+	 * 
+	 * @param len 受信を希望するデータサイズ
+	 * @param timeout タイムアウト値(ms)
+	 * @param iLife 継続確認インターフェース
+	 * @return 受信データ
+	 */
+	public byte[] recv(int len, int timeout, ILife iLife) {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.SECOND, timeout);
 
@@ -189,8 +196,8 @@ public final class SockTcp extends SockObj {
 				// キューから取得する
 				buffer = sockQueue.dequeue(len);
 			} else {
-				while (true) {
-					Thread.sleep(0);
+				while (iLife.isLife()) {
+					Util.sleep(0);
 					if (0 < sockQueue.length()) {
 						//size=受信が必要なバイト数
 						int size = len - buffer.length;
@@ -207,7 +214,7 @@ public final class SockTcp extends SockObj {
 						if (getSockState() != SockState.CONNECT) {
 							return null;
 						}
-						Thread.sleep(10);
+						Util.sleep(10);
 					}
 					if (c.compareTo(Calendar.getInstance()) < 0) {
 						buffer = sockQueue.dequeue(len); //タイムアウト
@@ -223,6 +230,42 @@ public final class SockTcp extends SockObj {
 		return buffer;
 	}
 
+	/**
+	 * １行受信<br>
+	 * 切断・タイムアウトでnullが返される
+	 * 
+	 * @param timeout タイムアウト値(ms)
+	 * @param iLife 継続確認インターフェース
+	 * @return 受信データ
+	 */
+	public byte[] lineRecv(int timeout, ILife iLife) {
+		//Socket.ReceiveTimeout = timeout * 1000;
+
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MILLISECOND, timeout);
+
+		while (iLife.isLife()) {
+			//Ver5.1.6
+			if (sockQueue.length() == 0) {
+				Util.sleep(100);
+			}
+			byte[] buf = sockQueue.dequeueLine();
+			//noEncode = false;//テキストである事が分かっている
+			//Trace(TraceKind.Recv, buf, false);//トレース表示
+			if (buf.length != 0) {
+				return buf;
+			}
+			if (getSockState() != SockState.CONNECT) {
+				return null;
+			}
+			if (c.compareTo(Calendar.getInstance()) < 0) {
+				return null; //タイムアウト
+			}
+			Util.sleep(1);
+		}
+		return null;
+	}
+
 	public int send(byte[] buf) {
 		try {
 			if (oneSsl != null) {
@@ -233,7 +276,7 @@ public final class SockTcp extends SockObj {
 				byteBuffer.put(buf);
 				byteBuffer.flip();
 				int len = channel.write(byteBuffer);
-				Thread.sleep(1); //次の動作が実行されるようにsleepを置く
+				Util.sleep(1); //次の動作が実行されるようにsleepを置く
 				return len;
 			}
 		} catch (Exception ex) {
@@ -241,6 +284,12 @@ public final class SockTcp extends SockObj {
 			//logger.set(LogKind.Error, this, 9000046, String.format("Length=%d %s", buffer.length, ex.getMessage()));
 		}
 		return -1;
+	}
+
+	public int lineSend(byte[] buf) {
+		int s1 = send(buf);
+		int s2 = send(new byte[] { 0x0d, 0x0a });
+		return s1 + s2;
 	}
 
 	@Override
@@ -257,8 +306,4 @@ public final class SockTcp extends SockObj {
 		setError("close()");
 	}
 
-	public byte[] lineRecv(int timeout, OperateCrlf yes, OneServer oneServer) {
-		Util.runtimeException("未実装");
-		return null;
-	}
 }

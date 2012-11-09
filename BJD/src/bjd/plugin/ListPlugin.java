@@ -48,10 +48,6 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 				getAr().add(new OnePlugin(file, classNameOption, classNameServer));
 			}
 		}
-
-		//TODO Debug Print
-		System.out.println(String.format("■new ListPlugin(%s) => size()=%d", dir, size()));
-
 	}
 
 	/**

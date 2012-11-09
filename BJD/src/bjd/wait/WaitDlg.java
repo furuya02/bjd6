@@ -23,11 +23,7 @@ import javax.swing.SwingWorker;
  * 			String msg = String.format("i=%d", i);
  * 			System.out.println(msg);
  * 			waitDlg.setLabel(msg);//ラベル表示(この他にもWaitDlgのpublicメソッドにアクセス可能)
- * 			try {
- * 				Thread.sleep(10);
- * 			} catch (InterruptedException ie) {
- * 				System.out.println(String.format("Interrupted"));
- * 			}
+ * 			Util.slww(10);			
  * 			return true; // return falseで直ちに終了
  * 		}
  * });

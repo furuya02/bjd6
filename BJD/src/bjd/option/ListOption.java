@@ -72,10 +72,7 @@ public final class ListOption extends ListBase<OneOption> {
 		add(new OptionLog(kernel, executePath)); //「ログ」オプション
 
 		for (OnePlugin onePlugin : listPlugin) {
-			//TODO Debug Print
-			System.out.println(String.format("onePlugin.getName() = %s", onePlugin.getName()));
 			OneOption oneOption = onePlugin.createOption(kernel);
-			System.out.println(String.format("■oneOption.getNameTag()=%s", oneOption.getNameTag()));
 			add(oneOption);
 		}
 

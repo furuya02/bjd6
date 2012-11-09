@@ -32,7 +32,7 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	private boolean isJp;
 	private String path; //実態が格納されているモジュール(DLL)のフルパス
 	private String nameTag;
-	
+
 	/**
 	 * OneValのリストを返す
 	 * @return ListVal
@@ -60,26 +60,28 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 		}
 		return (boolean) oneVal.getValue();
 	}
-	
+
 	/**
 	 * プラグインファイルのパス取得
 	 * @return
 	 */
-	public String getPath(){
+	public final String getPath() {
 		return path;
 	}
-	
-    public abstract String getJpMenu();
-    public abstract String getEnMenu();	
-    public abstract char getMnemonic();	
 
-    /**
-     * コンストラクタ
-     * @param isJp　
-     * @param path　モジュールへのパス //TODO　Javaでこれ必要なのかな？
-     * @param nameTag　名前
-     * @param iniDb Option.ini
-     */
+	public abstract String getJpMenu();
+
+	public abstract String getEnMenu();
+
+	public abstract char getMnemonic();
+
+	/**
+	 * コンストラクタ
+	 * @param isJp　
+	 * @param path　モジュールへのパス //TODO　Javaでこれ必要なのかな？
+	 * @param nameTag　名前
+	 * @param iniDb Option.ini
+	 */
 	public OneOption(boolean isJp, String path, String nameTag) {
 		this.isJp = isJp;
 		this.path = path;
@@ -89,23 +91,26 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	protected final boolean isJp() {
 		return isJp;
 	}
-	
+
 	/**
 	 * レジストリからの読み込み
 	 */
 	protected final void read(IniDb iniDb) {
-	//protected final void read() {
+		//protected final void read() {
 		iniDb.read(nameTag, listVal);
 	}
 
 	protected final OnePage pageAcl() {
 		OnePage onePage = new OnePage("ACL", "ACL");
-		onePage.add(new OneVal("enableAcl", 0, Crlf.NEXTLINE, new CtrlRadio(isJp ? "指定したアドレスからのアクセスのみを" : "Access of ths user who appoint it", new String[] { isJp ? "許可する" : "Allow", isJp ? "禁止する" : "Deny" }, 550, 2)));
+		onePage.add(new OneVal("enableAcl", 0, Crlf.NEXTLINE, new CtrlRadio(isJp ? "指定したアドレスからのアクセスのみを"
+				: "Access of ths user who appoint it",
+				new String[] { isJp ? "許可する" : "Allow", isJp ? "禁止する" : "Deny" }, 550, 2)));
 
 		ListVal list = new ListVal();
 		list.add(new OneVal("aclName", "", Crlf.NEXTLINE, new CtrlTextBox(isJp ? "名前（表示名）" : "Name(Display)", 20)));
 		list.add(new OneVal("aclAddress", "", Crlf.NEXTLINE, new CtrlTextBox(isJp ? "アドレス" : "Address", 20)));
-		onePage.add(new OneVal("acl", null, Crlf.NEXTLINE, new CtrlDat(isJp ? "利用者（アドレス）の指定" : "Access Control List", list, 320, isJp)));
+		onePage.add(new OneVal("acl", null, Crlf.NEXTLINE, new CtrlDat(isJp ? "利用者（アドレス）の指定" : "Access Control List",
+				list, 320, isJp)));
 
 		return onePage;
 	}
@@ -159,18 +164,24 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	 */
 	protected final OneVal createServerOption(ProtocolKind protocolKind, int port, int timeout, int multiple) {
 		ListVal list = new ListVal();
-		list.add(new OneVal("protocolKind", protocolKind.getIntValue(), Crlf.CONTINUE, new CtrlComboBox(isJp ? "プロトコル" : "Protocol", new String[] { "TCP", "UDP" }, 80)));
-		list.add(new OneVal("port", port, Crlf.NEXTLINE, new CtrlInt(isJp ? "クライアントから見たポート" : "Port (from client side)", 5)));
+		list.add(new OneVal("protocolKind", protocolKind.getIntValue(), Crlf.CONTINUE, new CtrlComboBox(isJp ? "プロトコル"
+				: "Protocol", new String[] { "TCP", "UDP" }, 80)));
+		list.add(new OneVal("port", port, Crlf.NEXTLINE, new CtrlInt(
+				isJp ? "クライアントから見たポート" : "Port (from client side)", 5)));
 		LocalAddress localAddress = LocalAddress.getInstance();
 		Ip[] v4 = localAddress.getV4();
 		Ip[] v6 = localAddress.getV6();
-		
-		list.add(new OneVal("bindAddress2", new BindAddr(), Crlf.NEXTLINE, new CtrlBindAddr(isJp ? "待ち受けるネットワーク" : "Bind Address", v4, v6)));
-		list.add(new OneVal("useResolve", false, Crlf.NEXTLINE, new CtrlCheckBox((isJp ? "クライアントのホスト名を逆引きする" : "Reverse pull of host name from IP address"))));
-		list.add(new OneVal("useDetailsLog", true, Crlf.CONTINUE, new CtrlCheckBox(isJp ? "詳細ログを出力する" : "Use Details Log")));
+
+		list.add(new OneVal("bindAddress2", new BindAddr(), Crlf.NEXTLINE, new CtrlBindAddr(isJp ? "待ち受けるネットワーク"
+				: "Bind Address", v4, v6)));
+		list.add(new OneVal("useResolve", false, Crlf.NEXTLINE, new CtrlCheckBox((isJp ? "クライアントのホスト名を逆引きする"
+				: "Reverse pull of host name from IP address"))));
+		list.add(new OneVal("useDetailsLog", true, Crlf.CONTINUE, new CtrlCheckBox(isJp ? "詳細ログを出力する"
+				: "Use Details Log")));
 		list.add(new OneVal("multiple", multiple, Crlf.CONTINUE, new CtrlInt(isJp ? "同時接続数" : "A repetition thread", 5)));
 		list.add(new OneVal("timeOut", timeout, Crlf.NEXTLINE, new CtrlInt(isJp ? "タイムアウト(秒)" : "Timeout", 6)));
-		return new OneVal("GroupServer", null, Crlf.NEXTLINE, new CtrlGroup(isJp ? "サーバ基本設定" : "Server Basic Option", list));
+		return new OneVal("GroupServer", null, Crlf.NEXTLINE, new CtrlGroup(isJp ? "サーバ基本設定" : "Server Basic Option",
+				list));
 	}
 
 	/**
@@ -221,13 +232,13 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 			return null;
 		}
 		return oneVal.getOneCtrl();
-//		try {
-//			OneVal oneVal = listVal.search(name);
-//			return oneVal.getOneCtrl();
-//		} catch (Exception e) {
-//			Util.runtimeException(String.format("getCtrl(%s)", name));//実行時例外
-//		}
-//		return null;
+		//		try {
+		//			OneVal oneVal = listVal.search(name);
+		//			return oneVal.getOneCtrl();
+		//		} catch (Exception e) {
+		//			Util.runtimeException(String.format("getCtrl(%s)", name));//実行時例外
+		//		}
+		//		return null;
 	}
 
 	protected abstract void abstractOnChange(OneCtrl oneCtrl);
@@ -237,7 +248,7 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	 */
 	@Override
 	public final void onChange(OneCtrl oneCtrl) {
-		
+
 		try {
 
 			OneCtrl o = getCtrl("protocolKind");
@@ -261,7 +272,7 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 	 * レジストリへ保存
 	 */
 	public final void save(IniDb iniDb) {
-	//public final void save() {
+		//public final void save() {
 		iniDb.save(nameTag, listVal);
 	}
 }

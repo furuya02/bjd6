@@ -59,10 +59,10 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 
 			//プラグイン情報の検索
 			OnePlugin onePlugin = listPlugin.get(op.getNameTag());
-//			if (onePlugin == null) {
-//				//設計上の問題
-//				Util.runtimeException(String.format("ListServer.initialize() listPlugin.get(%s)==null", op.getNameTag()));
-//			}
+			//			if (onePlugin == null) {
+			//				//設計上の問題
+			//				Util.runtimeException(String.format("ListServer.initialize() listPlugin.get(%s)==null", op.getNameTag()));
+			//			}
 
 			if (op.getNameTag().indexOf("Web-") == 0) {
 
@@ -98,7 +98,7 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	 * @param op
 	 */
 	private void addServer(Conf conf, OnePlugin onePlugin) {
-		
+
 		ProtocolKind protocol = ProtocolKind.valueOf((int) conf.get("protocolKind"));
 		BindAddr bindAddr = (BindAddr) conf.get("bindAddress2");
 
@@ -117,4 +117,43 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 			}
 		}
 	}
+
+	//１つでも起動中かどうか
+	/**
+	 * サーバが起動中かどうか
+	 */
+	public boolean isRunnig() {
+		//全スレッドの状態確認
+		for (OneServer sv : getAr()) {
+			if (sv.isRunnig()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * サーバ停止処理
+	 */
+	public void stop() {
+		//全スレッドスタート
+		for (OneServer sv : getAr()) {
+			sv.stop();
+		}
+	}
+
+	//開始処理
+	/**
+	 * サーバ開始処理
+	 */
+	public void start() {
+		if (isRunnig()) {
+			return;
+		}
+		//全スレッド停止 
+		for (OneServer sv : getAr()) {
+			sv.start();
+		}
+	}
+
 }

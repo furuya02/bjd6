@@ -8,6 +8,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import bjd.ctrl.ListView;
@@ -15,6 +16,7 @@ import bjd.ctrl.StatusBar;
 import bjd.option.Conf;
 import bjd.util.Msg;
 import bjd.util.MsgKind;
+import bjd.util.Util;
 import bjd.wait.IWaitDlg;
 import bjd.wait.WaitDlg;
 
@@ -28,7 +30,7 @@ public final class MainForm implements WindowListener {
 	}
 
 	/**
-	 * Launch the application.
+	 * アプリケーション起動
 	 */
 	public static void main(String[] args) {
 
@@ -50,16 +52,28 @@ public final class MainForm implements WindowListener {
 	 */
 	private MainForm() {
 		initialize();
-		
+
+		//*************************************************
+		//UI設定
+		//例外が発生した場合も、起動プロセスはそのまま継続する
+		//*************************************************
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-
-		} catch (Exception e) {
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
 
+		//*************************************************
+		//画面構成
+		//*************************************************
 		ListView listView = new ListView("listViewLog");
 		listView.addColumn("日時");
 		listView.addColumn("種類");
@@ -78,10 +92,6 @@ public final class MainForm implements WindowListener {
 		listView.setColWidth(6, 200);
 		listView.setColWidth(7, 300);
 
-		for (int i = 0; i < 100; i++) {
-			listView.itemAdd(new String[] { "1234567890", "abcdefghikl", "c" });
-		}
-
 		JMenuBar menuBar = new JMenuBar();
 		StatusBar bar = new StatusBar();
 
@@ -89,15 +99,11 @@ public final class MainForm implements WindowListener {
 		frame.getContentPane().add(listView);
 		frame.getContentPane().add(bar, BorderLayout.PAGE_END);
 
+
+		//*************************************************
+		// kernel初期化
+		//*************************************************
 		kernel = new Kernel(this, listView, menuBar);
-
-		//		frame.getContentPane().add(listView);
-
-		//		StatusBar bar = new StatusBar();
-		//		frame.getContentPane().add(bar, BorderLayout.PAGE_END);
-
-		// appFunc.dispose();
-		// appMeu.dispase();
 	}
 
 	/**
@@ -106,7 +112,6 @@ public final class MainForm implements WindowListener {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("\u30BF\u30A4\u30C8\u30EB");
-		// mainForm.setFont(new Font("メイリオ", Font.PLAIN, 12));
 		frame.setBounds(100, 100, 746, 368);
 		frame.addWindowListener(this);
 
@@ -118,17 +123,6 @@ public final class MainForm implements WindowListener {
 
 	//終了処理
 	public void exit() {
-
-		//プログラムの終了確認
-		//        if (_kernel.RunMode == RunMode.Normal || _kernel.RunMode == RunMode.NormalRegist) {
-		//            if ((bool)_kernel.ListOption.Get("Basic").GetValue("useExitDlg")) {
-		//                if (DialogResult.OK != Msg.Show(MsgKind.QUESTION, _kernel.Jp ? "プログラムを終了してよろしいですか" : "May I finish a program?")) {
-		//                    e.Cancel = true;//終了処理で中止された場合は、プログラムを終了しない
-		//                    return;
-		//                }
-		//            }
-		//        }
-		//        _kernel.Dispose();
 
 		//終了確認
 		Conf conf = kernel.createConf("Basic");
@@ -150,11 +144,7 @@ public final class MainForm implements WindowListener {
 				String msg = String.format("i=%d", i);
 				System.out.println(msg);
 				waitDlg.setLabel(msg);
-				try {
-					Thread.sleep(3);
-				} catch (InterruptedException ie) {
-					System.out.println(String.format("Interrupted"));
-				}
+				Util.sleep(3);
 				return true;
 			}
 		});

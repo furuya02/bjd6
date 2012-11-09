@@ -12,18 +12,10 @@ public final class Server extends OneServer {
 		super(kernel, "Sample", conf, oneBind);
 		
 		//Option.javaで定義したものが、読み込めているかどうかのチェック
-		String tag = "sampleText";
-		System.out.println(String.format("■CHECK => conf.get(%s)=%s", tag, conf.get(tag)));
+		//String tag = "sampleText";
+		//System.out.println(String.format("■CHECK => conf.get(%s)=%s", tag, conf.get(tag)));
 	}
 
-	//private Server() {
-	//	super(null, "Sample", null, null);
-	//}
-
-	
-	//	//リモート操作（データの取得）Toolダイログとのデータ送受
-	//	override public String Cmd(String cmdStr) { return ""; }
-	
 	@Override
 	public String getMsg(int messageNo) {
 		switch (messageNo) {
@@ -52,14 +44,15 @@ public final class Server extends OneServer {
 		//オプションから「sampleText」を取得する
 		String sampleText = (String) getConf().get("sampleText");
 
-		int timeout = (int) getConf().get("timeout");
-		//１行受信
-		byte[] buf = sockTcp.recv(sockTcp.length(), timeout);
-		//.AsciiRecv(30, OperateCrlf.No,this);
+		//１行送信
+		sockTcp.lineSend(sampleText.getBytes());
 
+		//５秒間待機して、１行受信に成功したら、その内容をechoして終了する
+		int timeout = 5000; //５秒間
+		//１行受信
+		byte[] buf = sockTcp.lineRecv(timeout, this);
 		//１行送信
 		sockTcp.send(buf);
-		//.AsciiSend(str, OperateCrlf.No);
 
 	}
 }

@@ -10,6 +10,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
+import bjd.ILife;
 import bjd.ThreadBase;
 import bjd.net.InetKind;
 import bjd.net.Ip;
@@ -79,7 +80,7 @@ public class SockServer extends SockObj {
 			//************************************************
 			serverChannel.socket().bind(new InetSocketAddress(bindIp.getInetAddress(), port), listenMax);
 			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 			setException(ex);
 			return false;
 		}
@@ -109,7 +110,7 @@ public class SockServer extends SockObj {
 			datagramChannel.socket().bind(new InetSocketAddress(bindIp.getInetAddress(), port));
 			//datagramChannel.socket().bind(l);
 			datagramChannel.register(selector, SelectionKey.OP_READ);
-			
+
 			//set(SockState.Bind, l, null);
 		} catch (Exception ex) {
 			setException(ex);
@@ -119,8 +120,8 @@ public class SockServer extends SockObj {
 		return true;
 	}
 
-	public final SockObj select(ThreadBase threadBase) {
-		while (threadBase.isLife()) {
+	public final SockObj select(ILife iLife) {
+		while (iLife.isLife()) {
 			int n;
 			try {
 				n = selector.select(1);
@@ -132,11 +133,7 @@ public class SockServer extends SockObj {
 				setError(String.format("selector.select(1)=%d", n));
 				break;
 			} else if (n == 0) {
-				try {
-					Thread.sleep(0);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(0);
 			} else if (n > 0) {
 				for (Iterator<SelectionKey> it = selector.selectedKeys().iterator(); it.hasNext();) {
 					SelectionKey key = (SelectionKey) it.next();

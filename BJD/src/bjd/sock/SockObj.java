@@ -16,6 +16,7 @@ public abstract class SockObj {
 	// LastError関連
 	//****************************************************************
 	private String lastError = "";
+
 	/**
 	 * LastErrorの取得
 	 * @return
@@ -28,6 +29,7 @@ public abstract class SockObj {
 	// SockState関連
 	//****************************************************************
 	private SockState sockState = SockState.IDLE;
+
 	/**
 	 * ステータスの取得
 	 * @return
@@ -53,14 +55,13 @@ public abstract class SockObj {
 	// エラー（切断）発生時にステータスの変更とLastErrorを設定するメソッド
 	//****************************************************************
 	protected final void setException(Exception ex) {
-		ex.printStackTrace();
-		lastError = ex.getMessage();
-		set(SockState.Error, null, null);
+		lastError = String.format("[%s] %s", ex.getClass().getSimpleName(), ex.getMessage());
+		this.sockState = SockState.Error;
 	}
 
 	protected final void setError(String msg) {
 		lastError = msg;
-		set(SockState.Error, null, null);
+		this.sockState = SockState.Error;
 	}
 
 	//****************************************************************

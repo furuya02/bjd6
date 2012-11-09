@@ -22,6 +22,7 @@ import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 public class OneServerTest {
 
@@ -47,11 +48,7 @@ public class OneServerTest {
 		@Override
 		protected void onSubThread(SockObj sockObj) {
 			while (isLife()) {
-				try {
-					Thread.sleep(0); //これが無いと、別スレッドでlifeをfalseにできない
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(0); //これが無いと、別スレッドでlifeをfalseにできない
 
 				if (sockObj.getSockState() != SockState.CONNECT) {
 					System.out.println(">>>>>sockAccept.getSockState()!=SockState.CONNECT");
@@ -85,21 +82,13 @@ public class OneServerTest {
 						e.printStackTrace();
 					}
 					while (life) {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						Util.sleep(100);
 					}
 				}
 			});
 			t.start();
 			//接続完了まで少し時間が必要
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Util.sleep(100);
 		}
 
 		public void dispose() {
@@ -113,11 +102,7 @@ public class OneServerTest {
 			life = false;
 
 			while (t.isAlive()) {
-				try {
-					Thread.sleep(0);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(0);
 			}
 		}
 	}
@@ -148,12 +133,7 @@ public class OneServerTest {
 			TestUtil.dispPrompt(this, String.format("[i=%d]", i));
 			myServer.start();
 
-			//			try {
-			//				Thread.sleep(500);
-			//			} catch (InterruptedException e) {
-			//				// TODO 自動生成された catch ブロック
-			//				e.printStackTrace();
-			//			}
+			//			Util.sleep(500);
 
 			TestUtil.dispPrompt(this, String.format("●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(true));

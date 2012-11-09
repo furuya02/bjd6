@@ -14,7 +14,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import bjd.ValidObjException;
-import bjd.option.Conf;
 import bjd.util.FileSearch;
 import bjd.util.TestUtil;
 import bjd.util.Util;

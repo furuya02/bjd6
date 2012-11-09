@@ -1,7 +1,9 @@
 package bjd.sock;
 
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 
 import java.net.InetSocketAddress;
 
@@ -13,6 +15,7 @@ import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.util.TestUtil;
+import bjd.util.Util;
 
 public final class SockServerTest {
 
@@ -60,11 +63,7 @@ public final class SockServerTest {
 			TestUtil.dispPrompt(this, String.format("s.bind()"));
 
 			while (sockServer.getSockState() == SockState.IDLE) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(100);
 			}
 			assertThat(sockServer.getSockState(), is(SockState.Bind));
 			TestUtil.dispPrompt(this, String.format("s.getSockState()=%s", sockServer.getSockState()));
@@ -109,11 +108,7 @@ public final class SockServerTest {
 			t.start();
 
 			while (sockServer.getSockState() == SockState.IDLE) {
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Util.sleep(200);
 			}
 
 			InetSocketAddress localAddress = sockServer.getLocalAddress();

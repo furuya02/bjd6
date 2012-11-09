@@ -13,6 +13,7 @@ import java.util.Iterator;
 
 import bjd.net.Ip;
 import bjd.net.Ssl;
+import bjd.util.Util;
 
 public final class SockUdp extends SockObj {
 
@@ -55,11 +56,7 @@ public final class SockUdp extends SockObj {
 			@Override
 			public void run() {
 				while (getSockState() == SockState.CONNECT) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					Util.sleep(100);
 				}
 			}
 		});
