@@ -5,7 +5,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -13,18 +12,13 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import bjd.ValidObjException;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class OneDatTest {
 
 	@RunWith(Theories.class)
-	public static final class A001 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("コンストラクタで初期化してtoReg()の出力を確認する [*]はisSecretList toReg()のパラメータは isSecret");
-		}
+	public static final class コンストラクタで初期化してtoRegの出力を確認するアスタリスクはisSecretList_toRegのパラメータはisSecret {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -52,8 +46,6 @@ public class OneDatTest {
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this);
-
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < fx.list.length; i++) {
 				if (sb.length() != 0) {
@@ -62,7 +54,7 @@ public class OneDatTest {
 				sb.append(fx.list[i]);
 				sb.append(String.format("[%s]", fx.isSecretList[i] ? "*" : ""));
 			}
-			System.out.printf("new OneDat(%s,{%s}) toReg(%s)=\"%s\"\n", fx.enable, sb.toString(), fx.isSecret, fx.expected);
+			TestUtil.prompt(String.format("new OneDat(%s,{%s}) toReg(%s)=\"%s\"", fx.enable, sb.toString(), fx.isSecret, fx.expected));
 
 			OneDat oneDat = null;
 			try {
@@ -75,10 +67,7 @@ public class OneDatTest {
 	}
 	
 	@RunWith(Theories.class) 
-	public static final class A002 {
-		@BeforeClass public static void before() {
-			TestUtil.dispHeader("fromRegで初期化してtoReg()で出力する"); 
-		}
+	public static final class fromRegで初期化してtoRegで出力する {
 		
 		@DataPoints public static Fixture[] datas = { 
 				new Fixture(2, "\tuser1\tpass", "\tuser1\tpass"),
@@ -99,9 +88,7 @@ public class OneDatTest {
 		}
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this);
-
-			System.out.printf("new OneDat(max=%d) frmoReg(\"%s\") => toReg()=\"%s\"\n", fx.max, fx.actual, fx.expected);
+			TestUtil.prompt(String.format("new OneDat(max=%d) frmoReg(\"%s\") => toReg()=\"%s\"", fx.max, fx.actual, fx.expected));
 
 			String [] list = new String[fx.max];
 			boolean [] isSecretList = new boolean[fx.max];
@@ -121,10 +108,7 @@ public class OneDatTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A003 {
-		@BeforeClass public static void before() {
-			TestUtil.dispHeader("// fromRegに無効な入力があった時、falseが帰る"); 
-		}
+	public static final class fromRegに無効な入力があった時falseが帰る {
 		
 		@DataPoints public static Fixture[] datas = { 
 				new Fixture(3, "\tuser1\tpass"), //カラム数宇一致
@@ -145,9 +129,8 @@ public class OneDatTest {
 		}
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this);
 
-			System.out.printf("new OneDat(max=%d) frmoReg(\"%s\") = false\n", fx.max, fx.str);
+			TestUtil.prompt(String.format("new OneDat(max=%d) frmoReg(\"%s\") = false", fx.max, fx.str));
 
 			String [] list = new String[fx.max];
 			boolean [] isSecretList = new boolean[fx.max];

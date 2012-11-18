@@ -12,8 +12,13 @@ import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
+<<<<<<< HEAD
 import bjd.util.Inet;
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+import bjd.util.Inet;
+>>>>>>> work
 import bjd.util.Util;
 
 //**************************************************
@@ -77,9 +82,7 @@ public final class TcpObjTest implements ILife {
 	}
 
 	@Test
-	public void a001() {
-
-		TestUtil.dispHeader("a001 Echoサーバに送信して、たまったデータサイズ（length）を確認する");
+	public void Echoサーバに送信して溜まったデータサイズ_lengthを確認する() {
 
 		String addr = "127.0.0.1";
 		int port = 9999;
@@ -96,33 +99,34 @@ public final class TcpObjTest implements ILife {
 			Assert.fail(ex.getMessage());
 		}
 		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
-		TestUtil.dispPrompt(this, "tcpObj = new TcpObj()");
+		TestUtil.prompt("tcpObj = new TcpObj()");
 
 		int max = 1000;
 		byte[] tmp = new byte[max];
 
 		for (int i = 0; i < 3; i++) {
 			sockTcp.send(tmp);
-			TestUtil.dispPrompt(this, String.format("tcpObj.send(%dbyte)", tmp.length));
+			TestUtil.prompt(String.format("tcpObj.send(%dbyte)", tmp.length));
 
 			//送信データが到着するまで、少し待機する
 			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
 			Util.sleep(sleep);
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
+=======
+			TestUtil.prompt(String.format("Thread.sleep(%d)", sleep));
+>>>>>>> work
 
-			TestUtil.dispPrompt(this, String.format("tcpObj.length()=%d", sockTcp.length()));
+			TestUtil.prompt(String.format("tcpObj.length()=%d", sockTcp.length()));
 			Assert.assertEquals((i + 1) * max, sockTcp.length());
 		}
-		TestUtil.dispPrompt(this, String.format("tcpObj.close()"));
+		TestUtil.prompt(String.format("tcpObj.close()"));
 		sockTcp.close();
 		echoServer.stop();
 	}
 
 	@Test
-	public void a002() {
-
-		TestUtil.dispHeader("a002 Echoサーバにsend(送信)して、tcpQueueのlength分ずつRecv()する");
-
+	public void Echoサーバにsendで送信てtcpQueueのlength分ずつRecvする() {
 		String addr = "127.0.0.1";
 		int port = 9992;
 
@@ -138,7 +142,7 @@ public final class TcpObjTest implements ILife {
 			Assert.fail(ex.getMessage());
 		}
 		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
-		TestUtil.dispPrompt(this, "tcpObj = new TcpObj()");
+		TestUtil.prompt("tcpObj = new TcpObj()");
 
 		int max = 1000;
 		int loop = 3;
@@ -149,33 +153,41 @@ public final class TcpObjTest implements ILife {
 
 		int recvCount = 0;
 		for (int i = 0; i < loop; i++) {
-			TestUtil.dispPrompt(this, String.format("tcpObj.send(%dbyte)", tmp.length));
+			TestUtil.prompt(String.format("tcpObj.send(%dbyte)", tmp.length));
 			int len = sockTcp.send(tmp);
 			Assert.assertEquals(len, tmp.length);
 
 			int sleep = 100;
 			Util.sleep(sleep);
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
+=======
+			TestUtil.prompt(String.format("Thread.sleep(%d)", sleep));
+>>>>>>> work
 
 			byte[] b = sockTcp.recv(len, timeout, this);
 			recvCount += b.length;
-			TestUtil.dispPrompt(this, String.format("len=%d  recv()=%d", len, b.length));
+			TestUtil.prompt(String.format("len=%d  recv()=%d", len, b.length));
 			for (int m = 0; m < max; m += 10) {
 				Assert.assertEquals(b[m], tmp[m]); //送信したデータと受信したデータが同一かどうかのテスト
 			}
 		}
-		TestUtil.dispPrompt(this, String.format("loop*max=%dbyte  recvCount:%d", loop * max, recvCount));
+		TestUtil.prompt(String.format("loop*max=%dbyte  recvCount:%d", loop * max, recvCount));
 		Assert.assertEquals(loop * max, recvCount); //送信したデータ数と受信したデータ数が一致するかどうかのテスト
 
-		TestUtil.dispPrompt(this, String.format("tcpObj.close()"));
+		TestUtil.prompt(String.format("tcpObj.close()"));
 		sockTcp.close();
 		echoServer.stop();
 	}
 
 	@Test
+<<<<<<< HEAD
 	public void a003() {
 
 		TestUtil.dispHeader("a003 EchoサーバにlineSend(1行送信)して、lineRecv(1行受信)する");
+=======
+	public void EchoサーバにlineSendで1行送信してlineRecvで1行受信する() {
+>>>>>>> work
 
 		String addr = "127.0.0.1";
 		int port = 9993;
@@ -192,7 +204,11 @@ public final class TcpObjTest implements ILife {
 			Assert.fail(ex.getMessage());
 		}
 		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
+<<<<<<< HEAD
 		TestUtil.dispPrompt(this, "tcpObj = new TcpObj()");
+=======
+		TestUtil.prompt("tcpObj = new TcpObj()");
+>>>>>>> work
 
 		String sendStr = "本日は晴天なり";
 		byte[] buf = null;
@@ -202,15 +218,25 @@ public final class TcpObjTest implements ILife {
 			Assert.fail();
 		}
 
+<<<<<<< HEAD
 		TestUtil.dispPrompt(this, String.format("tcpObj.lineSend(%s)", sendStr));
+=======
+		TestUtil.prompt(String.format("tcpObj.lineSend(%s)", sendStr));
+>>>>>>> work
 		int len = sockTcp.lineSend(buf);
 		Assert.assertEquals(len, buf.length + 2);
 
 		int sleep = 100;
 		Util.sleep(sleep);
+<<<<<<< HEAD
 		TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
 
 		buf = sockTcp.lineRecv(1000, this);
+=======
+		TestUtil.prompt(String.format("Thread.sleep(%d)", sleep));
+
+		buf = sockTcp.lineRecv(1, this);
+>>>>>>> work
 		String recvStr = "";
 		try {
 			recvStr = new String(buf, "UTF-8");
@@ -220,9 +246,15 @@ public final class TcpObjTest implements ILife {
 
 		recvStr = Inet.trimCrlf(recvStr);
 		Assert.assertEquals(sendStr, recvStr);
+<<<<<<< HEAD
 		TestUtil.dispPrompt(this, String.format("tcpObj.lineRecv()=%s", recvStr));
 
 		TestUtil.dispPrompt(this, String.format("tcpObj.close()"));
+=======
+		TestUtil.prompt(String.format("tcpObj.lineRecv()=%s", recvStr));
+
+		TestUtil.prompt(String.format("tcpObj.close()"));
+>>>>>>> work
 		sockTcp.close();
 		echoServer.stop();
 	}

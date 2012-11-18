@@ -91,6 +91,11 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 				if (!entry.isDirectory()) { //ディレクトリは対象外
 					//　Server.class
 					String className = entry.getName();
+					if (className.lastIndexOf("Server.class") == -1 && className.lastIndexOf("Option.class") == -1) {
+						//対象外
+						continue;
+					}
+					
 					//　Server　　.classを外す
 					int index = className.indexOf(".class");
 					if (index != -1) {
@@ -100,6 +105,7 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 					ar.add(className);
 				}
 			}
+			//jarIn.close();
 			return (String[]) ar.toArray(new String[0]);
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -1,30 +1,32 @@
 package bjd.server;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import bjd.Kernel;
-import bjd.ValidObjException;
 import bjd.ctrl.CtrlType;
 import bjd.net.Ip;
+import bjd.net.IpKind;
 import bjd.net.OneBind;
 import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 import bjd.util.Util;
 
 public final class ServerTest {
-	
+
 	//サーバ動作確認用
 	class MyServer extends OneServer {
 		public MyServer(Conf conf, OneBind oneBind) {
 			super(new Kernel(), "TEST-SERVER", conf, oneBind);
 		}
-		
+
 		@Override
 		protected boolean onStartServer() {
 			return true;
@@ -33,12 +35,13 @@ public final class ServerTest {
 		@Override
 		protected void onStopServer() {
 		}
-		
+
 		@Override
 		public String getMsg(int messageNo) {
 			return "";
 		}
 
+<<<<<<< HEAD
 //		@Override
 //		protected void onSubThread(SockAccept sockAccept) {
 //			for (int i = 3; i >= 0 && isLife(); i--) {
@@ -51,36 +54,49 @@ public final class ServerTest {
 //				Util.sleep(1000);
 //			}
 //		}
+=======
+		//		@Override
+		//		protected void onSubThread(SockAccept sockAccept) {
+		//			for (int i = 3; i >= 0 && isLife(); i--) {
+		//				if (sockAccept.getSockState() != SockState.CONNECT) {
+		//					TestUtil.prompt( String.format("接続中...sockAccept.getSockState!=Connect"));
+		//					break;
+		//				}
+		//
+		//				TestUtil.prompt( String.format("接続中...あと%d回待機", i));
+		//				Util.sleep(1000);
+		//			}
+		//		}
+>>>>>>> work
 
-//		@Override
-//		public void read(DatagramChannel channel, SockUdpServer sockUdpServer) {
-//			// TODO 自動生成されたメソッド・スタブ
-//			
-//		}
+		//		@Override
+		//		public void read(DatagramChannel channel, SockUdpServer sockUdpServer) {
+		//			// TODO 自動生成されたメソッド・スタブ
+		//			
+		//		}
 
 		@Override
 		protected void onSubThread(SockObj sockObj) {
 			for (int i = 3; i >= 0 && isLife(); i--) {
 				if (sockObj.getSockState() != SockState.CONNECT) {
-					TestUtil.dispPrompt(this, String.format("接続中...sockAccept.getSockState!=Connect"));
+					TestUtil.prompt(String.format("接続中...sockAccept.getSockState!=Connect"));
 					break;
 				}
 
+<<<<<<< HEAD
 				TestUtil.dispPrompt(this, String.format("接続中...あと%d回待機", i));
+=======
+				TestUtil.prompt(String.format("接続中...あと%d回待機", i));
+>>>>>>> work
 				Util.sleep(1000);
 			}
 		}
 
 	}
-	
+
 	@Test
 	public void a001() {
-		Ip ip = null;
-		try {
-			ip = new Ip("127.0.0.1");
-		} catch (ValidObjException ex) {
-			Assert.fail(ex.getMessage());
-		}
+		Ip ip = new Ip(IpKind.V4_LOCALHOST);
 		OneBind oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		Conf conf = TestUtil.createConf("OptionSample");
 		conf.set("protocolKind", ProtocolKind.Tcp.getIntValue());
@@ -89,12 +105,17 @@ public final class ServerTest {
 		conf.set("acl", new Dat(new CtrlType[0]));
 		conf.set("enableAcl", 1);
 		conf.set("timeOut", 3);
-		
+
 		MyServer myServer = new MyServer(conf, oneBind);
 		myServer.start();
 		for (int i = 10; i > 0; i--) {
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
             Util.sleep(1);
+=======
+			TestUtil.prompt(String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
+			Util.sleep(1);
+>>>>>>> work
 		}
 		myServer.dispose();
 	}

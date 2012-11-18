@@ -57,6 +57,16 @@ public final class Util {
 	}
 
 	/**
+	 * 設計上の問題によりプログラム停止
+	 * @param o 呼出し元クラス
+	 * @param e 発生した例外
+	 */
+	public static void runtimeException(Object o, Exception e) {
+		String msg = String.format("%s %s %s", o.getClass().getName(), e.getClass(), e.getMessage());
+		runtimeException(msg);
+	}
+
+	/**
 	 * ２つの配列の結合
 	 * @param a
 	 * @param b
@@ -81,11 +91,20 @@ public final class Util {
 		}
 	}
 
+	public static void sleep(int n) {
+		try {
+			Thread.sleep(n);
+		} catch (InterruptedException e) {
+			runtimeException("Thread.sleep() => InterruptedException");
+		}
+	}
+
 	/**
 	 * ファイル選択ダイログの表示<br>
 	 * 前回の選択を記憶している
 	 */
 	private static File selectedFile = null; //前回選択したファイル
+
 	public static File fileChooser(File file) {
 		JFileChooser dlg = new JFileChooser();
 		//初期化
@@ -100,6 +119,33 @@ public final class Util {
 		}
 		return null;
 	}
+
+	public enum ExistsKind {
+		FILE,
+		DIR,
+		NONE
+	}
+
+	/**
+	 * ファイル若しくはディレクトリが存在するかどうか<br>
+	 * path==null の場合、ExistsKind.Noneとなる
+	 * @param path 検査対象のパス
+	 * @return ExistsKind
+	 */
+	public static ExistsKind exists(String path) {
+		if (path != null) {
+			File file = new File(path);
+			if (file.exists()) {
+				if (file.isDirectory()) {
+					return ExistsKind.DIR;
+				} else if (file.isFile()) {
+					return ExistsKind.FILE;
+				}
+			}
+		}
+		return ExistsKind.NONE;
+	}
+
 	/**
 	 * テキストファイルを読み込んで、文字列リストに格納する<br>
 	 * このメソッドを使用する前に、ファイルの有効性を確認してあれば、(file.exists() && file.isFile() && file.canRead())<br>

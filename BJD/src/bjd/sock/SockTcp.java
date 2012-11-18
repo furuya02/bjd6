@@ -1,20 +1,19 @@
 package bjd.sock;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Calendar;
 import java.util.Iterator;
 
 import bjd.ILife;
 import bjd.net.Ip;
-import bjd.net.OperateCrlf;
 import bjd.net.Ssl;
-import bjd.server.OneServer;
 import bjd.util.Bytes;
+import bjd.util.Timeout;
 import bjd.util.Util;
 
 public final class SockTcp extends SockObj {
@@ -187,8 +186,13 @@ public final class SockTcp extends SockObj {
 	 * @return 受信データ
 	 */
 	public byte[] recv(int len, int timeout, ILife iLife) {
+<<<<<<< HEAD
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.SECOND, timeout);
+=======
+
+		Timeout tout = new Timeout(timeout);
+>>>>>>> work
 
 		byte[] buffer = new byte[0];
 		try {
@@ -216,7 +220,7 @@ public final class SockTcp extends SockObj {
 						}
 						Util.sleep(10);
 					}
-					if (c.compareTo(Calendar.getInstance()) < 0) {
+					if (tout.isFinish()) {
 						buffer = sockQueue.dequeue(len); //タイムアウト
 						break;
 					}
@@ -234,6 +238,7 @@ public final class SockTcp extends SockObj {
 	 * １行受信<br>
 	 * 切断・タイムアウトでnullが返される
 	 * 
+<<<<<<< HEAD
 	 * @param timeout タイムアウト値(ms)
 	 * @param iLife 継続確認インターフェース
 	 * @return 受信データ
@@ -243,6 +248,16 @@ public final class SockTcp extends SockObj {
 
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.MILLISECOND, timeout);
+=======
+	 * @param sec タイムアウト値(sec)
+	 * @param iLife 継続確認インターフェース
+	 * @return 受信データ
+	 */
+	public byte[] lineRecv(int sec, ILife iLife) {
+		//Socket.ReceiveTimeout = timeout * 1000;
+
+		Timeout tout = new Timeout(sec * 1000);
+>>>>>>> work
 
 		while (iLife.isLife()) {
 			//Ver5.1.6
@@ -258,7 +273,11 @@ public final class SockTcp extends SockObj {
 			if (getSockState() != SockState.CONNECT) {
 				return null;
 			}
+<<<<<<< HEAD
 			if (c.compareTo(Calendar.getInstance()) < 0) {
+=======
+			if (tout.isFinish()) {
+>>>>>>> work
 				return null; //タイムアウト
 			}
 			Util.sleep(1);
@@ -286,12 +305,50 @@ public final class SockTcp extends SockObj {
 		return -1;
 	}
 
+<<<<<<< HEAD
+=======
+	/**
+	 * 1行送信<br>
+	 * 内部でCRLFの２バイトが付かされる<br>
+	 * @param buf　送信データ
+	 * @return 送信バイト数
+	 */
+>>>>>>> work
 	public int lineSend(byte[] buf) {
 		int s1 = send(buf);
 		int s2 = send(new byte[] { 0x0d, 0x0a });
 		return s1 + s2;
 	}
 
+<<<<<<< HEAD
+=======
+	/**
+	 * １行のString送信
+	 * @param str 送信文字列
+	 * @param charsetName エンコード名
+	 * @return boolean 成功・失敗
+	 */
+	public boolean stringSend(String str, String charsetName) {
+		try {
+			byte[] buf = str.getBytes(charsetName);
+			int l = lineSend(buf);
+			return true;
+		} catch (UnsupportedEncodingException e) {
+			Util.runtimeException(this, e);
+		}
+		return false;
+	}
+
+	/**
+	 * １行送信(ASCII)
+	 * @param str 送信文字列
+	 * @return boolean　成否
+	 */
+	public boolean stringSend(String str) {
+		return stringSend(str, "ASCII");
+	}
+
+>>>>>>> work
 	@Override
 	public void close() {
 		//ACCEPT・CLIENT

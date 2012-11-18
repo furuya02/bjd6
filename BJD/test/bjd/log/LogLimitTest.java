@@ -7,16 +7,14 @@ import org.junit.Test;
 
 import bjd.ctrl.CtrlType;
 import bjd.option.Dat;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 public final class LogLimitTest {
 
 	@Test
-	public void a001() {
+	public void 指定した文字列が表示対象か否かの判断() {
 		
-		TestUtil.dispHeader("a001 指定した文字列が表示対象か否かの判断");
-		
-		TestUtil.dispPrompt(this, "logLimit = new LogLimit(dat={\"AAA\",\"表示\",\"123\",\"アイウ\"},isDisplay=true)");
+		TestUtil.prompt("logLimit = new LogLimit(dat={\"AAA\",\"表示\",\"123\",\"アイウ\"},isDisplay=true)");
 		Dat dat = new Dat(new CtrlType[]{CtrlType.TEXTBOX});
 		dat.add(true, "AAA");
 		dat.add(true, "表示");
@@ -27,7 +25,7 @@ public final class LogLimitTest {
 		LogLimit logLimit = new LogLimit(dat, isDisplay);
 		
 		//表示する
-		TestUtil.dispPrompt(this, "[表示する]");
+		TestUtil.prompt("[表示する]");
 		boolean expected = true;
 		check(logLimit, "AAA", expected);
 		check(logLimit, "表示A", expected);
@@ -36,7 +34,7 @@ public final class LogLimitTest {
 		check(logLimit, "12アイウ", expected);
 
 		//表示しない
-		TestUtil.dispPrompt(this, "[表示しない]");
+		TestUtil.prompt("[表示しない]");
 		expected = false;
 		check(logLimit, "AA", expected);
 		check(logLimit, "表a示A", expected);
@@ -48,7 +46,7 @@ public final class LogLimitTest {
 	}
 	
 	private void check(LogLimit logLimit, String str, boolean expected) {
-		TestUtil.dispPrompt(this, String.format("logLimit(\"%s\")=%s", str, expected));
+		TestUtil.prompt(String.format("logLimit(\"%s\")=%s", str, expected));
 		assertThat(logLimit.isDisplay(str), is(expected));
 	}
 

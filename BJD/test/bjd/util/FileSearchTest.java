@@ -14,15 +14,16 @@ import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import bjd.test.TestUtil;
+
 @RunWith(Enclosed.class)
 public final class FileSearchTest {
 	@RunWith(Theories.class)
-	public static final class A001 {
+	public static final class 各種のパタｰﾝで列挙する {
 		private static File tmpDir;
 
 		@BeforeClass
 		public static void before() {
-			TestUtil.dispHeader("各種のパタｰﾝで列挙する"); //TESTヘッダ
 
 			//テンポラリディレクトリの作成
 			String currentDir = new File(".").getAbsoluteFile().getParent();
@@ -53,7 +54,7 @@ public final class FileSearchTest {
 						String fileName = String.format("%s\\%c", tmpDir.getPath(), i + 'a');
 						(new File(fileName)).mkdir();
 					}
-				
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -69,11 +70,11 @@ public final class FileSearchTest {
 
 		@DataPoints
 		public static Fixture[] datas = {
-			new Fixture("*", new String[] { "000.txt", "001.txt", "002.txt", "000.tgz", "001.tgz", "002.tgz", "a", "b", "c" }),		
-			new Fixture("*.*", new String[] { "000.txt", "001.txt", "002.txt", "000.tgz", "001.tgz", "002.tgz" }),		
-			new Fixture("*.txt", new String[] { "000.txt", "001.txt", "002.txt" }),		
-			new Fixture("??1.*", new String[] { "001.txt", "001.tgz" }),		
-			new Fixture("?", new String[] { "a", "b", "c" }),		
+				new Fixture("*", new String[] { "000.txt", "001.txt", "002.txt", "000.tgz", "001.tgz", "002.tgz", "a", "b", "c" }),
+				new Fixture("*.*", new String[] { "000.txt", "001.txt", "002.txt", "000.tgz", "001.tgz", "002.tgz" }),
+				new Fixture("*.txt", new String[] { "000.txt", "001.txt", "002.txt" }),
+				new Fixture("??1.*", new String[] { "001.txt", "001.tgz" }),
+				new Fixture("?", new String[] { "a", "b", "c" }),
 		};
 
 		static class Fixture {
@@ -89,16 +90,15 @@ public final class FileSearchTest {
 
 		@Theory
 		public void test(Fixture fx) {
-			
-			TestUtil.dispPrompt(this); //TESTプロンプト
+
 
 			FileSearch fileSearch = new FileSearch(tmpDir.getPath());
 			File[] files = fileSearch.listFiles(fx.pattern);
 			Arrays.sort(files);
 
-			System.out.print(String.format("[%s] length=%d ", fx.pattern, files.length));
+			TestUtil.prompt(String.format("[%s] length=%d ", fx.pattern, files.length));
 			for (int i = 0; i < files.length; i++) {
-				System.out.print(String.format("%s ", files[i].getName()));
+				TestUtil.prompt(String.format("%s ", files[i].getName()));
 			}
 
 			assertThat(files.length, is(fx.expected.length));
@@ -106,7 +106,7 @@ public final class FileSearchTest {
 			for (int i = 0; i < fx.expected.length; i++) {
 				assertThat(files[i].getName(), is(fx.expected[i]));
 			}
-			System.out.println("");
+			TestUtil.prompt("");
 		}
 	}
 }

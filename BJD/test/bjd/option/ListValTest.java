@@ -13,15 +13,12 @@ import bjd.ctrl.CtrlDat;
 import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.OnePage;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
-//@RunWith(Enclosed.class)
 public class ListValTest {
 
 	@Test
-	public final void a001() {
-		TestUtil.dispHeader("a001 getList（)で取得した値の確認（パターン１）");
-		TestUtil.dispPrompt(this);
+	public final void getListで取得した値の確認_パターン１() {
 
 		//テスト用のListVal作成(パターン１)
 		ListVal listVal = createListVal1();
@@ -29,14 +26,12 @@ public class ListValTest {
 		//listValを名前覧にする
 		String actual = arrayToString(listVal.getList(null));
 		String expected = "n1,n2,n3,n4,n5,n6,n7,n8,";
-		System.out.printf("listVal.getList(null)=%s expected=%s\n", actual, expected);
+		TestUtil.prompt(String.format("listVal.getList(null)=%s expected=%s", actual, expected));
 		assertThat(actual, is(expected));
 	}
 
 	@Test
-	public final void a002() {
-		TestUtil.dispHeader("a002 getList（)で取得した値の確認（パターン２）");
-		TestUtil.dispPrompt(this);
+	public final void getListで取得した値の確認_パターン２() {
 
 		//テスト用のListVal作成(パターン２)
 		ListVal listVal = createListVal2();
@@ -44,31 +39,27 @@ public class ListValTest {
 		//listValを名前覧にする
 		String actual = arrayToString(listVal.getList(null));
 		String expected = "n0,n1,n2,";
-		System.out.printf("listVal.getList(null)=%s expected=%s\n", actual, expected);
+		TestUtil.prompt(String.format("listVal.getList(null)=%s expected=%s", actual, expected));
 		assertThat(actual, is(expected));
 	}
 
 	@Test
-	public final void a003() {
-		TestUtil.dispHeader("a003 search（)で検索に成功するとオブジェクトが返る");
-		TestUtil.dispPrompt(this);
+	public final void searchで検索に成功するとオブジェクトが返る() {
 		
 		//テスト用のListVal作成(パターン１)
 		ListVal listVal = createListVal1();
-		System.out.printf("listVal.search(n1)!=null \n");
+		TestUtil.prompt(String.format("listVal.search(n1)!=null "));
 		assertNotNull(listVal.search("n1"));
 	}
 
 	@Test
-	public final void a004() {
-		TestUtil.dispHeader("a004 search（)で検索に失敗するとnullが返される");
-		TestUtil.dispPrompt(this);
+	public final void searchで検索に失敗するとnullが返される() {
 
 		//テスト用のListVal作成(パターン１)
 		ListVal listVal = createListVal1();
 		OneVal  oneVal = listVal.search("xxx");
 		assertNull(oneVal);
-		TestUtil.dispPrompt(this, String.format("listVal.search(xxx) = %s ", oneVal));
+		TestUtil.prompt(String.format("listVal.search(xxx) = %s ", oneVal));
 	}
 
 	//テスト用のListVal作成(パターン１)

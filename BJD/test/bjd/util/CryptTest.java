@@ -10,23 +10,19 @@ import javax.mail.MessagingException;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import bjd.test.TestUtil;
+
 @RunWith(Enclosed.class)
 public class CryptTest {
 
 	@RunWith(Theories.class)
-	public static final class A001 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("encrypt及びdecrypt");
-		}
+	public static final class encrypt及びdecrypt {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -47,8 +43,7 @@ public class CryptTest {
 
 		@Theory
 		public void test(Fixture fx) throws MessagingException, IOException {
-			TestUtil.dispPrompt(this);
-
+			
 			String s = "";
 			String expected = "";
 			try {
@@ -57,19 +52,15 @@ public class CryptTest {
 			} catch (Exception e) {
 				Assert.fail();
 			}
-			System.out.printf("encrypt(%s)=%s  decrypt(%s)=%s\n", fx.actual, s, s, expected);
+			TestUtil.prompt(String.format("encrypt(%s)=%s  decrypt(%s)=%s", fx.actual, s, s, expected));
 			assertThat(expected, is(not("ERROR"))); //ERRORが出力された場合は、テスト失敗
 			assertThat(expected, is(expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A002 {
+	public static final class encryptの例外発生 {
 
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("encryptの例外発生");
-		}
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -87,13 +78,12 @@ public class CryptTest {
 
 		@Theory
 		public void test(Fixture fx) throws MessagingException, IOException {
-			TestUtil.dispPrompt(this);
 			try {
 				Crypt.encrypt(fx.actual);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (Exception e) {
 				//ここへ来ればテスト成功
-				System.out.printf("encrypt(%s) => %s\n", fx.actual, e.getClass());
+				TestUtil.prompt(String.format("encrypt(%s) => %s", fx.actual, e.getClass()));
 				return;
 			}
 			Assert.fail("この行が実行されたらエラー");
@@ -101,12 +91,7 @@ public class CryptTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A003 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("decryptのエラー発生");
-		}
+	public static final class decryptのエラー発生 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -126,13 +111,12 @@ public class CryptTest {
 
 		@Theory
 		public void test(Fixture fx) throws MessagingException, IOException {
-			TestUtil.dispPrompt(this);
 
 			try {
 				Crypt.decrypt(fx.actual);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (Exception e) {
-				System.out.printf("encrypt(%s) => %s\n", fx.actual, e.getClass());
+				TestUtil.prompt(String.format("encrypt(%s) => %s", fx.actual, e.getClass()));
 				return;
 			}
 			Assert.fail("この行が実行されたらエラー");

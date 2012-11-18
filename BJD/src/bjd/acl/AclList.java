@@ -155,7 +155,7 @@ public final class AclList {
 			return AclKind.Deny;
 		}
 		if (enable && acl != null) {
-			logger.set(LogKind.SECURE, (SockObj) null, 9000018, String.format("user:%s address:%s", acl.getName(), ip.toString())); //この利用者のアクセスは許可されていません
+			logger.set(LogKind.SECURE, (SockObj) null, 9000018, String.format("aclName:%s address:%s", acl.getName(), ip.toString())); //この利用者のアクセスは許可されていません
 			return AclKind.Deny;
 		}
 		return AclKind.Allow;

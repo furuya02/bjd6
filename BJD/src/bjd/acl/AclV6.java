@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import bjd.ValidObjException;
 import bjd.net.InetKind;
 import bjd.net.Ip;
-import bjd.util.Util;
+import bjd.net.IpKind;
 
 /**
  * 
@@ -38,8 +38,8 @@ final class AclV6 extends Acl {
 
 		//「*」によるALL指定
 		if (ipStr.equals("*") || ipStr.equals("*:*:*:*:*:*:*:*")) {
-			setStart(new Ip("::0"));
-			setEnd(new Ip("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
+			setStart(new Ip(IpKind.V6_0));
+			setEnd(new Ip(IpKind.V6_FF));
 			//setStatus(true);
 			return; //初期化成功
 		}
@@ -173,11 +173,11 @@ final class AclV6 extends Acl {
 
 	@Override
 	protected void init() {
-		try {
-			setStart(new Ip("::"));
-			setEnd(new Ip("FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF"));
-		} catch (ValidObjException e) {
-			Util.runtimeException("AclV6 init()");
-		}
+		//try {
+		setStart(new Ip(IpKind.V6_0));
+		setEnd(new Ip(IpKind.V6_FF));
+		//} catch (ValidObjException e) {
+		//	Util.runtimeException("AclV6 init()");
+		//}
 	}
 }

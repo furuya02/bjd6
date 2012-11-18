@@ -7,23 +7,19 @@ import java.io.IOException;
 
 import javax.mail.MessagingException;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import bjd.test.TestUtil;
+
 @RunWith(Enclosed.class)
 public final class Base64Test {
 
 	@RunWith(Theories.class) 
-	public static final class A001 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("Base64のエンコード及びデコード");
-		}
+	public static final class Base64のエンコード及びデコード {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -47,11 +43,10 @@ public final class Base64Test {
 
 		@Theory
 		public void test(Fixture fx) throws MessagingException, IOException {
-			TestUtil.dispPrompt(this);
 			
 			String s = Base64.encode(fx.actual);
 			String expected = Base64.decode(s);
-			System.out.printf("encode(%s)=%s  decode(%s)=%s\n", fx.actual, s, s, expected);
+			TestUtil.prompt(String.format("encode(%s)=%s  decode(%s)=%s\n", fx.actual, s, s, expected));
 			assertThat(expected, is(fx.expected));
 		}
 	}

@@ -2,19 +2,17 @@ package bjd.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Calendar;
-
 import bjd.Kernel;
 import bjd.ThreadBase;
-import bjd.ValidObjException;
+import bjd.acl.AclKind;
 import bjd.acl.AclList;
 import bjd.ctrl.CtrlType;
 import bjd.log.LogKind;
 import bjd.log.Logger;
 import bjd.log.OneLog;
 import bjd.net.Ip;
+import bjd.net.IpKind;
 import bjd.net.OneBind;
-import bjd.net.OperateCrlf;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
 import bjd.option.Conf;
@@ -25,6 +23,8 @@ import bjd.sock.SockServer;
 import bjd.sock.SockState;
 import bjd.sock.SockTcp;
 import bjd.sock.SockUdp;
+import bjd.util.Inet;
+import bjd.util.Timeout;
 import bjd.util.Util;
 
 /**
@@ -50,6 +50,13 @@ public abstract class OneServer extends ThreadBase {
 		return conf;
 	}
 
+<<<<<<< HEAD
+=======
+	protected final Logger getLogger() {
+		return logger;
+	}
+
+>>>>>>> work
 	protected final String getNameTag() {
 		return nameTag;
 	}
@@ -57,6 +64,13 @@ public abstract class OneServer extends ThreadBase {
 	protected final boolean isJp() {
 		return isJp;
 	}
+<<<<<<< HEAD
+=======
+
+	protected final int getTimeout() {
+		return timeout;
+	}
+>>>>>>> work
 
 	public abstract String getMsg(int messageNo);
 
@@ -119,6 +133,7 @@ public abstract class OneServer extends ThreadBase {
 		}
 		//DEBUG用
 		if (this.oneBind == null) {
+<<<<<<< HEAD
 			Ip ip = null;
 			try {
 				ip = new Ip("127.0.0.1");
@@ -126,6 +141,9 @@ public abstract class OneServer extends ThreadBase {
 				//127.0.0.1で例外となるようなら設計問題とするしかない
 				Util.runtimeException("new Ip(127.0.0.1)");
 			}
+=======
+			Ip ip = new Ip(IpKind.V4_LOCALHOST);
+>>>>>>> work
 			this.oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		}
 
@@ -233,16 +251,12 @@ public abstract class OneServer extends ThreadBase {
 					child.close();
 					continue;
 				}
-				//***************************************************************
+
 				// ACL制限のチェック
-				//***************************************************************
-				//					if (aclList != null) {
-				//						if (!aclList.check(new Ip(sockObj.getRemoteAddress().getAddress().toString()))) {
-				//							child.close();
-				//							denyAddress = sockObj.getRemoteAddress().getAddress().toString();
-				//							continue;
-				//						}
-				//					}
+				if (aclCheck(child) == AclKind.Deny) {
+					child.close();
+					continue;
+				}
 
 				synchronized (lock) {
 					Thread t = new Thread(new Runnable() {
@@ -277,16 +291,12 @@ public abstract class OneServer extends ThreadBase {
 					child.close();
 					continue;
 				}
-				//***************************************************************
+
 				// ACL制限のチェック
-				//***************************************************************
-				//					if (aclList != null) {
-				//						if (!aclList.check(new Ip(sockObj.getRemoteAddress().getAddress().toString()))) {
-				//							child.close();
-				//							denyAddress = sockObj.getRemoteAddress().getAddress().toString();
-				//							continue;
-				//						}
-				//					}
+				if (aclCheck(child) == AclKind.Deny) {
+					child.close();
+					continue;
+				}
 
 				synchronized (lock) {
 					Thread t = new Thread(new Runnable() {
@@ -303,6 +313,24 @@ public abstract class OneServer extends ThreadBase {
 		}
 	}
 
+	/**
+	 * ACL制限のチェック
+	 * @param sockObj 検査対象のソケット
+	 * @return AclKind
+	 */
+	private AclKind aclCheck(SockObj sockObj) {
+		AclKind aclKind = AclKind.Allow;
+		if (aclList != null) {
+			Ip ip = new Ip(sockObj.getRemoteAddress().getAddress());
+			aclKind = aclList.check(ip);
+		}
+
+		if (aclKind == AclKind.Deny) {
+			denyAddress = sockObj.getRemoteAddress().getAddress().toString();
+		}
+		return aclKind;
+	}
+
 	protected abstract void onSubThread(SockObj sockObj);
 
 	private String denyAddress = ""; //Ver5.3.5 DoS対処
@@ -315,6 +343,7 @@ public abstract class OneServer extends ThreadBase {
 
 		//クライアントのホスト名を逆引きする
 		sockObj.resolve((boolean) conf.get("useResolve"), logger);
+<<<<<<< HEAD
 
 		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
 		logger.set(LogKind.DETAIL, sockObj, 9000002, String.format("count=%d Local=%s Remote=%s", count(), sockObj
@@ -326,6 +355,19 @@ public abstract class OneServer extends ThreadBase {
 		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
 				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
+=======
+
+		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
+		logger.set(LogKind.DETAIL, sockObj, 9000002, String.format("count=%d Local=%s Remote=%s", count(), sockObj
+				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
+
+		onSubThread(sockObj); //接続単位の処理
+		sockObj.close();
+
+		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
+				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
+
+>>>>>>> work
 	}
 
 	//RemoteServerでのみ使用される
@@ -338,8 +380,7 @@ public abstract class OneServer extends ThreadBase {
 	 * @return
 	 */
 	public final Cmd waitLine(SockTcp sockTcp) {
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.SECOND, timeout);
+		Timeout tout = new Timeout(timeout * 1000);
 
 		while (isLife()) {
 			Cmd cmd = recvCmd(sockTcp);
@@ -349,7 +390,7 @@ public abstract class OneServer extends ThreadBase {
 			if (!(cmd.getCmdStr().equals(""))) {
 				return cmd;
 			}
-			if (c.compareTo(Calendar.getInstance()) < 0) {
+			if (tout.isFinish()) {
 				return null;
 			}
 			Util.sleep(100);
@@ -359,18 +400,33 @@ public abstract class OneServer extends ThreadBase {
 
 	//TODO RecvCmdのパラメータ形式を変更するが、これは、後ほど、Web,Ftp,SmtpのServerで使用されているため影響がでる予定
 	/**
-	 * コマンド取得
+	 * コマンド取得<br>
+	 * コネクション切断などエラーが発生した時はnullが返される<br>
+	 * 
 	 * @param sockTcp
-	 * @return
+	 * @return Cmd コマンド
 	 */
 	protected final Cmd recvCmd(SockTcp sockTcp) {
 		if (sockTcp.getSockState() != SockState.CONNECT) { //切断されている
 			return null;
 		}
 		byte[] recvbuf = sockTcp.lineRecv(timeout, this);
+<<<<<<< HEAD
+=======
+		//切断された場合
+>>>>>>> work
 		if (recvbuf == null) {
-			return null; //切断された
+			return null;
 		}
+
+		//受信待機中の場合
+		if (recvbuf.length == 0) {
+			return new Cmd("", "", "");
+		}
+		
+		//CRLFの排除
+		recvbuf = Inet.trimCrlf(recvbuf);
+
 		String str = new String(recvbuf, Charset.forName("Shift-JIS"));
 		if (str.equals("")) {
 			return null;
@@ -394,35 +450,6 @@ public abstract class OneServer extends ThreadBase {
 			cmdStr = str; //全部コマンド
 		}
 		return new Cmd(str, cmdStr, paramStr);
-	}
-
-	/**
-	 * 受信したコマンドを表現するクラス
-	 * @author SIN
-	 *
-	 */
-	class Cmd {
-		private String str;
-		private String cmdStr;
-		private String paramStr;
-
-		public String getStr() {
-			return str;
-		}
-
-		public String getCmdStr() {
-			return cmdStr;
-		}
-
-		public String getParamStr() {
-			return paramStr;
-		}
-
-		public Cmd(String str, String cmdStr, String paramStr) {
-			this.str = str;
-			this.cmdStr = cmdStr;
-			this.paramStr = paramStr;
-		}
 	}
 
 	//未実装

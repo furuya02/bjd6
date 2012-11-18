@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -40,18 +39,14 @@ import bjd.net.BindAddr;
 import bjd.net.BindStyle;
 import bjd.net.InetKind;
 import bjd.net.Ip;
-import bjd.util.TestUtil;
+import bjd.net.IpKind;
+import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class OneValTest {
 
 	@RunWith(Theories.class)
-	public static final class A001 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("デフォルト値をtoReg()で取り出す");
-		}
+	public static final class デフォルト値をtoRegで取り出す {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -88,8 +83,7 @@ public class OneValTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this);
-			System.out.printf("(%s) default値=%s toReg()=\"%s\"\n", fx.ctrlType, fx.actual, fx.expected);
+			TestUtil.prompt(String.format("(%s) default値=%s toReg()=\"%s\"", fx.ctrlType, fx.actual, fx.expected));
 
 			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.actual);
 			boolean isDebug = false;
@@ -98,12 +92,7 @@ public class OneValTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A002 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromReg()で設定した値をtoReg()で取り出す");
-		}
+	public static final class fromRegで設定した値をtoRegで取り出す {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -133,8 +122,7 @@ public class OneValTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this);
-			System.out.printf("(%s) fromReg(\"%s\") toReg()=\"%s\"\n", fx.ctrlType, fx.actual, fx.actual);
+			TestUtil.prompt(String.format("(%s) fromReg(\"%s\") toReg()=\"%s\"", fx.ctrlType, fx.actual, fx.actual));
 
 			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, null);
 
@@ -145,12 +133,7 @@ public class OneValTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A003 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromReg()の不正パラメータ判定");
-		}
+	public static final class fromRegの不正パラメータ判定 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -201,8 +184,7 @@ public class OneValTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this);
-			System.out.printf("(%s) fromReg(\"%s\") = %s\n", fx.ctrlType, fx.actual, fx.expected);
+			TestUtil.prompt(String.format("(%s) fromReg(\"%s\") = %s", fx.ctrlType, fx.actual, fx.expected));
 
 			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, null);
 
@@ -211,12 +193,7 @@ public class OneValTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A004 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("isDebug=trueの時のtoReg()出力");
-		}
+	public static final class isDebug_trueの時のtoReg出力 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -224,8 +201,8 @@ public class OneValTest {
 				new Fixture(CtrlType.HIDDEN, true, "123", "***"),
 				new Fixture(CtrlType.HIDDEN, false, "123", "2d7ee3636680c1f6"),
 				new Fixture(CtrlType.HIDDEN, false, "", "60392a0d922b9077"),
-		//new Fixture(CtrlType.HIDDEN, false, null, "60392a0d922b9077"),
-		//new Fixture(CtrlType.HIDDEN, false, "本日は晴天なり", "35c9f14ba7b574f21d70ddaa6e9277658992ffef4868a5be"), 
+				//new Fixture(CtrlType.HIDDEN, false, null, "60392a0d922b9077"),
+				//new Fixture(CtrlType.HIDDEN, false, "本日は晴天なり", "35c9f14ba7b574f21d70ddaa6e9277658992ffef4868a5be"), 
 		};
 
 		static class Fixture {
@@ -245,8 +222,7 @@ public class OneValTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this);
-			System.out.printf("(%s) Default=\"%s\" toReg(%s) = %s\n", fx.ctrlType, fx.actual, fx.isDebug, fx.expected);
+			TestUtil.prompt(String.format("(%s) Default=\"%s\" toReg(%s) = %s", fx.ctrlType, fx.actual, fx.isDebug, fx.expected));
 
 			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.actual);
 			//String s = oneVal.toReg(fx.isDebug);
@@ -254,66 +230,56 @@ public class OneValTest {
 			assertThat(oneVal.toReg(fx.isDebug), is(fx.expected));
 		}
 	}
-	
+
 	@RunWith(Theories.class)
-	public static final class A005 {
+	public static final class readCtrl_false_でデフォルトの値に戻るかどうかのテスト {
 
-	    @BeforeClass
-	    public static void before() {
-	        TestUtil.dispHeader("createCtrl()->readCtrl(false)して、デフォルトの値に戻るかどうかのテスト");
-	    }
+		@DataPoints
+		public static Fixture[] datas = {
+				new Fixture(CtrlType.CHECKBOX, true),
+				new Fixture(CtrlType.HIDDEN, "123"),
+				new Fixture(CtrlType.TEXTBOX, "123"),
+				new Fixture(CtrlType.MEMO, "123\n123"),
+				new Fixture(CtrlType.CHECKBOX, true),
+				new Fixture(CtrlType.INT, 0),
+				new Fixture(CtrlType.FOLDER, "c:\\test"),
+				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３"),
+				new Fixture(CtrlType.RADIO, 1),
+				new Fixture(CtrlType.FONT, new Font("Times New Roman", Font.ITALIC, 15)),
+				new Fixture(CtrlType.MEMO, "1\r\n2\r\n3\r\n"),
+				new Fixture(CtrlType.ADDRESSV4, new Ip(InetKind.V4)),
+				new Fixture(CtrlType.ADDRESSV4, new Ip(IpKind.V6_LOCALHOST)), //追加
+				//new Fixture(CtrlType.DAT, new Dat(new CtrlType[] { CtrlType.TEXTBOX, CtrlType.TEXTBOX })),
+				new Fixture(CtrlType.BINDADDR, new BindAddr()),
+				new Fixture(CtrlType.COMBOBOX, 0),
+		};
 
-	    
-	    @DataPoints
-	    public static Fixture[] datas = {
-	        new Fixture(CtrlType.CHECKBOX, true), 
-	        new Fixture(CtrlType.HIDDEN, "123"), 
-	        new Fixture(CtrlType.TEXTBOX, "123"), 
-	        new Fixture(CtrlType.MEMO, "123\n123"), 
-			new Fixture(CtrlType.CHECKBOX, true),
-			new Fixture(CtrlType.INT, 0),
-			new Fixture(CtrlType.FOLDER, "c:\\test"),
-			new Fixture(CtrlType.TEXTBOX, "abcdefg１２３"),
-			new Fixture(CtrlType.RADIO, 1),
-			new Fixture(CtrlType.FONT, new Font("Times New Roman", Font.ITALIC, 15)),
-			new Fixture(CtrlType.MEMO, "1\r\n2\r\n3\r\n"),
-			new Fixture(CtrlType.ADDRESSV4, new Ip(InetKind.V4)),
-			//new Fixture(CtrlType.ADDRESSV4, new Ip("192.168.0.1")),
-			//new Fixture(CtrlType.DAT, new Dat(new CtrlType[] { CtrlType.TEXTBOX, CtrlType.TEXTBOX })),
-			new Fixture(CtrlType.BINDADDR, new BindAddr()),
-			new Fixture(CtrlType.COMBOBOX, 0),
-	    };
-
-	    static class Fixture {
-	        private CtrlType ctrlType;
-	        private Object value;
+		static class Fixture {
+			private CtrlType ctrlType;
+			private Object value;
 
 			public Fixture(CtrlType ctrlType, Object value) {
-	            this.ctrlType = ctrlType;
-	            this.value = value;
-	        }
-	    }
+				this.ctrlType = ctrlType;
+				this.value = value;
+			}
+		}
 
-	    @Theory
-	    public void test(Fixture fx) {
+		@Theory
+		public void test(Fixture fx) {
 
-	        TestUtil.dispPrompt(this);
-
-	        OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.value);
+			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.value);
 			oneVal.createCtrl(null, 0, 0);
 			boolean b = oneVal.readCtrl(false); //isConfirm = false; 確認のみではなく、実際に読み込む
-	        
-	        Assert.assertTrue(b); // readCtrl()の戻り値がfalseの場合、読み込みに失敗している
-	        
-	        Object expected = fx.value;
-	        Object actual = oneVal.getValue();
-			System.out.printf("(%s) new oneVal()->createCtrl()->readCtrl() expected=%s actual=%s\n",
-							fx.ctrlType, expected, actual);
+
+			Assert.assertTrue(b); // readCtrl()の戻り値がfalseの場合、読み込みに失敗している
+
+			Object expected = fx.value;
+			Object actual = oneVal.getValue();
+			TestUtil.prompt(String.format("(%s) new oneVal()->createCtrl()->readCtrl() expected=%s actual=%s", fx.ctrlType, expected, actual));
 
 			assertThat(expected, is(actual));
-	    }
+		}
 	}
-
 
 	/**
 	 * 共通的に利用されるメソッド
@@ -398,13 +364,13 @@ public class OneValTest {
 					}
 					ArrayList<Ip> list = new ArrayList<>();
 					try {
-						list.add(new Ip("INADDR_ANY"));
+						list.add(new Ip(IpKind.INADDR_ANY));
 						list.add(new Ip("192.168.0.1"));
 					} catch (ValidObjException ex) {
 						Assert.fail(ex.getMessage());
 
 					}
-					oneCtrl = new CtrlBindAddr(help, list.toArray(new Ip[]{}), list.toArray(new Ip[]{}));
+					oneCtrl = new CtrlBindAddr(help, list.toArray(new Ip[] {}), list.toArray(new Ip[] {}));
 					break;
 				case COMBOBOX:
 					//listを{"1","2"}で決め打ち

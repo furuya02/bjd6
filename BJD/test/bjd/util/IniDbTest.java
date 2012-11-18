@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -36,21 +35,19 @@ import bjd.ctrl.CtrlType;
 import bjd.ctrl.OneCtrl;
 import bjd.net.InetKind;
 import bjd.net.Ip;
+import bjd.net.IpKind;
 import bjd.option.Crlf;
 import bjd.option.Dat;
 import bjd.option.ListVal;
 import bjd.option.OneVal;
+import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class IniDbTest {
 
 	
 	@RunWith(Theories.class)
-	public static final class A001 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("listVal.add(OneVal)で初期化後、save（） して、当該設定が保存されているかどうか"); //TESTヘッダ
-		}
+	public static final class listVal_add_OneVal_で初期化後saveして当該設定が保存されているかどうか {
 
 		@DataPoints
 		public static Fixture[] datas = { 
@@ -83,8 +80,6 @@ public class IniDbTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-
 			String fileName = "iniDbTestTmp"; //テンポラリファイル名
 			String progDir = new File(".").getAbsoluteFile().getParent(); //カレントディレクトリ
 			String path = String.format("%s\\%s.ini", progDir, fileName);
@@ -98,7 +93,7 @@ public class IniDbTest {
 			listVal.add(Assistance.createOneVal(fx.ctrlType, fx.value));
 			iniDb.save("Basic", listVal); // nameTagは"Basic"で決め打ちされている
 
-			System.out.printf("%s\n", fx.expected);
+			TestUtil.prompt(String.format("%s", fx.expected));
 			try {
 				ArrayList<String> lines = Util.textFileRead(new File(path));
 				assertThat(lines.get(0), is(fx.expected));
@@ -113,11 +108,7 @@ public class IniDbTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A002 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("設定ファイルにテキストでセットして read（） して、当該設定が読み込めるかどうか"); //TESTヘッダ
-		}
+	public static final class 設定ファイルにテキストでセットしてreadして当該設定が読み込めるかどうか {
 
 		@DataPoints
 		public static Fixture[] datas = { 
@@ -147,8 +138,6 @@ public class IniDbTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-
 			String fileName = "iniDbTestTmp"; //テンポラリファイル名
 			String progDir = new File(".").getAbsoluteFile().getParent();
 			String path = String.format("%s\\%s.ini", progDir, fileName);
@@ -168,7 +157,7 @@ public class IniDbTest {
 			
 			OneVal oneVal = listVal.search("name");
 
-			System.out.printf("%s\n", fx.expected);
+			TestUtil.prompt(String.format("%s", fx.expected));
 			assertThat(fx.value, is(oneVal.toReg(false)));
 
 			iniDb.deleteIni();
@@ -258,7 +247,7 @@ public class IniDbTest {
 					}
 					ArrayList<Ip> list = new ArrayList<>();
 					try {
-						list.add(new Ip("INADDR_ANY"));
+						list.add(new Ip(IpKind.INADDR_ANY));
 						list.add(new Ip("192.168.0.1"));
 					} catch (ValidObjException e) {
 						Assert.fail(e.getMessage());
@@ -321,7 +310,7 @@ public class IniDbTest {
 //
 //			TestUtil.dispPrompt(this); //TESTプロンプト
 //
-//			System.out.printf("filename = %s\n", fx.fileName);
+//			System.out.printf("filename = %s", fx.fileName);
 //			
 //			IniDb iniDb = new IniDb(progDir, fx.fileName);
 //			iniDb..save(nameTag, listVal)

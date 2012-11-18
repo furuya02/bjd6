@@ -64,7 +64,7 @@ public final class LogFile implements IDispose {
 	 */
 	public boolean append(OneLog oneLog) {
 		//コンストラクタで初期化に失敗している場合、falseを返す
-		if (timer == null) { 
+		if (timer == null) {
 			return false;
 		}
 		synchronized (lock) {
@@ -91,17 +91,19 @@ public final class LogFile implements IDispose {
 		String fileName = "";
 
 		switch (normalLogKind) {
-			case 0:// bjd.yyyy.mm.dd.log
-				fileName = String.format("%s\\bjd.%04d.%02d.%02d.log", saveDirectory, dt.get(Calendar.YEAR), (dt.get(Calendar.MONTH) + 1), dt.get(Calendar.DATE));
-				break;
-			case 1:// bjd.yyyy.mm.log
-				fileName = String.format("%s\\bjd.%04d.%02d.log", saveDirectory, dt.get(Calendar.YEAR), (dt.get(Calendar.MONTH) + 1));
-				break;
-			case 2:// BlackJumboDog.Log
-				fileName = String.format("%s\\BlackJumboDog.Log", saveDirectory);
-				break;
-			default:
-				Util.runtimeException(String.format("nomalLogKind=%d", normalLogKind));
+		case 0:// bjd.yyyy.mm.dd.log
+			fileName = String.format("%s\\bjd.%04d.%02d.%02d.log", saveDirectory, dt.get(Calendar.YEAR),
+					(dt.get(Calendar.MONTH) + 1), dt.get(Calendar.DATE));
+			break;
+		case 1:// bjd.yyyy.mm.log
+			fileName = String.format("%s\\bjd.%04d.%02d.log", saveDirectory, dt.get(Calendar.YEAR),
+					(dt.get(Calendar.MONTH) + 1));
+			break;
+		case 2:// BlackJumboDog.Log
+			fileName = String.format("%s\\BlackJumboDog.Log", saveDirectory);
+			break;
+		default:
+			Util.runtimeException(String.format("nomalLogKind=%d", normalLogKind));
 		}
 		try {
 			normalLog = new OneLogFile(fileName);
@@ -111,17 +113,19 @@ public final class LogFile implements IDispose {
 		}
 
 		switch (secureLogKind) {
-			case 0:// secure.yyyy.mm.dd.log
-				fileName = String.format("%s\\secure.%04d.%02d.%02d.log", saveDirectory, dt.get(Calendar.YEAR), (dt.get(Calendar.MONTH) + 1), dt.get(Calendar.DATE));
-				break;
-			case 1:// secure.yyyy.mm.log
-				fileName = String.format("%s\\secure.%04d.%02d.log", saveDirectory, dt.get(Calendar.YEAR), (dt.get(Calendar.MONTH) + 1));
-				break;
-			case 2:// secure.Log
-				fileName = String.format("%s\\secure.Log", saveDirectory);
-				break;
-			default:
-				Util.runtimeException(String.format("secureLogKind=%d", secureLogKind));
+		case 0:// secure.yyyy.mm.dd.log
+			fileName = String.format("%s\\secure.%04d.%02d.%02d.log", saveDirectory, dt.get(Calendar.YEAR),
+					(dt.get(Calendar.MONTH) + 1), dt.get(Calendar.DATE));
+			break;
+		case 1:// secure.yyyy.mm.log
+			fileName = String.format("%s\\secure.%04d.%02d.log", saveDirectory, dt.get(Calendar.YEAR),
+					(dt.get(Calendar.MONTH) + 1));
+			break;
+		case 2:// secure.Log
+			fileName = String.format("%s\\secure.Log", saveDirectory);
+			break;
+		default:
+			Util.runtimeException(String.format("secureLogKind=%d", secureLogKind));
 		}
 		try {
 			secureLog = new OneLogFile(fileName);
@@ -130,6 +134,7 @@ public final class LogFile implements IDispose {
 			throw new IOException(String.format("file open error. \"%s\"", fileName));
 		}
 	}
+
 	/**
 	 * オープンしているログファイルを全てクローズする
 	 */
@@ -197,7 +202,7 @@ public final class LogFile implements IDispose {
 			}
 		}
 	}
-	
+
 	private void tail(String fileName, int saveDays, Calendar now) {
 		Calendar targetDt = Calendar.getInstance(); //インスタンスの生成（初期化時間は関係ない）
 		DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -235,7 +240,6 @@ public final class LogFile implements IDispose {
 		}
 	}
 
-
 	/**
 	 * 指定日以前のログファイルを削除する
 	 * @param year
@@ -245,7 +249,7 @@ public final class LogFile implements IDispose {
 	 * @param fullName 
 	 */
 	private void deleteLogFile(int year, int month, int day, int saveDays, String fullName) {
-		
+
 		Calendar targetDt = Calendar.getInstance(); // 現在時間で初期化される
 		targetDt.set(year, month, day);
 		targetDt.add(Calendar.DAY_OF_MONTH, saveDays);
@@ -255,14 +259,13 @@ public final class LogFile implements IDispose {
 			file.delete();
 		}
 	}
-	
 
 	private class MyTimer extends TimerTask {
 		@Override
 		public void run() {
 
 			Calendar now = Calendar.getInstance();
-			
+
 			if (lastDelete == null) {
 				return;
 			}
@@ -272,7 +275,7 @@ public final class LogFile implements IDispose {
 			}
 
 			synchronized (lock) {
-				
+
 				logClose(); // クローズ
 				logDelete(); // 過去ログの自動削除
 				try {
@@ -284,7 +287,6 @@ public final class LogFile implements IDispose {
 			}
 		}
 	}
-
 
 	/**
 	 * 終了処理<br>

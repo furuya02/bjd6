@@ -3,7 +3,7 @@ package bjd.acl;
 import bjd.ValidObjException;
 import bjd.net.InetKind;
 import bjd.net.Ip;
-import bjd.util.Util;
+import bjd.net.IpKind;
 
 /**
  * 
@@ -38,8 +38,8 @@ final class AclV4 extends Acl {
 		//「*」によるALL指定
 		if (ipStr.equals("*") || ipStr.equals("*.*.*.*")) {
 			
-			setStart(new Ip("0.0.0.0"));
-			setEnd(new Ip("255.255.255.255"));
+			setStart(new Ip(IpKind.V4_0));
+			setEnd(new Ip(IpKind.V4_255));
 			//setStatus(true);
 			return; //初期化成功
 		}
@@ -191,11 +191,11 @@ final class AclV4 extends Acl {
 
 	@Override
 	protected void init() {
-		try {
-			setStart(new Ip("0.0.0.0"));
-			setEnd(new Ip("255.255.255.255"));
-		} catch (ValidObjException e) {
-			Util.runtimeException("AclV4 init()");
-		}
+		//try {
+		setStart(new Ip(IpKind.V4_0));
+		setEnd(new Ip(IpKind.V4_255));
+		//} catch (ValidObjException e) {
+		//	Util.runtimeException("AclV4 init()");
+		//}
 	}
 }

@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -12,17 +11,12 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import bjd.ctrl.CtrlType;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class DatTest {
 	@RunWith(Theories.class)
-	public static final class A001 {
-
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromReg()で初期化してtoReg(false)で取り出す");
-		}
+	public static final class fromRegで初期化してtoReg_false_で取り出す {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -42,7 +36,6 @@ public class DatTest {
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this);
 
 			CtrlType[]  ctrlTypeList = new CtrlType[fx.colMax];
 			
@@ -50,7 +43,7 @@ public class DatTest {
 				ctrlTypeList[i] = CtrlType.INT;
 			}
 
-			System.out.printf("fromReg(\"%s\") => toReg(\"%s\")\n", fx.colMax, fx.str);
+			TestUtil.prompt(String.format("fromReg(\"%s\") => toReg(\"%s\")", fx.colMax, fx.str));
 
 			Dat dat = new Dat(ctrlTypeList);
 			if (!dat.fromReg(fx.str)) {
@@ -61,12 +54,8 @@ public class DatTest {
 	}
 	
 	@RunWith(Theories.class)
-	public static final class A002 {
+	public static final class fromRegに無効な文字列を与えると例外_DatExceptionが発生する {
 
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromReg()に無効な文字列を与えると例外(DatException)が発生する");
-		}
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -90,14 +79,13 @@ public class DatTest {
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this);
 
 			CtrlType[] ctrlTypeList = new CtrlType[fx.colMax];
 			for (int i = 0; i < fx.colMax; i++) {
 				ctrlTypeList[i] = CtrlType.INT;
 			}
 
-			System.out.printf("colMax=%d fromReg(\"%s\") => return false\n", fx.colMax, fx.str);
+			TestUtil.prompt(String.format("colMax=%d fromReg(\"%s\") => return false", fx.colMax, fx.str));
 
 			Dat dat = new Dat(ctrlTypeList);
 			if (!dat.fromReg(fx.str)) {
@@ -106,21 +94,5 @@ public class DatTest {
 			Assert.fail("この行が実行されたらエラー");
 		}
 	}
-
-	
-//	@Test
-//	public void testAdd() {
-//		fail("まだ実装されていません");
-//	}
-//
-//	@Test
-//	public void testToReg() {
-//		fail("まだ実装されていません");
-//	}
-//
-//	@Test
-//	public void testFromReg() {
-//		fail("まだ実装されていません");
-//	}
 
 }

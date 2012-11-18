@@ -41,13 +41,8 @@ public final class LocalAddress extends ValidObj {
 	 */
 	private LocalAddress() {
 		init(); //初期化
-		try {
-			v4.add(new Ip("INADDR_ANY"));
-			v6.add(new Ip("IN6ADDR_ANY_INIT"));
-		} catch (ValidObjException ex) {
-			//状息の初期化で例外となった場合は、実行時例外とする
-			Util.runtimeException("Ip(INADDR_ANY) Ip(IN6ADDR_ANY_INIT)"); //実行時例外
-		}
+		v4.add(new Ip(IpKind.INADDR_ANY));
+		v6.add(new Ip(IpKind.IN6ADDR_ANY_INIT));
 
 		Enumeration<NetworkInterface> interfaceList;
 		try {

@@ -5,21 +5,18 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import bjd.test.TestUtil;
+
 @RunWith(Enclosed.class)
 public class InetTest {
 	@RunWith(Theories.class)
-	public static final class A001 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("toBytes[]"); //TESTヘッダ
-		}
+	public static final class toBytes {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("本日は晴天なり", "feff672c65e5306f66745929306a308a"), new Fixture("12345", "feff00310032003300340035"),
@@ -38,8 +35,7 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.getBytes(\"%s\")=%s\n", fx.str, fx.byteStr);
+			TestUtil.prompt(String.format("Inet.getBytes(\"%s\")=%s", fx.str, fx.byteStr));
 			byte[] bytes = Inet.toBytes(fx.str);
 			StringBuilder sb = new StringBuilder(bytes.length * 2);
 			for (byte b : bytes) {
@@ -50,11 +46,7 @@ public class InetTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A002 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromBytes[]"); //TESTヘッダ
-		}
+	public static final class fromBytes {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("本日は晴天なり", "feff672c65e5306f66745929306a308a"), new Fixture("12345", "feff00310032003300340035"),
@@ -73,8 +65,7 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.fromBytes(\"%s\")=%s\n", fx.byteStr, fx.str);
+			TestUtil.prompt(String.format("Inet.fromBytes(\"%s\")=%s", fx.byteStr, fx.str));
 			byte[] bytes = new byte[fx.byteStr.length() / 2];
 			for (int index = 0; index < bytes.length; index++) {
 				bytes[index] = (byte) Integer.parseInt(fx.byteStr.substring(index * 2, (index + 1) * 2), 16);
@@ -85,11 +76,7 @@ public class InetTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A003 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromBytes[String]"); //TESTヘッダ
-		}
+	public static final class fromBytes_String {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("1\r\n2\r\n3", 3), new Fixture("1\r\n2\r\n3\r\n", 3), new Fixture("1\n2\n3", 1), new Fixture("", 0),
@@ -108,19 +95,14 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.getLines(\"%s\") count=%d\n", TestUtil.toString(fx.str), fx.count);
+			TestUtil.prompt(String.format("Inet.getLines(\"%s\") count=%d", TestUtil.toString(fx.str), fx.count));
 			ArrayList<String> lines = Inet.getLines(fx.str);
 			assertThat(lines.size(), is(fx.count));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A004 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("fromBytes[byte[]]"); //TESTヘッダ
-		}
+	public static final class fromBytes_byte__ {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture(new byte[] { 0x62, 0x0d, 0x0a, 0x62, 0x0d, 0x0a, 0x62 }, 3),
@@ -140,21 +122,15 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-
-			System.out.printf("Inet.getLines(\"%s\") count=%d\n", TestUtil.toString(fx.buf), fx.count);
+			TestUtil.prompt(String.format("Inet.getLines(\"%s\") count=%d", TestUtil.toString(fx.buf), fx.count));
 			ArrayList<byte[]> lines = Inet.getLines(fx.buf);
 			assertThat(lines.size(), is(fx.count));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A005 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("trimCrlf(String)"); //TESTヘッダ
-		}
-
+	public static final class trimCrlf_String {
+		
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("1", "1"), new Fixture("1\r\n", "1"), new Fixture("1\r", "1\r"), new Fixture("1\n", "1"),
 				new Fixture("1\n2\n", "1\n2"), };
@@ -172,19 +148,13 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-
-			System.out.printf("Inet.trimCrlf(\"%s\") =%s\n", TestUtil.toString(fx.str), fx.expected);
+			TestUtil.prompt(String.format("Inet.trimCrlf(\"%s\") =%s", TestUtil.toString(fx.str), fx.expected));
 			assertThat(Inet.trimCrlf(fx.str), is(fx.expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A006 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("trimCrlf(byte[])"); //TESTヘッダ
-		}
+	public static final class trimCrlf_byte配列 {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture(new byte[] { 0x64 }, new byte[] { 0x64 }),
@@ -205,18 +175,13 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.trimCrlf(%s) = %s\n", TestUtil.toString(fx.buf), TestUtil.toString(fx.expected));
+			TestUtil.prompt(String.format("Inet.trimCrlf(%s) = %s", TestUtil.toString(fx.buf), TestUtil.toString(fx.expected)));
 			assertThat(Inet.trimCrlf(fx.buf), is(fx.expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A007 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("サニタイズ処理"); //TESTヘッダ
-		}
+	public static final class サニタイズ処理 {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("<HTML>", "&lt;HTML&gt;"), new Fixture("R&B", "R&amp;B"), new Fixture("123~", "123%7E"), };
@@ -234,19 +199,14 @@ public class InetTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.Sanitize(\"%s\") = \"%s\"\n", fx.str, fx.expected);
+			TestUtil.prompt(String.format("Inet.Sanitize(\"%s\") = \"%s\"", fx.str, fx.expected));
 			assertThat(Inet.sanitize(fx.str), is(fx.expected));
 		}
 
 	}
 
 	@RunWith(Theories.class)
-	public static final class A008 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("MD5ハッシュ文字列"); //TESTヘッダ
-		}
+	public static final class MD5ハッシュ文字列 {
 
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("<HTML>", "BE-90-72-8C-11-BF-70-8F-52-50-28-A6-78-0F-8E-17"),
@@ -265,8 +225,7 @@ public class InetTest {
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			System.out.printf("Inet.Md5Str(\"%s\") = \"%s\"\n", fx.str, fx.expected);
+			TestUtil.prompt(String.format("Inet.Md5Str(\"%s\") = \"%s\"\n", fx.str, fx.expected));
 			assertThat(Inet.md5Str(fx.str), is(fx.expected));
 		}
 

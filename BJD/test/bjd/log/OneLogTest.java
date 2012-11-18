@@ -11,16 +11,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import bjd.ValidObjException;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 public final class OneLogTest {
 
 	@Test
-	public void a001() {
-
-		TestUtil.dispHeader("a001 無効な文字列で初期化すると例外が発生する");
-
-		TestUtil.dispPrompt(this, String.format("new OneLog(\"xxx\") => IllegalArgumentException"));
+	public void 無効な文字列で初期化すると例外が発生する() {
+		TestUtil.prompt(String.format("new OneLog(\"xxx\") => IllegalArgumentException"));
 
 		try {
 			new OneLog("xxx");
@@ -32,9 +29,7 @@ public final class OneLogTest {
 	}
 
 	@Test
-	public void a002() {
-
-		TestUtil.dispHeader("a002 初期化とtoString()");
+	public void 初期化とtoString() {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(0)); // 1970.1.1で初期化
@@ -47,17 +42,15 @@ public final class OneLogTest {
 		String detailInfomation = "DETAIL";
 		OneLog oneLog = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
 
-		String expected = "1970/01/01 09:00:00\tDEBUG\t100\tNAME\t127.0.0.1\t    200\tMSG\tDETAIL";
+		String expected = "1970/01/01 09:00:00\tDEBUG\t100\tNAME\t127.0.0.1\t0000200\tMSG\tDETAIL";
 
-		TestUtil.dispPrompt(this, String.format("new OneLog() => toString()=%s", expected));
+		TestUtil.prompt(String.format("new OneLog() => toString()=%s", expected));
 		assertThat(oneLog.toString(), is(expected));
 
 	}
 
 	@Test
-	public void a003() {
-
-		TestUtil.dispHeader("a003 セキュアログの確認");
+	public void セキュアログの確認() {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date(0)); // 1970.1.1で初期化
@@ -70,13 +63,13 @@ public final class OneLogTest {
 
 		LogKind logKind = LogKind.DEBUG;
 		boolean expected = false;
-		TestUtil.dispPrompt(this, String.format("new OneLog(LogKind=%s) => isSecure()=%s", logKind, expected));
+		TestUtil.prompt(String.format("new OneLog(LogKind=%s) => isSecure()=%s", logKind, expected));
 		OneLog oneLog = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
 		assertThat(oneLog.isSecure(), is(expected));
 
 		logKind = LogKind.SECURE;
 		expected = true;
-		TestUtil.dispPrompt(this, String.format("new OneLog(LogKind=%s) => isSecure()=%s", logKind, expected));
+		TestUtil.prompt(String.format("new OneLog(LogKind=%s) => isSecure()=%s", logKind, expected));
 		oneLog = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
 		assertThat(oneLog.isSecure(), is(expected));
 

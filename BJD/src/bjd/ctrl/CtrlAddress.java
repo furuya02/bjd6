@@ -8,6 +8,8 @@ import javax.swing.text.AbstractDocument;
 
 import bjd.ValidObjException;
 import bjd.net.Ip;
+import bjd.net.IpKind;
+import bjd.util.Util;
 
 /**
  * IPv4アドレス　コントロール
@@ -92,8 +94,9 @@ public final class CtrlAddress extends OneCtrl implements DocumentListener {
 			String ipStr = String.format("%d.%d.%d.%d", Integer.valueOf(textFieldList[0].getText()), Integer.valueOf(textFieldList[1].getText()),
 					Integer.valueOf(textFieldList[2].getText()), Integer.valueOf(textFieldList[3].getText()));
 			return new Ip(ipStr);
-		} catch (Exception ex) {
-			System.out.printf("%s", ex);
+		} catch (Exception e) {
+			//ここでの例外は、設計の問題
+			Util.runtimeException(this, e);
 			return null;
 		}
 	}
@@ -147,12 +150,13 @@ public final class CtrlAddress extends OneCtrl implements DocumentListener {
 
 	@Override
 	protected void abstractFromText(String s) {
+		Ip ip = null;
 		try {
-			Ip ip = new Ip(s);
-			abstractWrite(ip);
+			ip = new Ip(s);
 		} catch (ValidObjException e) {
-			//TODO ここの例外処理が必要
+			ip = new Ip(IpKind.V4_0);
 		}
+		abstractWrite(ip);
 	}
 
 	@Override

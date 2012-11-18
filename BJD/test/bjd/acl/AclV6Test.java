@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -13,17 +12,13 @@ import org.junit.runner.RunWith;
 
 import bjd.ValidObjException;
 import bjd.net.Ip;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 
 @RunWith(Enclosed.class)
 public class AclV6Test {
 	@RunWith(Theories.class)
-	public static final class A001 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("Acl()で生成して、StartとEndを検証"); //TESTヘッダ
-		}
+	public static final class startとendの確認 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -46,17 +41,21 @@ public class AclV6Test {
 				this.startStr = startStr;
 				this.endStr = endStr;
 			}
+			
+			public String toString() {
+				return String.format("new AclV6(%s) => getStartr()=%s getEnd()=%s", aclStr, startStr, endStr);
+			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
+			TestUtil.prompt(fx.toString()); 
 			try {
-				AclV6 aclV6 = new AclV6("test", fx.aclStr);
-				System.out.printf("new AclV6(%s) => start=%s end=%s\n", fx.aclStr, fx.startStr, fx.endStr);
-				assertThat(aclV6.getStart().toString(), is(fx.startStr));
-				assertThat(aclV6.getEnd().toString(), is(fx.endStr));
+				AclV6 sut = new AclV6("TEST", fx.aclStr);
+				assertThat(fx.toString(), sut.getStart().toString(), is(fx.startStr));
+				assertThat(fx.toString(), sut.getEnd().toString(), is(fx.endStr));				
+				
 			} catch (ValidObjException e) {
 				Assert.fail(e.getMessage());
 			}
@@ -64,11 +63,7 @@ public class AclV6Test {
 	}
 	
 	@RunWith(Theories.class)
-	public static final class A002 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("範囲に入っているかどうかの検証 　isHit()"); //TESTヘッダ
-		}
+	public static final class isHitを使用して範囲に入っているかを確認する {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -87,20 +82,21 @@ public class AclV6Test {
 				this.ipStr = ipStr;
 				this.expected = expected;
 			}
+
+			public String toString() {
+				return String.format("new AclV6(%s) => isHit(%s)=%s", aclStr, ipStr, expected);
+			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this); //TESTプロンプト
+
+			TestUtil.prompt(fx.toString()); 
 
 			try {
-				AclV6 aclV6 = new AclV6("test", fx.aclStr);
-				System.out.printf("new AclV6(%s) => isHit(%s)=%s\n", fx.aclStr, fx.ipStr, fx.expected);
-				//Ip a = aclV6.getStart();
-				//Ip b = aclV6.getEnd();
-				//Ip c = new Ip(fx.ipStr);
-				aclV6.isHit(new Ip(fx.ipStr));
-				assertThat(aclV6.isHit(new Ip(fx.ipStr)), is(fx.expected));
+				AclV6 sut = new AclV6("TEST", fx.aclStr);
+				boolean actual = sut.isHit(new Ip(fx.ipStr));
+				assertThat(fx.toString(), actual, is(fx.expected));
 
 			} catch (ValidObjException e) {
 				Assert.fail(e.getMessage());
@@ -109,11 +105,7 @@ public class AclV6Test {
 	}
 	
 	@RunWith(Theories.class)
-	public static final class A003 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("無効な文字列で初期化した場合に例外が発生するかの検証"); //TESTヘッダ
-		}
+	public static final class 無効な文字列で初期化した場合に例外が発生する {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -129,47 +121,24 @@ public class AclV6Test {
 			public Fixture(String aclStr) {
 				this.aclStr = aclStr;
 			}
+
+			public String toString() {
+				return String.format("new AclV6(%s) => ValidObjException", aclStr);
+			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this); //TESTプロンプト
+
+			TestUtil.prompt(fx.toString()); 
+			
 			try {
-				new AclV6("test", fx.aclStr);
+				new AclV6("TEST", fx.aclStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				System.out.printf("new AclV6(%s) => ValidObjException\n", fx.aclStr);
 				return;
 			}
 			Assert.fail("この行が実行されたらエラー");
 		}
 	}
-
-
 }
-
-/*
-        [TestCase("1122:3344::/32", "1122:3344::", "1122:3344:ffff:ffff:ffff:ffff:ffff:FFFF")]
-        [TestCase("1122:3344::/64", "1122:3344::", "1122:3344::ffff:ffff:ffff:FFFF")]
-        [TestCase("1122:3344::-1122:3355::", "1122:3344::", "1122:3355::")]
-        [TestCase("1122:3355::-1122:3344::", "1122:3344::", "1122:3355::")]
-        [TestCase("1122:3344::2", "1122:3344::2", "1122:3344::2")]
-        [TestCase("*", "::0", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")]
-        [TestCase("*:*:*:*:*:*:*:*", "::0", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")]
-        public void StartEndTest(string strAcl, string start, string end) {
-            var o = new AclV6("test", strAcl);
-            Assert.AreEqual(o.Start, new Ip(start));
-            Assert.AreEqual(o.End, new Ip(end));
-        }
-
-        [TestCase("1122:3344::/64", "1122:3343::", false)]
-        [TestCase("1122:3344::/64", "1122:3344::1", true)]
-        [TestCase("1122:3344::/64", "1122:3345::", false)]
-        public void IsHitTest(string strAcl, string ipStr, bool status) {
-            var o = new AclV6("test", strAcl);
-            Assert.AreEqual(o.IsHit(new Ip(ipStr)), status);
-        }
-    }
-
-}
-*/

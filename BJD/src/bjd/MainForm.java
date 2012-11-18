@@ -75,6 +75,7 @@ public final class MainForm implements WindowListener {
 		//画面構成
 		//*************************************************
 		ListView listView = new ListView("listViewLog");
+<<<<<<< HEAD
 		listView.addColumn("日時");
 		listView.addColumn("種類");
 		listView.addColumn("スレッドID");
@@ -91,6 +92,24 @@ public final class MainForm implements WindowListener {
 		listView.setColWidth(5, 70);
 		listView.setColWidth(6, 200);
 		listView.setColWidth(7, 300);
+=======
+//		listView.addColumn("日時");
+//		listView.addColumn("種類");
+//		listView.addColumn("スレッドID");
+//		listView.addColumn("機能（サーバ）");
+//		listView.addColumn("アドレス");
+//		listView.addColumn("メッセージID");
+//		listView.addColumn("説明");
+//		listView.addColumn("詳細情報");
+//		listView.setColWidth(0, 120);
+//		listView.setColWidth(1, 60);
+//		listView.setColWidth(2, 60);
+//		listView.setColWidth(3, 80);
+//		listView.setColWidth(4, 80);
+//		listView.setColWidth(5, 70);
+//		listView.setColWidth(6, 200);
+//		listView.setColWidth(7, 300);
+>>>>>>> work
 
 		JMenuBar menuBar = new JMenuBar();
 		StatusBar bar = new StatusBar();

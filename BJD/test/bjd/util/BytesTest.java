@@ -3,13 +3,14 @@ package bjd.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+
+import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class BytesTest {
@@ -36,11 +37,7 @@ public class BytesTest {
 	
 	
 	@RunWith(Theories.class)
-	public static final class A001 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("Bytes.create(....) offset番目のデータの確認"); //TESTヘッダ
-		}
+	public static final class Bytes_create_offset番目のデータの確認 {
 		@DataPoints
 		public static Fixture[] datas = {
 			new Fixture(100, (byte) 1),		
@@ -65,20 +62,15 @@ public class BytesTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			
-			System.out.printf("data[%d] = %d\n", fx.offset, fx.expected);
+		
+			TestUtil.prompt(String.format("data[%d] = %d", fx.offset, fx.expected));
 			byte [] data = Data.generate();
 			assertThat(data[fx.offset], is(fx.expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class A002 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("Bytes.search() 指定したoffset以降で、「\"123\"」が出現する位置を検索する"); //TESTヘッダ
-		}
+	public static final class Bytes_search指定したoffset以降で123が出現する位置を検索する {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -101,9 +93,7 @@ public class BytesTest {
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
-			
-			System.out.printf("data.indexOf(%d,\"123\") = %d\n", fx.offset, fx.expected);
+			TestUtil.prompt(String.format("data.indexOf(%d,\"123\") = %d", fx.offset, fx.expected));
 			byte [] data = Data.generate();
 			byte [] src = ("123").getBytes();
 

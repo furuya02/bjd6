@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 
 import bjd.ValidObj;
 import bjd.ValidObjException;
+import bjd.util.Util;
 
 /**
  * Ipアドレスを表現するクラス<br>
@@ -123,6 +124,105 @@ public final class Ip extends ValidObj {
 	 * @throws ValidObjException 初期化失敗
 	 */
 	public Ip(String ipStr) throws ValidObjException {
+		init(ipStr);
+	}
+
+	/**
+	 * InetAddrによるコンストラクタ
+	 * @param inetAddress
+	 */
+	public Ip(InetAddress inetAddress) {
+		String ipStr = inetAddress.toString();
+		if (ipStr.charAt(0) == '/') {
+			ipStr = ipStr.substring(1);
+		}
+		try {
+			init(ipStr);
+		} catch (ValidObjException e) {
+			//InetAddressからの生成では、原則として例外は発生しないはず
+			Util.runtimeException(this, e);
+		}
+	}
+
+	/**
+	 * IpKindによるコンストラクタ
+	 * @param ipKind
+	 */
+	public Ip(IpKind ipKind) {
+		String ipStr = "";
+		switch (ipKind) {
+		case V4_0:
+			ipStr = "0.0.0.0";
+			break;
+		case V4_255:
+			ipStr = "255.255.255.255";
+			break;
+		case V6_0:
+			ipStr = "::";
+			break;
+		case V6_FF:
+			ipStr = "FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF";
+			break;
+		case INADDR_ANY:
+			ipStr = "INADDR_ANY";
+			break;
+		case IN6ADDR_ANY_INIT:
+			ipStr = "IN6ADDR_ANY_INIT";
+			break;
+		case V4_LOCALHOST:
+			ipStr = "127.0.0.1";
+			break;
+		case V6_LOCALHOST:
+			ipStr = "::1";
+			break;
+		default:
+			//定義が不足している場合
+			Util.runtimeException(String.format("Ip(IpKind) ipKind=%s", ipKind));
+			break;
+		}
+		try {
+			init(ipStr);
+		} catch (ValidObjException e) {
+			//ここで例外が発生するのは、設計上の問題
+			Util.runtimeException(this, e);
+		}
+	}
+
+	/**
+	 * コンストラクタ<br>
+	 * IPv4のバイトオーダで初期化する<br>
+	 * @param ip バイトオーダ 　4byte(32bit)
+	 */
+	public Ip(int ip) {
+		init(InetKind.V4); // デフォルト値での初期化
+
+		ipV4 = ByteBuffer.allocate(4).putInt(ip).array();
+		if (isAllZero(ipV4)) {
+			any = true;
+		}
+	}
+
+	/**
+	 * コンストラクタ<br>
+	 * IPv6のバイトオーダで初期化する<br>
+	 * 
+	 * @param h 上位バイトオーダ　8byte(64bit)
+	 * @param l　下位バイトオーダ　8byte(64bit)
+	 */
+	public Ip(long h, long l) {
+
+		init(InetKind.V6); // デフォルト値での初期化
+		byte[] b = ByteBuffer.allocate(8).putLong(h).array();
+		for (int i = 0; i < 8; i++) {
+			ipV6[i] = b[i];
+		}
+		b = ByteBuffer.allocate(8).putLong(l).array();
+		for (int i = 0; i < 8; i++) {
+			ipV6[i + 8] = b[i];
+		}
+	}
+
+	private void init(String ipStr) throws ValidObjException {
 		init(InetKind.V4);
 
 		if (ipStr == null) {
@@ -215,40 +315,6 @@ public final class Ip extends ValidObj {
 			}
 		} else {
 			throwException(ipStr); //例外終了
-		}
-	}
-
-	/**
-	 * コンストラクタ<br>
-	 * IPv4のバイトオーダで初期化する<br>
-	 * @param ip バイトオーダ 　4byte(32bit)
-	 */
-	public Ip(int ip) {
-		init(InetKind.V4); // デフォルト値での初期化
-
-		ipV4 = ByteBuffer.allocate(4).putInt(ip).array();
-		if (isAllZero(ipV4)) {
-			any = true;
-		}
-	}
-
-	/**
-	 * コンストラクタ<br>
-	 * IPv6のバイトオーダで初期化する<br>
-	 * 
-	 * @param h 上位バイトオーダ　8byte(64bit)
-	 * @param l　下位バイトオーダ　8byte(64bit)
-	 */
-	public Ip(long h, long l) {
-
-		init(InetKind.V6); // デフォルト値での初期化
-		byte[] b = ByteBuffer.allocate(8).putLong(h).array();
-		for (int i = 0; i < 8; i++) {
-			ipV6[i] = b[i];
-		}
-		b = ByteBuffer.allocate(8).putLong(l).array();
-		for (int i = 0; i < 8; i++) {
-			ipV6[i + 8] = b[i];
 		}
 	}
 

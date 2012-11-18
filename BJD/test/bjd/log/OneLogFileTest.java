@@ -12,22 +12,20 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public final class OneLogFileTest {
 
 	@Test
-	public void a001() {
+	public void 一度disposeしたファイルに正常に追加できるかどうか() {
 
-		TestUtil.dispHeader("a001 一度dispose()したファイルに正常に追加できるかどうか"); // TESTヘッダ
 
 		String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
 		String fileName = String.format("%s\\OneLogFileTest.txt", currentDir);
 
 		(new File(fileName)).delete();
 
-		TestUtil.dispPrompt(this); // TESTプロンプト
 		System.out.println(String.format("new OneLogFile() -> set(\"1\") -> set(\"2\") -> set(\"3\") -> dispose()"));
 		try {
 			OneLogFile oneLogFile = new OneLogFile(fileName);
@@ -50,11 +48,8 @@ public final class OneLogFileTest {
 		assertThat(lines.get(2), is("3"));
 		assertEquals(3, lines.size());
 
-		TestUtil.dispPrompt(this); // TESTプロンプト
-		System.out.println(String.format("lines.length==3"));
-
-		TestUtil.dispPrompt(this); // TESTプロンプト
-		System.out.println(String.format("new OneLogFile() -> set(\"4\") -> set(\"5\") -> set(\"6\") -> dispose()"));
+		TestUtil.prompt(String.format("lines.length==3"));
+		TestUtil.prompt(String.format("new OneLogFile() -> set(\"4\") -> set(\"5\") -> set(\"6\") -> dispose()"));
 
 		try {
 			OneLogFile oneLogFile = new OneLogFile(fileName);
@@ -80,8 +75,7 @@ public final class OneLogFileTest {
 
 		assertEquals(6, lines.size());
 
-		TestUtil.dispPrompt(this); // TESTプロンプト
-		System.out.println(String.format("lines.length==6"));
+		TestUtil.prompt(String.format("lines.length==6"));
 
 		(new File(fileName)).delete();
 

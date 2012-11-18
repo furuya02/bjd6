@@ -1,17 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 本プロジェクトを再コンパイルしてBJD/bin/pluginsの下にjarファイルを生成する -->
 <project name="build" default="default" basedir="./">
-   	<property name="target" value="SampleServer"/>
+	<!-- ここだけプロジェクトごとに名前を変えればよい -->
+   	<property name="name" value="Sample"/>
+	
+	<!-- ソースの配置が換わる場合、ここを修正する -->
 	<property name="dev" value="C:/dev/bjd6"/>
+	
+   	<property name="target" value="${name}Server"/>
    	<property name="project" value="${dev}/${target}"/>
 	<property name="out" value="${dev}/BJD/bin/plugins"/>
 
 	<target name="default">
   		
 		<!-- 出力フォルダの作成 -->
-   		<mkdir dir="${out}"/>
+		<mkdir dir="${out}"/>
   		
 		<!-- コンパイル class生成 -->
+		<delete dir="${project}/bin"/>
    		<mkdir dir="${project}/bin"/>
   		<javac fork="true" encoding="utf-8" srcdir="${project}/src" 
   			destdir="${project}/bin" includeantruntime="false" classpath="${dev}/BJD/bin">

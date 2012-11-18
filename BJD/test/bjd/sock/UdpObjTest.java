@@ -9,7 +9,11 @@ import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 import bjd.util.Util;
 
 //**************************************************
@@ -73,37 +77,38 @@ public final class UdpObjTest {
 			}
 		}
 	}
-/*
-	class EchoServer extends OneServer {
 
-		public EchoServer(Conf conf, OneBind oneBind) {
-			super(new Kernel(),"NAME",conf,oneBind);
+	/*
+		class EchoServer extends OneServer {
+
+			public EchoServer(Conf conf, OneBind oneBind) {
+				super(new Kernel(),"NAME",conf,oneBind);
+			}
+
+			@Override
+			public String getMsg(int messageNo) {
+				return null;
+			}
+
+			@Override
+			protected void onStopServer() {
+			}
+
+			@Override
+			protected boolean onStartServer() {
+				return true;
+			}
+
+			@Override
+			protected void onSubThread(SockObj sockObj) {
+				SockUdp sockUdp = (SockUdp) sockObj;
+				System.out.println(String.format("onSubThread"));
+
+				byte[] buf = sockUdp.recv();
+				sockUdp.send(buf);
+			}
 		}
-
-		@Override
-		public String getMsg(int messageNo) {
-			return null;
-		}
-
-		@Override
-		protected void onStopServer() {
-		}
-
-		@Override
-		protected boolean onStartServer() {
-			return true;
-		}
-
-		@Override
-		protected void onSubThread(SockObj sockObj) {
-			SockUdp sockUdp = (SockUdp) sockObj;
-			System.out.println(String.format("onSubThread"));
-
-			byte[] buf = sockUdp.recv();
-			sockUdp.send(buf);
-		}
-	}
-*/
+	*/
 
 	/*
 	@Test
@@ -135,42 +140,44 @@ public final class UdpObjTest {
 		int timeout = 100;
 		Ssl ssl = null;
 		SockUdp sock = new SockUdp(new Ip(addr), port, timeout, ssl, tmp);
-		TestUtil.dispPrompt(this, "sock = new SockUdp()");
+		TestUtil.prompt( "sock = new SockUdp()");
 
 		for (int i = 0; i < 10; i++) {
 			sock.send(tmp);
-			TestUtil.dispPrompt(this, String.format("sock.send(%dbyte)", tmp.length));
+			TestUtil.prompt( String.format("sock.send(%dbyte)", tmp.length));
 
 			//送信データが到着するまで、少し待機する
 			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
 			Util.sleep(sleep);
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
+=======
+			TestUtil.prompt( String.format("Thread.sleep(%d)", sleep));
+>>>>>>> work
 
-			TestUtil.dispPrompt(this, String.format("sock.length()=%d", sock.length()));
+			TestUtil.prompt( String.format("sock.length()=%d", sock.length()));
 			Assert.assertEquals((i + 1) * max, sock.length());
 		}
-		TestUtil.dispPrompt(this, String.format("sock.close()"));
+		TestUtil.prompt( String.format("sock.close()"));
 		sock.close();
 		echoServer.stop();
 	}
 	*/
 	@Test
-	public void a002() {
-
-		TestUtil.dispHeader("a002 Echoサーバにsend(送信)して、length分ずつRecv()する");
+	public void Echoサーバにsendしてlength分ずつRecvする() {
 
 		String addr = "127.0.0.1";
 		int port = 53;
 
-//		OneBind oneBind = new OneBind(new Ip(addr), ProtocolKind.Udp);
-//		OptionSample optionSample = new OptionSample(new Kernel(), "", "Sample");
-//		Conf conf = new Conf(optionSample);
-//		conf.set("port", port);
-//		conf.set("multiple", 10);
-//		conf.set("acl", new Dat(new CtrlType[0]));
-//		conf.set("enableAcl", 1);
-//		conf.set("timeOut", 3);
-//		EchoServer echoServer = new EchoServer(conf, oneBind);
+		//		OneBind oneBind = new OneBind(new Ip(addr), ProtocolKind.Udp);
+		//		OptionSample optionSample = new OptionSample(new Kernel(), "", "Sample");
+		//		Conf conf = new Conf(optionSample);
+		//		conf.set("port", port);
+		//		conf.set("multiple", 10);
+		//		conf.set("acl", new Dat(new CtrlType[0]));
+		//		conf.set("enableAcl", 1);
+		//		conf.set("timeOut", 3);
+		//		EchoServer echoServer = new EchoServer(conf, oneBind);
 		EchoServer echoServer = new EchoServer(addr, port);
 		echoServer.start();
 
@@ -189,18 +196,18 @@ public final class UdpObjTest {
 			ip = new Ip(addr);
 		} catch (ValidObjException ex) {
 			Assert.fail(ex.getMessage());
-		}		
+		}
 		for (int i = 0; i < loop; i++) {
 			SockUdp sockUdp = new SockUdp(ip, port, timeout, ssl, tmp);
-			TestUtil.dispPrompt(this, String.format("sockUdp = new SockUdp(%dbyte)", tmp.length));
+			TestUtil.prompt(String.format("sockUdp = new SockUdp(%dbyte)", tmp.length));
 			int len = 0;
 			while (len == 0) {
 				len = sockUdp.length();
 				Util.sleep(0);
 			}
-			TestUtil.dispPrompt(this, String.format("len=%d", len));
+			TestUtil.prompt(String.format("len=%d", len));
 			byte[] b = sockUdp.recv();
-			TestUtil.dispPrompt(this, String.format("b=recv()  b.length=%d", b.length));
+			TestUtil.prompt(String.format("b=recv()  b.length=%d", b.length));
 			for (int m = 0; m < max; m += 10) {
 				Assert.assertEquals(b[m], tmp[m]); //送信したデータと受信したデータが同一かどうかのテスト
 			}

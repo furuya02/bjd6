@@ -11,7 +11,10 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 import bjd.ILife;
+<<<<<<< HEAD
 import bjd.ThreadBase;
+=======
+>>>>>>> work
 import bjd.net.InetKind;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
@@ -156,6 +159,33 @@ public class SockServer extends SockObj {
 			}
 		}
 		setError("isLife()==false");
+		return null;
+	}
+
+	/**
+	 * 指定したアドレス・ポートで待ち受けて、接続されたら、そのソケットを返す<br>
+	 * 失敗した時nullが返る
+	 * @param ip 待ち受けるアドレス
+	 * @param port 待ち受けるポート
+	 * @param iLife ILifeインターフェースオブジェクト
+	 * @return SockTcp
+	 */
+	public static SockTcp createConnection(Ip ip, int port, ILife iLife) {
+		SockServer sockServer = new SockServer(ProtocolKind.Tcp);
+		if (sockServer.getSockState() != SockState.Error) {
+			int listenMax = 1;
+			if (sockServer.bind(ip, port, listenMax)) {
+				while (iLife.isLife()) {
+					final SockTcp child = (SockTcp) sockServer.select(iLife);
+					if (child == null) {
+						break;
+					}
+					sockServer.close(); //これ大丈夫？
+					return child;
+				}
+			}
+		}
+		sockServer.close();
 		return null;
 	}
 }

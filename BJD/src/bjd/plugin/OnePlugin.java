@@ -99,7 +99,7 @@ public final class OnePlugin implements IDispose {
 			return (OneServer) constructor.newInstance(new Object[] { kernel, conf, oneBind });
 		} catch (Exception e) {
 			//何の例外が発生しても、プラグインとしては受け付けない
-			Util.runtimeException(e.getMessage());
+			Util.runtimeException(this, e);
 			return null;
 		}
 	}

@@ -4,7 +4,9 @@
    	
 	<property name="target" value="BJD"/>
 	
-   	<property name="dev" value="C:/dev/bjd6"/>
+	<!-- ソースの配置が換わる場合、ここを修正する -->
+	<property name="dev" value="C:/dev/bjd6"/>
+
    	<property name="project" value="${dev}/${target}"/>
 	<property name="out" value="${dev}/out"/>
 	<target name="main">
@@ -42,6 +44,7 @@
 		<!--【プラグインの構築】 -->
 		<!-- BJD/bin/pluginの下に各プラグインサーバのjarファイルが生成される -->
 		<ant antfile="${dev}/SampleServer/build.xml" target="default" inheritAll="false" />
+		<ant antfile="${dev}/FtpServer/build.xml" target="default" inheritAll="false" />
 		
 		
 		<!--【プラグインのコピー】-->

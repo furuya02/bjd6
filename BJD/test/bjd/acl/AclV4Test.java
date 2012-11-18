@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
@@ -13,17 +12,13 @@ import org.junit.runner.RunWith;
 
 import bjd.ValidObjException;
 import bjd.net.Ip;
-import bjd.util.TestUtil;
+import bjd.test.TestUtil;
 
 
 @RunWith(Enclosed.class)
 public class AclV4Test {
 	@RunWith(Theories.class)
-	public static final class A001 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("Acl()で生成して、StartとEndを検証"); //TESTヘッダ
-		}
+	public static final class startとendの確認 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -47,18 +42,22 @@ public class AclV4Test {
 				this.startStr = startStr;
 				this.endStr = endStr;
 			}
+
+			public String toString() {
+				return String.format("new AclV4(%s) => getStartr()=%s getEnd()=%s", aclStr, startStr, endStr);
+			}
+
 		}
 
 		@Theory
 		public void test(Fixture fx) {
 
-			TestUtil.dispPrompt(this); //TESTプロンプト
+			TestUtil.prompt(fx.toString()); 
 
 			try {
-				AclV4 aclV4 = new AclV4("test", fx.aclStr);
-				System.out.printf("new AclV4(%s) => start=%s end=%s\n", fx.aclStr, fx.startStr, fx.endStr);
-				assertThat(aclV4.getStart().toString(), is(fx.startStr));
-				assertThat(aclV4.getEnd().toString(), is(fx.endStr));
+				AclV4 sut = new AclV4("test", fx.aclStr);
+				assertThat(sut.getStart().toString(), is(fx.startStr));
+				assertThat(sut.getEnd().toString(), is(fx.endStr));
 			} catch (ValidObjException e) {
 				Assert.fail(e.getMessage());
 			}
@@ -67,11 +66,7 @@ public class AclV4Test {
 	}
 	
 	@RunWith(Theories.class)
-	public static final class A002 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("範囲に入っているかどうかの検証 　isHit()"); //TESTヘッダ
-		}
+	public static final class isHitを使用して範囲に入っているかを確認する {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -91,14 +86,19 @@ public class AclV4Test {
 				this.ipStr = ipStr;
 				this.expected = expected;
 			}
+
+			public String toString() {
+				return String.format("new AclV4(%s) => isHit(%s)=%s", aclStr, ipStr, expected);
+			}
+
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this); //TESTプロンプト
+			TestUtil.prompt(fx.toString()); 
+
 			try {
 				AclV4 aclV4 = new AclV4("test", fx.aclStr);
-				System.out.printf("new AclV4(%s) => isHit(%s)=%s\n", fx.aclStr, fx.ipStr, fx.expected);
 				assertThat(aclV4.isHit(new Ip(fx.ipStr)), is(fx.expected));
 			} catch (ValidObjException e) {
 				Assert.fail(e.getMessage());
@@ -107,11 +107,7 @@ public class AclV4Test {
 	}
 
 	@RunWith(Theories.class)
-	public static final class A003 {
-		@BeforeClass
-		public static void before() {
-			TestUtil.dispHeader("無効な文字列で初期化した場合に例外が発生するかの検証"); //TESTヘッダ
-		}
+	public static final class 無効な文字列で初期化した場合に例外が発生する {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -128,16 +124,18 @@ public class AclV4Test {
 			public Fixture(String aclStr) {
 				this.aclStr = aclStr;
 			}
+			public String toString() {
+				return String.format("new AclV6(%s) => ValidObjException", aclStr);
+			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-			TestUtil.dispPrompt(this); //TESTプロンプト
+			TestUtil.prompt(fx.toString()); 
 			try {
-				new AclV4("test", fx.aclStr);
+				new AclV4("TEST", fx.aclStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				System.out.printf("new AclV4(%s) => ValidObjException\n", fx.aclStr);
 				return;
 			}
 			Assert.fail("この行が実行されたらエラー");

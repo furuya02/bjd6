@@ -6,7 +6,11 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 import bjd.util.Util;
 
 public class ThreadBaseTest {
@@ -41,52 +45,48 @@ public class ThreadBaseTest {
 	}
 
 	@Test
-	public final void test() {
-
-		TestUtil.dispHeader("start() stop()　してisRunnig()の状態を確認する"); //TESTヘッダ
+	public final void start及びstopでisRunnigの状態を確認する() {
 
 		MyThread myThread = new MyThread();
 
 		myThread.start();
-		TestUtil.dispPrompt(this, "myThread.start()");
+		TestUtil.prompt("myThread.start()");
 		assertThat(myThread.isRunnig(), is(true));
-		TestUtil.dispPrompt(this, "isRunnig()=true start()から返った時点で、isRunnig()はTrueになっている");
+		TestUtil.prompt("isRunnig()=true start()から返った時点で、isRunnig()はTrueになっている");
 
 		myThread.stop();
-		TestUtil.dispPrompt(this, "myThread.stop()");
+		TestUtil.prompt("myThread.stop()");
 		assertThat(myThread.isRunnig(), is(false));
-		TestUtil.dispPrompt(this, "isRunnig()=false stop()から返った時点で、isRunnig()はfalseになっている");
+		TestUtil.prompt("isRunnig()=false stop()から返った時点で、isRunnig()はfalseになっている");
 
 		myThread.stop();
-		TestUtil.dispPrompt(this, "myThread.stop() stop()が重複しても問題ない");
+		TestUtil.prompt("myThread.stop() stop()が重複しても問題ない");
 
 		//start()から返った時点で、isRunnig()はTrueになっている
 		myThread.start();
-		TestUtil.dispPrompt(this, "myThread.start()");
+		TestUtil.prompt("myThread.start()");
 		assertThat(myThread.isRunnig(), is(true));
-		TestUtil.dispPrompt(this, "isRunnig()=true");
+		TestUtil.prompt("isRunnig()=true");
 
 		myThread.start(); //start()が重複しても問題ない
-		TestUtil.dispPrompt(this, "myThread.start() start()が重複しても問題ない");
+		TestUtil.prompt("myThread.start() start()が重複しても問題ない");
 
 		myThread.stop();
-		TestUtil.dispPrompt(this, "myThread.stop()");
+		TestUtil.prompt("myThread.stop()");
 		assertThat(myThread.isRunnig(), is(false));
-		TestUtil.dispPrompt(this, "isRunnig()=false");
+		TestUtil.prompt("isRunnig()=false");
 
 		myThread.dispose();
-		TestUtil.dispPrompt(this, "myThread.dispose()");
+		TestUtil.prompt("myThread.dispose()");
 	}
 
 	@Test
-	public final void test2() {
-
-		TestUtil.dispHeader("start() stop()　してisRunnig()の状態を確認する(負荷テスト)"); //TESTヘッダ
+	public final void start及びstopしてisRunnigの状態を確認する_負荷テスト() {
 
 		MyThread myThread = new MyThread();
 
 		for (int i = 0; i < 5; i++) {
-			TestUtil.dispPrompt(this, String.format("[i=%d]", i));
+			TestUtil.prompt(String.format("[i=%d]", i));
 			myThread.start();
 			assertThat(myThread.isRunnig(), is(true));
 			myThread.stop();
@@ -97,12 +97,10 @@ public class ThreadBaseTest {
 	}
 
 	@Test
-	public final void test3() {
-
-		TestUtil.dispHeader("new start() stop()　dispose してisRunnig()の状態を確認する(負荷テスト)"); //TESTヘッダ
+	public final void new及びstart_stop_disposeしてisRunnigの状態を確認する_負荷テスト() {
 
 		for (int i = 0; i < 3; i++) {
-			TestUtil.dispPrompt(this, String.format("[i=%d]", i));
+			TestUtil.prompt(String.format("[i=%d]", i));
 			MyThread myThread = new MyThread();
 			myThread.start();
 			assertThat(myThread.isRunnig(), is(true));

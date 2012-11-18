@@ -53,12 +53,8 @@ public final class BindAddr extends ValidObj  {
 	@Override
 	protected void init() {
 		bindStyle = BindStyle.V4ONLY;
-		try {
-			ipV4 = new Ip("INADDR_ANY");
-			ipV6 = new Ip("IN6ADDR_ANY_INIT");
-		} catch (ValidObjException ex) {
-			//上記の初期化が失敗した場合は、実行時例外
-		}
+		ipV4 = new Ip(IpKind.INADDR_ANY);
+		ipV6 = new Ip(IpKind.IN6ADDR_ANY_INIT);
 	}
 
 	/**

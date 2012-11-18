@@ -11,10 +11,14 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import bjd.ValidObjException;
 import bjd.net.Ip;
+import bjd.net.IpKind;
 import bjd.net.ProtocolKind;
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 import bjd.util.Util;
 
 public final class SockServerTest {
@@ -31,23 +35,18 @@ public final class SockServerTest {
 	class Execute {
 		public void startStop(String title, final ProtocolKind protocolKind) {
 
-			TestUtil.dispHeader(title);
-			
-			Ip ip = null;
-			try {
-				ip = new Ip("127.0.0.1");
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
+			TestUtil.prompt(title);
+
+			Ip ip = new Ip(IpKind.V4_LOCALHOST);
 			final Ip bindIp = ip;
 			final int port = 8881;
 			final int listenMax = 10;
 
 			final SockServer sockServer = new SockServer(protocolKind);
-			TestUtil.dispPrompt(this, String.format("s = new SockServer()"));
+			TestUtil.prompt(String.format("s = new SockServer()"));
 
 			assertThat(sockServer.getSockState(), is(SockState.IDLE));
-			TestUtil.dispPrompt(this, String.format("s.getSockState()=%s", sockServer.getSockState()));
+			TestUtil.prompt(String.format("s.getSockState()=%s", sockServer.getSockState()));
 			Thread t = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -60,40 +59,30 @@ public final class SockServerTest {
 			});
 			t.start();
 
-			TestUtil.dispPrompt(this, String.format("s.bind()"));
+			TestUtil.prompt(String.format("s.bind()"));
 
 			while (sockServer.getSockState() == SockState.IDLE) {
 				Util.sleep(100);
 			}
 			assertThat(sockServer.getSockState(), is(SockState.Bind));
-			TestUtil.dispPrompt(this, String.format("s.getSockState()=%s", sockServer.getSockState()));
+			TestUtil.prompt(String.format("s.getSockState()=%s", sockServer.getSockState()));
 
-			TestUtil.dispPrompt(this, String.format("s.close()"));
+			TestUtil.prompt(String.format("s.close()"));
 			sockServer.close(); //bind()にThreadBaseのポインタを送っていないため、isLifeでブレイクできないので、selectで例外を発生させて終了する
 
 			assertThat(sockServer.getSockState(), is(SockState.Error));
-			TestUtil.dispPrompt(this, String.format("getSockState()=%s", sockServer.getSockState()));
+			TestUtil.prompt(String.format("getSockState()=%s", sockServer.getSockState()));
 		}
 
 		public void getLocalAddress(String title, final ProtocolKind protocolKind) {
-			TestUtil.dispHeader(title);
+			TestUtil.prompt(title);
 
-			Ip ip = null;
-			try {
-				ip = new Ip("127.0.0.1");
-				//	Ip bindIp = new Ip("INADDR_ANY");
-				//	Ip bindIp = new Ip("0.0.0.0");
-				//	Ip bindIp = new Ip("::1");
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-			
-			final Ip bindIp = ip;
+			final Ip bindIp = new Ip(IpKind.V4_LOCALHOST);
 			final int port = 9991;
 			final int listenMax = 10;
 
 			final SockServer sockServer = new SockServer(protocolKind);
-			TestUtil.dispPrompt(this, String.format("s = new SockServer(%s)", protocolKind));
+			TestUtil.prompt(String.format("s = new SockServer(%s)", protocolKind));
 
 			Thread t = new Thread(new Runnable() {
 				@Override
@@ -113,11 +102,11 @@ public final class SockServerTest {
 
 			InetSocketAddress localAddress = sockServer.getLocalAddress();
 			assertThat(localAddress.toString(), is("/127.0.0.1:9991"));
-			TestUtil.dispPrompt(this, String.format("s.getLocalAddress() = %s bind()後 localAddressの取得が可能になる", localAddress.toString()));
+			TestUtil.prompt(String.format("s.getLocalAddress() = %s bind()後 localAddressの取得が可能になる", localAddress.toString()));
 
 			InetSocketAddress remoteAddress = sockServer.getRemoteAddress();
 			Assert.assertNull(remoteAddress);
-			TestUtil.dispPrompt(this, String.format("s.getRemoteAddress() = %s SockServerでは、remoteＡｄｄｒｅｓｓは常にnullになる", remoteAddress));
+			TestUtil.prompt(String.format("s.getRemoteAddress() = %s SockServerでは、remoteＡｄｄｒｅｓｓは常にnullになる", remoteAddress));
 
 			sockServer.close();
 

@@ -7,6 +7,12 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import bjd.ILife;
+import bjd.net.Ip;
+import bjd.net.Ssl;
+import bjd.sock.SockState;
+import bjd.sock.SockTcp;
+
 /**
  * インターネットに関する各種のユーティリティ
  * @author SIN
@@ -168,6 +174,7 @@ public final class Inet {
 
 	}
 
+<<<<<<< HEAD
 	//クライアントソケットを作成して相手先に接続する
 	//        static public TcpObj Connect(ILife iLife, Kernel kernel, Logger logger, Ip ip, Int32 port, Ssl ssl) {
 	//            //float fff = 0;
@@ -195,6 +202,35 @@ public final class Inet {
 	//            tcpObj.Close();//2009.06.01追加
 	//            return null;
 	//        }
+=======
+	/**
+	 * クライアントソケットを作成して相手先に接続する<br>
+	 * 失敗した時nullが返る
+	 * 
+	 * @param ip 接続先アドレス
+	 * @param port　接続先ポート
+	 * @param timeout タイムアウト
+	 * @param ssl SSL
+	 * @param iLife ILifeインターフェースオブジェクト
+	 * @return SockTcp
+	 */
+	public static SockTcp connect(Ip ip, int port, int timeout, Ssl ssl, ILife iLife) {
+		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
+		Util.sleep(0);
+		while (iLife.isLife()) {
+			if (sockTcp.getSockState() == SockState.CONNECT) {
+				return sockTcp;
+			}
+			if (sockTcp.getSockState() == SockState.Error) {
+				sockTcp.close();
+				return null;
+			}
+			Util.sleep(10);
+		}
+		sockTcp.close();
+		return null;
+	}
+>>>>>>> work
 
 	/**
 	 * 指定した長さのランダム文字列を取得する（チャレンジ文字列用）

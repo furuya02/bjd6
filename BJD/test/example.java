@@ -17,7 +17,7 @@
 //import org.junit.runner.RunWith;
 //
 
-class example {
+class Example {
 
 }
 //

@@ -93,7 +93,11 @@ public abstract class SockObj {
 				logger.set(LogKind.ERROR, (SockObj) null, 9000053, ex.getMessage());
 			}
 		} else {
-			remoteHostname = remoteAddress.getAddress().toString();
+			String ipStr = remoteAddress.getAddress().toString();
+			if (ipStr.charAt(0) == '/') {
+				ipStr = ipStr.substring(1);
+			}
+			remoteHostname = ipStr;
 		}
 	}
 

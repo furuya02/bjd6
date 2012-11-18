@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import bjd.ctrl.CtrlComboBox;
 import bjd.ctrl.CtrlType;
+import bjd.option.Crlf;
 import bjd.option.ListVal;
 import bjd.option.OneVal;
 
@@ -303,4 +305,15 @@ public final class IniDb {
 		}
 	}
 
+	/**
+	 * 設定ファイルから"lang"の値を読み出す
+	 * @return isJp
+	 */
+	public boolean isJp() {
+		ListVal listVal = new ListVal();
+		listVal.add(new OneVal("lang", 0, Crlf.NEXTLINE, new CtrlComboBox("Language", new String[] { "Japanese", "English" }, 80)));
+		read("Basic", listVal);
+		OneVal oneVal = listVal.search("lang");
+		return ((int) oneVal.getValue() == 0) ? true : false;
+	}
 }

@@ -15,13 +15,18 @@ import bjd.Kernel;
 import bjd.ValidObjException;
 import bjd.ctrl.CtrlType;
 import bjd.net.Ip;
+import bjd.net.IpKind;
 import bjd.net.OneBind;
 import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 import bjd.util.Util;
 
 public class OneServerTest {
@@ -107,17 +112,10 @@ public class OneServerTest {
 		}
 	}
 
-	
 	@Test
-	public final void a001() {
+	public final void start_stopの繰り返し_負荷テスト() {
 
-		TestUtil.dispHeader("a001 start() stop()　の繰り返し(負荷テスト)"); //TESTヘッダ
-		Ip ip = null;
-		try {
-			ip = new Ip("127.0.0.1");
-		} catch (ValidObjException ex) {
-			Assert.fail(ex.getMessage());
-		}
+		Ip ip = new Ip(IpKind.V4_LOCALHOST);
 		OneBind oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		Conf conf = TestUtil.createConf("OptionSample");
 		conf.set("port", 9990);
@@ -126,40 +124,34 @@ public class OneServerTest {
 		conf.set("enableAcl", 1);
 		conf.set("timeOut", 3);
 
-		TestUtil.dispPrompt(this, String.format("new MyServer()"));
+		TestUtil.prompt(String.format("new MyServer()"));
 		MyServer myServer = new MyServer(conf, oneBind);
 
 		for (int i = 0; i < 2; i++) {
-			TestUtil.dispPrompt(this, String.format("[i=%d]", i));
+			TestUtil.prompt(String.format("[i=%d]", i));
 			myServer.start();
 
 			//			Util.sleep(500);
 
-			TestUtil.dispPrompt(this, String.format("●sockState=%s", myServer.getSockState()));
+			TestUtil.prompt(String.format("●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			TestUtil.dispPrompt(this, String.format("●sockState=%s", myServer.getSockState()));
+			TestUtil.prompt(String.format("●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 		}
 
-		TestUtil.dispPrompt(this, String.format("myServer.despose()"));
+		TestUtil.prompt(String.format("myServer.despose()"));
 		myServer.dispose();
 	}
 
 	@Test
-	public final void a002() {
+	public final void new及びstart_stop_disposeの繰り返し_負荷テスト() {
 
-		TestUtil.dispHeader("a002 new start() stop()　dispose の繰り返し(負荷テスト)"); //TESTヘッダ
-		Ip ip = null;
-		try {
-			ip = new Ip("127.0.0.1");
-		} catch (ValidObjException ex) {
-			Assert.fail(ex.getMessage());
-		}
+		Ip ip = new Ip(IpKind.V4_LOCALHOST);
 		OneBind oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		Conf conf = TestUtil.createConf("OptionSample");
 		conf.set("port", 80);
@@ -169,29 +161,28 @@ public class OneServerTest {
 		conf.set("timeOut", 3);
 
 		for (int i = 0; i < 3; i++) {
-			TestUtil.dispPrompt(this, String.format("[i=%d]", i));
-			TestUtil.dispPrompt(this, String.format("new MyServer()"));
+			TestUtil.prompt(String.format("[i=%d]", i));
+			TestUtil.prompt(String.format("new MyServer()"));
 			MyServer myServer = new MyServer(conf, oneBind);
 
 			myServer.start();
-			TestUtil.dispPrompt(this, String.format("myServer.start() => ●sockState=%s", myServer.getSockState()));
+			TestUtil.prompt(String.format("myServer.start() => ●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			TestUtil.dispPrompt(this, String.format("myServer.stop() => ●sockState=%s", myServer.getSockState()));
+			TestUtil.prompt(String.format("myServer.stop() => ●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
-			TestUtil.dispPrompt(this, String.format("myServer.despose()"));
+			TestUtil.prompt(String.format("myServer.despose()"));
 			myServer.dispose();
 		}
 	}
 
 	@Test
-	public final void a003() {
+	public final void multipleを超えたリクエストは破棄される事をcountで確認する() {
 
-		TestUtil.dispHeader("a003 count() multipleを超えたリクエストは破棄される"); //TESTヘッダ
 		int multiple = 2;
 		final int port = 8889;
 		final String address = "127.0.0.1";
@@ -209,7 +200,7 @@ public class OneServerTest {
 		conf.set("enableAcl", 1);
 		conf.set("timeOut", 3);
 
-		TestUtil.dispPrompt(this, String.format("s = new OneServer() %s:%d multiple=%d", address, port, multiple));
+		TestUtil.prompt(String.format("s = new OneServer() %s:%d multiple=%d", address, port, multiple));
 		MyServer myServer = new MyServer(conf, oneBind);
 		myServer.start();
 

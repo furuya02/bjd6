@@ -255,6 +255,12 @@ public abstract class OneOption implements ICtrlEventListener, IDispose {
 			if (o != null) {
 				o.setEnable(false); // プロトコル 変更不可
 			}
+			
+			o = getCtrl("port");
+			if (o != null) {
+				o.setEnable(false); // ポート番号変更禁止
+			}
+
 			abstractOnChange(oneCtrl);
 		} catch (NullPointerException e) {
 			// コントロールの破棄後に、このイベントが発生した場合（この例外は無視する）

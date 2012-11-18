@@ -95,7 +95,7 @@ public final class OneLog extends ValidObj {
 	 * @return 0000001 (７桁)
 	 */
 	public String getMessageNo() {
-		return String.format("%7d", messageNo);
+		return String.format("%07d", messageNo);
 	}
 
 	/**

@@ -34,6 +34,7 @@ public final class Kernel implements IDispose {
 
 	//プロセス起動時に初期化される変数
 	private RunMode runMode = RunMode.Normal; //通常起動;
+	private boolean editBrowse = false; //「参照」のテキストボックスの編集
 	private OneServer remoteServer = null; //クライアントへ接続中のみオブジェクトが存在する
 	private TraceDlg traceDlg = null; //トレース表示
 	private DnsCache dnsCache;
@@ -88,11 +89,7 @@ public final class Kernel implements IDispose {
 	}
 
 	public boolean getEditBrowse() {
-		Conf conf = createConf("Basic");
-		if (conf != null) {
-			return (boolean) conf.get("editBrowse");
-		}
-		return false;
+		return editBrowse;
 	}
 
 	public DnsCache getDnsCache() {
@@ -170,6 +167,7 @@ public final class Kernel implements IDispose {
 		}
 
 		switch (runMode) {
+<<<<<<< HEAD
 		case Normal:
 			menuOnClick("StartStop_Start"); //メニュー選択イベント
 			break;
@@ -177,6 +175,15 @@ public final class Kernel implements IDispose {
 			//                RemoteClient = new RemoteClient(this);
 			//                RemoteClient.Start();
 			break;
+=======
+			case Normal:
+				menuOnClick("StartStop_Start"); //メニュー選択イベント
+				break;
+			case Remote:
+				//                RemoteClient = new RemoteClient(this);
+				//                RemoteClient.Start();
+				break;
+>>>>>>> work
 		}
 
 		//        switch (RunMode){
@@ -233,12 +240,23 @@ public final class Kernel implements IDispose {
 		for (OnePlugin o : listPlugin) {
 			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
 		}
+<<<<<<< HEAD
+=======
+
+		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
+		//最初にOptionBasicのlangだけを読み出す
+		isJp = OptionIni.getInstance().isJp();
+>>>>>>> work
 
 		listOption = new ListOption(this, listPlugin);
 
 		//OptionBasic
 		Conf confBasic = new Conf(listOption.get("Basic"));
+<<<<<<< HEAD
 		isJp = ((int) confBasic.get("lang") == 0) ? true : false;
+=======
+		editBrowse = (boolean) confBasic.get("editBrowse");
+>>>>>>> work
 
 		//OptionLog
 		Conf confOption = new Conf(listOption.get("Log"));
@@ -282,7 +300,7 @@ public final class Kernel implements IDispose {
 		//        }
 		remoteServer = listServer.get("RemoteServer");
 
-		view.setLang();
+		view.setColumnText(); //Logビューのカラムテキストの初期化
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）
 
 	}
@@ -475,6 +493,7 @@ public final class Kernel implements IDispose {
 			//            dlg.ShowDialog();
 		} else if (cmd.indexOf("StartStop_") == 0) {
 			switch (cmd) {
+<<<<<<< HEAD
 			case "StartStop_Start":
 				start();
 				break;
@@ -497,43 +516,72 @@ public final class Kernel implements IDispose {
 			default:
 				Util.runtimeException(String.format("cmd=%s", cmd));
 				break;
+=======
+				case "StartStop_Start":
+					start();
+					break;
+				case "StartStop_Stop":
+					stop();
+					break;
+				case "StartStop_Restart":
+					stop();
+					Util.sleep(300);
+					start();
+					break;
+				case "StartStop_Reload":
+					stop();
+					listInitialize();
+					start();
+					break;
+				case "StartStop_Service":
+					//SetupService(); //サービスの設定
+					break;
+				default:
+					Util.runtimeException(String.format("cmd=%s", cmd));
+					break;
+>>>>>>> work
 
 			}
 			view.setColor(); //ウインドのカラー初期化
-			//menu.setEnable(); //状態に応じた有効・無効
+			menu.setEnable(); //状態に応じた有効・無効
 		} else {
 			switch (cmd) {
-			case "File_LogClear":
-				logView.clear();
-				break;
-			case "File_LogCopy":
-				logView.setClipboard();
-				break;
-			case "File_Trace":
-				traceDlg.open();
-				break;
-			case "File_Exit":
-				view.getMainForm().exit();
-				break;
-			case "Help_Version":
+				case "File_LogClear":
+					logView.clear();
+					break;
+				case "File_LogCopy":
+					logView.setClipboard();
+					break;
+				case "File_Trace":
+					traceDlg.open();
+					break;
+				case "File_Exit":
+					view.getMainForm().exit();
+					break;
+				case "Help_Version":
 
-				view.getMainForm().test();
-				break;
-			case "Help_Homepage":
-				view.getMainForm().test2();
-				//Process.Start(Define.WebHome());
-				break;
-			case "Help_Document":
-				//Process.Start(Define.WebDocument());
-				break;
-			case "Help_Support":
-				//Process.Start(Define.WebSupport());
-				break;
-			default:
-				Util.runtimeException(String.format("cmd=%s", cmd));
-				break;
+					view.getMainForm().test();
+					break;
+				case "Help_Homepage":
+					view.getMainForm().test2();
+					//Process.Start(Define.WebHome());
+					break;
+				case "Help_Document":
+					//Process.Start(Define.WebDocument());
+					break;
+				case "Help_Support":
+					//Process.Start(Define.WebSupport());
+					break;
+				default:
+					Util.runtimeException(String.format("cmd=%s", cmd));
+					break;
 			}
 		}
 
+	}
+
+	public static String ChangeTag(String getValue) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 }

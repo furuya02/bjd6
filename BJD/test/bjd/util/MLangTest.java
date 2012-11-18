@@ -9,12 +9,13 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import bjd.test.TestUtil;
+
 public final class MLangTest {
 
 	@Test
-	public void a001() {
+	public void getEncoding及びgetStringの確認() {
 
-		TestUtil.dispHeader("getEncoding() 及び getString() の確認");
 
 		try {
 			String str = "あいうえお";
@@ -38,7 +39,7 @@ public final class MLangTest {
 						break;
 				}
 				byte[] bytes = str.getBytes(charset);
-				TestUtil.dispPrompt(this, String.format("byte[] buf=str.getBytes(\"%s\") => MLang.getEncoding(buf)=%s => MLang.getString(buf)=%s", charset, charset, str));
+				TestUtil.prompt(String.format("byte[] buf=str.getBytes(\"%s\") => MLang.getEncoding(buf)=%s => MLang.getString(buf)=%s", charset, charset, str));
 				assertThat(MLang.getEncoding(bytes).toString(), is(charset));
 				assertThat(MLang.getString(bytes), is(str));
 			}
@@ -51,9 +52,7 @@ public final class MLangTest {
 	}
 	
 	@Test
-	public void a002() {
-
-		TestUtil.dispHeader("getEncoding(fileName) の確認");
+	public void getEncoding_fileName_の確認() {
 
 		String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
 		String path = String.format("%s\\MLangTest.txt", currentDir);
@@ -67,7 +66,7 @@ public final class MLangTest {
 		//assertThat(charset.name(), is("Shift_JIS"));
 		assertThat(charset.name(), is("UTF-8"));
 
-		TestUtil.dispPrompt(this, String.format("MLang.getEncoding(fileName)=%s", charset.name()));
+		TestUtil.prompt(String.format("MLang.getEncoding(fileName)=%s", charset.name()));
 
 		file.delete();
 		

@@ -1,10 +1,12 @@
 package bjd.ctrl;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -13,7 +15,7 @@ import bjd.util.IDispose;
 @SuppressWarnings("serial")
 public final class ListView extends JScrollPane implements IDispose {
 
-	private JTable table;
+	private JTable table = null;
 	private DefaultTableModel model;
 	private String name = "";
 
@@ -64,6 +66,19 @@ public final class ListView extends JScrollPane implements IDispose {
 		}
 	}
 
+	@Override
+	public void setBackground(Color color) {
+		super.setBackground(color);
+		if (table != null) {
+			table.setBackground(color);
+		}
+		JViewport viewport = getViewport();
+		if (viewport != null) {
+			viewport.setBackground(color);
+		}
+
+	}
+
 	//*******************************************************
 	//行操作
 	//*******************************************************
@@ -97,16 +112,23 @@ public final class ListView extends JScrollPane implements IDispose {
 
 	//カラムの設定
 	public void setColumnText(int col, String text) {
+
 		int colMax = model.getColumnCount();
 		String[] columnNames = new String[colMax];
+		int[] columnWidth = new int[colMax];
 		for (int i = 0; i < colMax; i++) {
 			if (col == i) {
 				columnNames[i] = text;
 			} else {
 				columnNames[i] = model.getColumnName(i);
 			}
+			columnWidth[i] = getColWidth(i);
 		}
 		model.setColumnIdentifiers(columnNames);
+		for (int i = 0; i < colMax; i++) {
+			setColWidth(i, columnWidth[i]);
+		}
+
 	}
 
 	//カラムの取得

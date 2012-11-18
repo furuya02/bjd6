@@ -1,8 +1,11 @@
 package bjd;
 
+import java.awt.Color;
+
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
 import bjd.util.IDispose;
+import bjd.util.Util;
 
 public final class View implements IDispose {
 	private Kernel kernel;
@@ -29,10 +32,17 @@ public final class View implements IDispose {
 		if (listView == null) {
 			return;
 		}
-
-		setLang();
-		setColor();
-
+		for (int i = 0; i < 8; i++) {
+			listView.addColumn("");
+		}
+		listView.setColWidth(0, 120);
+		listView.setColWidth(1, 60);
+		listView.setColWidth(2, 60);
+		listView.setColWidth(3, 80);
+		listView.setColWidth(4, 80);
+		listView.setColWidth(5, 70);
+		listView.setColWidth(6, 200);
+		listView.setColWidth(7, 300);
 	}
 
 	//フォームがアクティブにされた時
@@ -80,49 +90,51 @@ public final class View implements IDispose {
 		if (listView == null) {
 			return;
 		}
-		//        if (listView.InvokeRequired) {
-		//            listView.BeginInvoke(new MethodInvoker(SetColor));
-		//        } else {
-		//            var color = SystemColors.Window;
-		//            switch (_kernel.RunMode) {
-		//                case RunMode.Normal:
-		//                    //サーバプログラムが１つも起動していない場合
-		//                    if (!_kernel.ListServer.IsRunnig)
-		//                        color = Color.LightGray;
-		//                    //リモート接続を受けている場合
-		//                    if(_kernel.RemoteServer!=null)
-		//                        color = Color.LightCyan;
-		//                    break;
-		//                case RunMode.NormalRegist:
-		//                    color = Color.LightSkyBlue;
-		//                    break;
-		//                case RunMode.Remote:
-		//                    color = (_kernel.RemoteClient!=null && _kernel.RemoteClient.IsConected) ? Color.LightGreen : Color.DarkGreen;
-		//                    break;
-		//            }
-		//            _listView.BackColor = color;
-		//        }
+		RunMode runMode = kernel.getRunMode();
+		Color color = Color.white;
+		switch (runMode) {
+		case Normal:
+			//サーバプログラムが１つも起動していない場合
+			if (!kernel.getListServer().isRunnig()) {
+				color = Color.LIGHT_GRAY;
+			}
+			//リモート接続を受けている場合
+			if (kernel.getRemoteServer() != null) {
+				color = Color.CYAN;
+			}
+			break;
+		case NormalRegist:
+			color = Color.BLUE;
+			break;
+		case Remote:
+			//color = (kernel.RemoteClient!=null && _kernel.RemoteClient.IsConected) ? Color.LightGreen : Color.DarkGreen;
+			break;
+		default:
+			Util.runtimeException(String.format("undefind runMode=%s", runMode));
+			break;
+		}
+		listView.setBackground(color);
 	}
 
-	public void setLang() {
+	/**
+	 * カラムのタイトル初期化
+	 */
+	public void setColumnText() {
 		if (listView == null) {
 			return;
 		}
+		listView.setColumnText(0, kernel.isJp() ? "日時" : "DateTime");
+		listView.setColumnText(1, kernel.isJp() ? "種類" : "Kind");
+		listView.setColumnText(2, kernel.isJp() ? "スレッドID" : "Thread ID");
+		listView.setColumnText(3, kernel.isJp() ? "機能（サーバ）" : "Function(Server)");
+		listView.setColumnText(4, kernel.isJp() ? "アドレス" : "Address");
+		listView.setColumnText(5, kernel.isJp() ? "メッセージID" : "Message ID");
+		listView.setColumnText(6, kernel.isJp() ? "説明" : "Explanation");
+		listView.setColumnText(7, kernel.isJp() ? "詳細情報" : "Detailed information");
 
-		//        if (_listView.InvokeRequired) {
-		//            _listView.Invoke(new MethodInvoker(SetLang));
-		//        } else {
-		//            //リストビューのカラム初期化（言語）
-		//            _listView.Columns[0].Text = (_kernel.Jp) ? "日時" : "DateTime";
-		//            _listView.Columns[1].Text = (_kernel.Jp) ? "種類" : "Kind";
-		//            _listView.Columns[2].Text = (_kernel.Jp) ? "スレッドID" : "Thread ID";
-		//            _listView.Columns[3].Text = (_kernel.Jp) ? "機能(サーバ)" : "Function(Server)";
-		//            _listView.Columns[4].Text = (_kernel.Jp) ? "アドレス" : "Address";
-		//            _listView.Columns[5].Text = (_kernel.Jp) ? "メッセージID" : "Message ID";
-		//            _listView.Columns[6].Text = (_kernel.Jp) ? "説明" : "Explanation";
-		//            _listView.Columns[7].Text = (_kernel.Jp) ? "詳細情報" : "Detailed information";
-		//        }
 	}
+	
+	
 
 	public void activate() {
 		if (listView == null) {

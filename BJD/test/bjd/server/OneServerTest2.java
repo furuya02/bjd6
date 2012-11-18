@@ -20,10 +20,17 @@ import bjd.sock.SockObj;
 import bjd.sock.SockState;
 import bjd.sock.SockTcp;
 import bjd.sock.SockUdp;
+<<<<<<< HEAD
 import bjd.util.TestUtil;
 import bjd.util.Util;
 
 public class OneServerTest2 implements ILife{
+=======
+import bjd.test.TestUtil;
+import bjd.util.Util;
+
+public class OneServerTest2 implements ILife {
+>>>>>>> work
 	class EchoServer extends OneServer {
 		private ProtocolKind protocolKind;
 
@@ -78,9 +85,7 @@ public class OneServerTest2 implements ILife{
 	
 
 	@Test
-	public final void a001() {
-
-		TestUtil.dispHeader("a001 EchoServer(TCP)");
+	public final void EchoServer_TCP() {
 
 		String addr = "127.0.0.1";
 		int port = 9999;
@@ -109,20 +114,29 @@ public class OneServerTest2 implements ILife{
 		buf[8] = 100; //CheckData
 		for (int i = 0; i < 3; i++) {
 			SockTcp sockTcp = new SockTcp(ip, port, timeout, null);
-			TestUtil.dispPrompt(this, String.format("[%d] sockTcp = new SockTcp(%s,%d)", i, addr, port));
+			TestUtil.prompt(String.format("[%d] sockTcp = new SockTcp(%s,%d)", i, addr, port));
 
 			int len = sockTcp.send(buf);
-			TestUtil.dispPrompt(this, String.format("sockTcp.send(%dbyte)", len));
+			TestUtil.prompt(String.format("sockTcp.send(%dbyte)", len));
 
 			while (sockTcp.length() == 0) {
 				Util.sleep(100);
+<<<<<<< HEAD
 				TestUtil.dispPrompt("Thread.sleep(100)");
+=======
+				TestUtil.prompt("Thread.sleep(100)");
+>>>>>>> work
 			}
 
 			len = sockTcp.length();
 			if (0 < len) {
+<<<<<<< HEAD
 				byte[] b = sockTcp.recv(len, timeout,this);
 				TestUtil.dispPrompt(this, String.format("sockTcp.recv()=%dbyte", b.length));
+=======
+				byte[] b = sockTcp.recv(len, timeout, this);
+				TestUtil.prompt(String.format("sockTcp.recv()=%dbyte", b.length));
+>>>>>>> work
 				assertThat(b[8], is(buf[8])); //CheckData
 			}
 			assertThat(max, is(len));
@@ -136,9 +150,7 @@ public class OneServerTest2 implements ILife{
 	}
 
 	@Test
-	public final void a002() {
-
-		TestUtil.dispHeader("a002 EchoServer(UDP)");
+	public final void EchoServer_UDP() {
 
 		String addr = "127.0.0.1";
 		int port = 9991;
@@ -168,16 +180,24 @@ public class OneServerTest2 implements ILife{
 
 		for (int i = 0; i < 3; i++) {
 			SockUdp sockUdp = new SockUdp(ip, port, timeout, null, buf);
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this,
+=======
+			TestUtil.prompt(
+>>>>>>> work
 					String.format("[%d] sockUdp = new SockUdp(%s,%d,%dbytes)", i, addr, port, buf.length));
 
 			while (sockUdp.length() == 0) {
 				Util.sleep(100);
+<<<<<<< HEAD
 				TestUtil.dispPrompt("Thread.sleep(100)");
+=======
+				TestUtil.prompt("Thread.sleep(100)");
+>>>>>>> work
 			}
 
 			byte[] b = sockUdp.recv();
-			TestUtil.dispPrompt(this, String.format("sockUdp.recv()=%dbyte", b.length));
+			TestUtil.prompt(String.format("sockUdp.recv()=%dbyte", b.length));
 			assertThat(b[8], is(buf[8])); //CheckData
 			assertThat(max, is(b.length));
 
