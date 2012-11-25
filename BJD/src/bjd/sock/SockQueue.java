@@ -7,7 +7,8 @@ package bjd.sock;
  */
 public final class SockQueue {
 	private byte[] db = new byte[0]; //現在のバッファの内容
-	private static int max = 1048560; //保持可能な最大数<=この辺りが適切な値かもしれない
+	//private static int max = 1048560; //保持可能な最大数<=この辺りが適切な値かもしれない
+	private static int max =   2000000; //保持可能な最大数
 	//TODO modifyの動作に不安あり（これ必要なのか？） 
 	private boolean modify; //バッファに追加があった場合にtrueに変更される
 

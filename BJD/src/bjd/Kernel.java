@@ -18,6 +18,7 @@ import bjd.log.Logger;
 import bjd.log.TmpLogger;
 import bjd.menu.Menu;
 import bjd.net.DnsCache;
+import bjd.net.LocalAddress;
 import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.ListOption;
@@ -96,6 +97,14 @@ public final class Kernel implements IDispose {
 		return dnsCache;
 	}
 
+	public String getServerName() {
+		OneOption oneOption = listOption.get("Basic");
+		if (oneOption != null) {
+			return (String) oneOption.getValue("serverName");
+		}
+		return "";
+	}
+
 	/**
 	 * テスト用コンストラクタ
 	 */
@@ -168,6 +177,7 @@ public final class Kernel implements IDispose {
 
 		switch (runMode) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		case Normal:
 			menuOnClick("StartStop_Start"); //メニュー選択イベント
 			break;
@@ -176,6 +186,8 @@ public final class Kernel implements IDispose {
 			//                RemoteClient.Start();
 			break;
 =======
+=======
+>>>>>>> work
 			case Normal:
 				menuOnClick("StartStop_Start"); //メニュー選択イベント
 				break;
@@ -183,6 +195,9 @@ public final class Kernel implements IDispose {
 				//                RemoteClient = new RemoteClient(this);
 				//                RemoteClient.Start();
 				break;
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 		}
 
@@ -241,11 +256,15 @@ public final class Kernel implements IDispose {
 			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
 		}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
 		//最初にOptionBasicのlangだけを読み出す
 		isJp = OptionIni.getInstance().isJp();
+<<<<<<< HEAD
 >>>>>>> work
 
 		listOption = new ListOption(this, listPlugin);
@@ -257,6 +276,16 @@ public final class Kernel implements IDispose {
 =======
 		editBrowse = (boolean) confBasic.get("editBrowse");
 >>>>>>> work
+=======
+
+		listOption = new ListOption(this, listPlugin);
+
+
+		//OptionBasic
+		Conf confBasic = new Conf(listOption.get("Basic"));
+		editBrowse = (boolean) confBasic.get("editBrowse");
+
+>>>>>>> work
 
 		//OptionLog
 		Conf confOption = new Conf(listOption.get("Log"));
@@ -267,6 +296,10 @@ public final class Kernel implements IDispose {
 			if (runMode == RunMode.Normal || runMode == RunMode.Service) {
 				//LogFileの初期化
 				String saveDirectory = (String) confOption.get("saveDirectory");
+<<<<<<< HEAD
+=======
+				saveDirectory = replaceOptionEnv(saveDirectory);
+>>>>>>> work
 				int normalLogKind = (int) confOption.get("normalLogKind");
 				int secureLogKind = (int) confOption.get("secureLogKind");
 				int saveDays = (int) confOption.get("saveDays");
@@ -274,11 +307,16 @@ public final class Kernel implements IDispose {
 				if (!useLogClear) {
 					saveDays = 0; //ログの自動削除が無効な場合、saveDaysに0をセットする
 				}
-				try {
-					logFile = new LogFile(saveDirectory, normalLogKind, secureLogKind, saveDays);
-				} catch (IOException e) {
-					logFile = null;
-					tmpLogger.set(LogKind.ERROR, null, 9000031, e.getMessage());
+				if (saveDirectory.equals("")) {
+					tmpLogger.set(LogKind.ERROR, null, 9000045, "It is not appointed");
+				} else {
+					tmpLogger.set(LogKind.DETAIL, null, 9000032, saveDirectory);
+					try {
+						logFile = new LogFile(saveDirectory, normalLogKind, secureLogKind, saveDays);
+					} catch (IOException e) {
+						logFile = null;
+						tmpLogger.set(LogKind.ERROR, null, 9000031, e.getMessage());
+					}
 				}
 			}
 		}
@@ -286,6 +324,8 @@ public final class Kernel implements IDispose {
 		tmpLogger.release(logger);
 
 		listServer = new ListServer(this, listPlugin);
+		
+
 		//listTool = new ListTool(this);
 
 		//mailBox初期化
@@ -300,6 +340,10 @@ public final class Kernel implements IDispose {
 		//        }
 		remoteServer = listServer.get("RemoteServer");
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> work
 		view.setColumnText(); //Logビューのカラムテキストの初期化
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）
 
@@ -429,9 +473,46 @@ public final class Kernel implements IDispose {
 		return new File(path).getParent();
 	}
 
-	public String env(String str) {
-		//TODO Kernel.env() ここの正規表現は大丈夫か
-		return str.replaceAll("%ExecutablePath%", getProgDir());
+	/**
+	 * オプションで指定される変数を置き変える
+	 * @param str 元の値
+	 * @return 変換後の値
+	 */
+	private String replaceOptionEnv(String str) {
+		String executablePath = getProgDir();
+		executablePath = executablePath.replaceAll("\\\\", "\\\\\\\\");
+		str = str.replaceAll("%ExecutablePath%", executablePath);
+		return str;
+	}
+
+	private void start() {
+
+		//サービス登録されている場合の処理
+		if (runMode == RunMode.NormalRegist) {
+			//            var setupService = new SetupService(this);
+			//            if (setupService.Status != ServiceControllerStatus.Running) {
+			//                setupService.Job(ServiceCmd.Start);
+			//            }
+		} else {
+			if (listServer.size() == 0) {
+				logger.set(LogKind.ERROR, null, 9000030, "");
+			} else {
+				listServer.start();
+			}
+		}
+	}
+
+	private void stop() {
+
+		//サービス登録されている場合の処理
+		if (runMode == RunMode.NormalRegist) {
+			//            var setupService = new SetupService(this);
+			//            if (setupService.Status == ServiceControllerStatus.Running) {
+			//                setupService.Job(ServiceCmd.Stop);
+			//            }
+		} else {
+			listServer.stop();
+		}
 	}
 
 	private void start() {
@@ -494,6 +575,7 @@ public final class Kernel implements IDispose {
 		} else if (cmd.indexOf("StartStop_") == 0) {
 			switch (cmd) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			case "StartStop_Start":
 				start();
 				break;
@@ -517,6 +599,8 @@ public final class Kernel implements IDispose {
 				Util.runtimeException(String.format("cmd=%s", cmd));
 				break;
 =======
+=======
+>>>>>>> work
 				case "StartStop_Start":
 					start();
 					break;
@@ -539,6 +623,9 @@ public final class Kernel implements IDispose {
 				default:
 					Util.runtimeException(String.format("cmd=%s", cmd));
 					break;
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 			}
@@ -580,8 +667,57 @@ public final class Kernel implements IDispose {
 
 	}
 
+<<<<<<< HEAD
 	public static String ChangeTag(String getValue) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
+=======
+	public String changeTag(String src) {
+		String[] tagList = new String[] { "$h", "$v", "$p", "$d", "$a", "$s" };
+
+		for (String tag : tagList) {
+			while (true) {
+				int index = src.indexOf(tag);
+				if (index == -1) {
+					break;
+				}
+				String tmp1 = src.substring(0, index);
+				String tmp2 = "";
+				switch (tag) {
+					case "$h":
+						String serverName = getServerName();
+						if (serverName.equals("")) {
+							tmp2 = "localhost"; //Define.HostName();
+						} else {
+							tmp2 = serverName;
+						}
+						break;
+					case "$v":
+						tmp2 = Ver.getVersion();
+						break;
+					case "$p":
+						tmp2 = Define.getApplicationName();
+						break;
+					case "$d":
+						tmp2 = Define.getDate();
+						break;
+					case "$a":
+						LocalAddress localAddress = LocalAddress.getInstance();
+						tmp2 = localAddress.remoteStr();
+						//tmp2 = Define.ServerAddress();
+						break;
+					case "$s":
+						tmp2 = getServerName();
+						break;
+					default:
+						Util.runtimeException(String.format("undefind tag = %s", tag));
+						break;
+				}
+				String tmp3 = src.substring(index + 2);
+				src = tmp1 + tmp2 + tmp3;
+			}
+		}
+		return src;
+>>>>>>> work
 	}
 }

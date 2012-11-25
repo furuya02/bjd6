@@ -9,17 +9,21 @@ import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
+<<<<<<< HEAD:BJD/test/bjd/sock/UdpObjTest.java
 <<<<<<< HEAD
 import bjd.util.TestUtil;
 =======
 import bjd.test.TestUtil;
 >>>>>>> work
+=======
+import bjd.test.TestUtil;
+>>>>>>> work:BJD/test/bjd/sock/SockUdpTest.java
 import bjd.util.Util;
 
 //**************************************************
 // Echoサーバを使用したテスト
 //**************************************************
-public final class UdpObjTest {
+public final class SockUdpTest {
 	class EchoServer extends ThreadBase {
 		private SockServer sockServer;
 		private String addr;
@@ -149,11 +153,15 @@ public final class UdpObjTest {
 			//送信データが到着するまで、少し待機する
 			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
 			Util.sleep(sleep);
+<<<<<<< HEAD:BJD/test/bjd/sock/UdpObjTest.java
 <<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("Thread.sleep(%d)", sleep));
 =======
 			TestUtil.prompt( String.format("Thread.sleep(%d)", sleep));
 >>>>>>> work
+=======
+			TestUtil.prompt( String.format("Thread.sleep(%d)", sleep));
+>>>>>>> work:BJD/test/bjd/sock/SockUdpTest.java
 
 			TestUtil.prompt( String.format("sock.length()=%d", sock.length()));
 			Assert.assertEquals((i + 1) * max, sock.length());

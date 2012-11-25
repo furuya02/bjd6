@@ -151,9 +151,16 @@ public final class SockTcp extends SockObj {
 	}
 
 	private void doRead(SocketChannel channel) {
-		recvBuf.limit(sockQueue.getSpace()); //受信できるのは、TcpQueueの空きサイズ分だけ
+		//キューのスペース確認
+		int space = sockQueue.getSpace();
+		if (space <20000) {
+			Util.sleep(10);
+			return;
+		}
 		try {
+
 			recvBuf.clear();
+			recvBuf.limit(space); //受信できるのは、TcpQueueの空きサイズ分だけ
 			if (channel.read(recvBuf) < 0) {
 				//切断されている
 				setError("channel.read()<0");
@@ -164,7 +171,10 @@ public final class SockTcp extends SockObj {
 			recvBuf.flip();
 			recvBuf.get(buf);
 
-			sockQueue.enqueue(buf, buf.length);
+			int q = sockQueue.enqueue(buf, buf.length);
+			if(q!=buf.length){
+				Util.runtimeException("SockTcp.doRead() sockQueue.enqueue()!=buf.length");
+			}
 
 		} catch (Exception ex) {
 			setException(ex);
@@ -187,8 +197,13 @@ public final class SockTcp extends SockObj {
 	 */
 	public byte[] recv(int len, int timeout, ILife iLife) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.SECOND, timeout);
+=======
+
+		Timeout tout = new Timeout(timeout);
+>>>>>>> work
 =======
 
 		Timeout tout = new Timeout(timeout);
@@ -199,18 +214,21 @@ public final class SockTcp extends SockObj {
 			if (len <= sockQueue.length()) {
 				// キューから取得する
 				buffer = sockQueue.dequeue(len);
+
 			} else {
 				while (iLife.isLife()) {
 					Util.sleep(0);
 					if (0 < sockQueue.length()) {
 						//size=受信が必要なバイト数
 						int size = len - buffer.length;
+
 						//受信に必要なバイト数がバッファにない場合
 						if (size > sockQueue.length()) {
 							size = sockQueue.length(); //とりあえずバッファサイズ分だけ受信する
 						}
 						byte[] tmp = sockQueue.dequeue(size);
 						buffer = Bytes.create(buffer, tmp);
+
 						if (len <= buffer.length) {
 							break;
 						}
@@ -231,13 +249,61 @@ public final class SockTcp extends SockObj {
 			return null;
 		}
 		//trace(TraceKind.Recv, buffer, false);//noEncode = false;テキストかバイナリかは不明
+
 		return buffer;
 	}
 
+<<<<<<< HEAD
+=======
+	//	public byte[] recv(int len, int timeout, ILife iLife) {
+	//
+	//		Timeout tout = new Timeout(timeout);
+	//
+	//		byte[] buffer = new byte[0];
+	//		try {
+	//			if (len <= sockQueue.length()) {
+	//				// キューから取得する
+	//				buffer = sockQueue.dequeue(len);
+	//			} else {
+	//				while (iLife.isLife()) {
+	//					Util.sleep(0);
+	//					if (0 < sockQueue.length()) {
+	//						//size=受信が必要なバイト数
+	//						int size = len - buffer.length;
+	//						//受信に必要なバイト数がバッファにない場合
+	//						if (size > sockQueue.length()) {
+	//							size = sockQueue.length(); //とりあえずバッファサイズ分だけ受信する
+	//						}
+	//						byte[] tmp = sockQueue.dequeue(size);
+	//						buffer = Bytes.create(buffer, tmp);
+	//						if (len <= buffer.length) {
+	//							break;
+	//						}
+	//					} else {
+	//						if (getSockState() != SockState.CONNECT) {
+	//							return null;
+	//						}
+	//						Util.sleep(10);
+	//					}
+	//					if (tout.isFinish()) {
+	//						buffer = sockQueue.dequeue(len); //タイムアウト
+	//						break;
+	//					}
+	//				}
+	//			}
+	//		} catch (Exception ex) {
+	//			ex.printStackTrace();
+	//			return null;
+	//		}
+	//		//trace(TraceKind.Recv, buffer, false);//noEncode = false;テキストかバイナリかは不明
+	//		return buffer;
+	//	}
+>>>>>>> work
 	/**
 	 * １行受信<br>
 	 * 切断・タイムアウトでnullが返される
 	 * 
+<<<<<<< HEAD
 <<<<<<< HEAD
 	 * @param timeout タイムアウト値(ms)
 	 * @param iLife 継続確認インターフェース
@@ -249,6 +315,8 @@ public final class SockTcp extends SockObj {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.MILLISECOND, timeout);
 =======
+=======
+>>>>>>> work
 	 * @param sec タイムアウト値(sec)
 	 * @param iLife 継続確認インターフェース
 	 * @return 受信データ
@@ -257,6 +325,9 @@ public final class SockTcp extends SockObj {
 		//Socket.ReceiveTimeout = timeout * 1000;
 
 		Timeout tout = new Timeout(sec * 1000);
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		while (iLife.isLife()) {
@@ -274,7 +345,11 @@ public final class SockTcp extends SockObj {
 				return null;
 			}
 <<<<<<< HEAD
+<<<<<<< HEAD
 			if (c.compareTo(Calendar.getInstance()) < 0) {
+=======
+			if (tout.isFinish()) {
+>>>>>>> work
 =======
 			if (tout.isFinish()) {
 >>>>>>> work
@@ -285,11 +360,43 @@ public final class SockTcp extends SockObj {
 		return null;
 	}
 
+<<<<<<< HEAD
 	public int send(byte[] buf) {
+=======
+	/**
+	 * １行のString受信
+	 * @param charsetName エンコード名
+	 * @param sec タイムアウト（秒）
+	 * @param iLife ILifeオブジェクトへのポインタ
+	 * @return String 受信文字列
+	 */
+	public String stringRecv(String charsetName, int sec, ILife iLife) {
+		try {
+			byte[] bytes = lineRecv(sec, iLife);
+			return new String(bytes, charsetName);
+		} catch (Exception e) {
+			Util.runtimeException(this, e);
+		}
+		return null;
+	}
+
+	/**
+	 * １行受信(ASCII)
+	 * @param sec タイムアウト（秒）
+	 * @param iLife ILifeオブジェクトへのポインタ
+	 * @return String 受信文字列
+	 */
+	public String stringRecv(int sec, ILife iLife) {
+		return stringRecv("ASCII", sec, iLife);
+	}
+
+	public int send(byte[] buf, int start, int length) {
+>>>>>>> work
 		try {
 			if (oneSsl != null) {
 				//return oneSsl.Write(buffer, buffer.length);
 			}
+<<<<<<< HEAD
 			if (getSockState() == SockState.CONNECT) {
 				ByteBuffer byteBuffer = ByteBuffer.allocate(buf.length);
 				byteBuffer.put(buf);
@@ -297,7 +404,20 @@ public final class SockTcp extends SockObj {
 				int len = channel.write(byteBuffer);
 				Util.sleep(1); //次の動作が実行されるようにsleepを置く
 				return len;
+=======
+			ByteBuffer byteBuffer = ByteBuffer.allocate(length);
+			byteBuffer.put(buf, start, length);
+			byteBuffer.flip();
+			int size = 0;
+			while (byteBuffer.hasRemaining()) {
+				int written = channel.write(byteBuffer);
+				if (written == 0) {
+					Util.sleep(10);
+				}
+				size += written;
+>>>>>>> work
 			}
+			return size;
 		} catch (Exception ex) {
 			setException(ex);
 			//logger.set(LogKind.Error, this, 9000046, String.format("Length=%d %s", buffer.length, ex.getMessage()));
@@ -306,13 +426,23 @@ public final class SockTcp extends SockObj {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+	public int send(byte[] buf) {
+		return send(buf, 0, buf.length);
+	}
+
+>>>>>>> work
 	/**
 	 * 1行送信<br>
 	 * 内部でCRLFの２バイトが付かされる<br>
 	 * @param buf　送信データ
 	 * @return 送信バイト数
 	 */
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	public int lineSend(byte[] buf) {
 		int s1 = send(buf);
@@ -321,7 +451,10 @@ public final class SockTcp extends SockObj {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 	/**
 	 * １行のString送信
 	 * @param str 送信文字列
@@ -331,7 +464,11 @@ public final class SockTcp extends SockObj {
 	public boolean stringSend(String str, String charsetName) {
 		try {
 			byte[] buf = str.getBytes(charsetName);
+<<<<<<< HEAD
 			int l = lineSend(buf);
+=======
+			lineSend(buf);
+>>>>>>> work
 			return true;
 		} catch (UnsupportedEncodingException e) {
 			Util.runtimeException(this, e);
@@ -348,6 +485,9 @@ public final class SockTcp extends SockObj {
 		return stringSend(str, "ASCII");
 	}
 
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	@Override
 	public void close() {
@@ -362,5 +502,8 @@ public final class SockTcp extends SockObj {
 		}
 		setError("close()");
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 }

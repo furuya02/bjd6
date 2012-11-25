@@ -1,8 +1,6 @@
 package bjd.option;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
@@ -13,37 +11,69 @@ import bjd.ctrl.CtrlDat;
 import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.OnePage;
+<<<<<<< HEAD
 import bjd.test.TestUtil;
 
 public class ListValTest {
 
 	@Test
 	public final void getListで取得した値の確認_パターン１() {
+=======
 
-		//テスト用のListVal作成(パターン１)
-		ListVal listVal = createListVal1();
+/**
+ * テストでは、リソースの開放（dispose）を省略する
+ * @author SIN
+ *
+ */
+public class ListValTest {
 
+	@Test
+	public void パターン１で作成したListValをgetListで取得する() throws Exception {
+		//setUp
+		ListVal sut = createListVal1();
+		String expected = "n1,n2,n3,n4,n5,n6,n7,n8,";
+>>>>>>> work
+
+		//exercise
+		String actual = arrayToString(sut.getList(null));
+
+<<<<<<< HEAD
 		//listValを名前覧にする
 		String actual = arrayToString(listVal.getList(null));
 		String expected = "n1,n2,n3,n4,n5,n6,n7,n8,";
 		TestUtil.prompt(String.format("listVal.getList(null)=%s expected=%s", actual, expected));
+=======
+		//verify
+>>>>>>> work
 		assertThat(actual, is(expected));
 	}
-
+	
 	@Test
+<<<<<<< HEAD
 	public final void getListで取得した値の確認_パターン２() {
+=======
+	public void パターン２で作成したListValをgetListで取得する() throws Exception {
+		//setUp
+		ListVal sut = createListVal2();
+		String expected = "n0,n1,n2,";
+>>>>>>> work
 
-		//テスト用のListVal作成(パターン２)
-		ListVal listVal = createListVal2();
+		//exercise
+		String actual = arrayToString(sut.getList(null));
 
+<<<<<<< HEAD
 		//listValを名前覧にする
 		String actual = arrayToString(listVal.getList(null));
 		String expected = "n0,n1,n2,";
 		TestUtil.prompt(String.format("listVal.getList(null)=%s expected=%s", actual, expected));
+=======
+		//verify
+>>>>>>> work
 		assertThat(actual, is(expected));
 	}
-
+	
 	@Test
+<<<<<<< HEAD
 	public final void searchで検索に成功するとオブジェクトが返る() {
 		
 		//テスト用のListVal作成(パターン１)
@@ -60,6 +90,29 @@ public class ListValTest {
 		OneVal  oneVal = listVal.search("xxx");
 		assertNull(oneVal);
 		TestUtil.prompt(String.format("listVal.search(xxx) = %s ", oneVal));
+=======
+	public void 存在するデータを検査するとnull以外が返る() throws Exception {
+		//setUp
+		ListVal sut = createListVal1();
+
+		//exercise
+		Object actual = sut.search("n1");
+
+		//verify
+		assertThat(actual, is(notNullValue()));
+	}
+
+	@Test
+	public void 存在しないデータを検査するとnullが返る() throws Exception {
+		//setUp
+		ListVal sut = createListVal1();
+
+		//exercise
+		Object actual = sut.search("xxx");
+
+		//verify
+		assertThat(actual, is(nullValue()));
+>>>>>>> work
 	}
 
 	//テスト用のListVal作成(パターン１)
@@ -101,7 +154,7 @@ public class ListValTest {
 		return listVal;
 	}
 
-	//listValを名前覧にする
+	//listValを名前一覧（文字列）に変換する
 	private String arrayToString(ArrayList<OneVal> list) {
 		StringBuilder sb = new StringBuilder();
 		for (OneVal o : list) {

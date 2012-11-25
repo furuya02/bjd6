@@ -127,6 +127,7 @@ final class CurrentDir {
 			}
 			paramStr = paramStr.substring(1);
 		}
+<<<<<<< HEAD
 		//１階層づつ処理する
 		String[] tmp = paramStr.split("[\\|/]");
 		for (String name : tmp) { //.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries)) {
@@ -134,6 +135,17 @@ final class CurrentDir {
 				current = keepCurrent;
 				oneMount = keepOneMount;
 				return false;
+=======
+		if (!paramStr.equals("")) {
+			//１階層づつ処理する
+			String[] tmp = paramStr.split("[\\|/]");
+			for (String name : tmp) { //.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries)) {
+				if (!cwd1(name)) {
+					current = keepCurrent;
+					oneMount = keepOneMount;
+					return false;
+				}
+>>>>>>> work
 			}
 		}
 		return true;

@@ -12,7 +12,10 @@ import java.util.Iterator;
 
 import bjd.ILife;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.ThreadBase;
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 import bjd.net.InetKind;
@@ -70,7 +73,7 @@ public class SockServer extends SockObj {
 
 	public final boolean bind(Ip bindIp, int port, int listenMax) {
 		if (protocolKind != ProtocolKind.Tcp) {
-			Util.runtimeException(String.format("this object is %s", protocolKind));
+			Util.runtimeException("use udp version bind()");
 		}
 		try {
 			//************************************************
@@ -93,7 +96,7 @@ public class SockServer extends SockObj {
 
 	public final boolean bind(Ip bindIp, int port) {
 		if (protocolKind != ProtocolKind.Udp) {
-			Util.runtimeException(String.format("this object is %s", protocolKind));
+			Util.runtimeException("use tcp version bind()");
 		}
 		//InetSocketAddress l = new InetSocketAddress(bindIp.getInetAddress(), port);
 		try {
@@ -188,4 +191,26 @@ public class SockServer extends SockObj {
 		sockServer.close();
 		return null;
 	}
+<<<<<<< HEAD
+=======
+	/**
+	 * bindが可能かどうかの確認
+	 * @param ip
+	 * @param port
+	 * @return
+	 */
+	public static boolean isAvailable(Ip ip, int port) {
+		SockServer sockServer = new SockServer(ProtocolKind.Tcp);
+		if (sockServer.getSockState() != SockState.Error) {
+			int listenMax = 1;
+			if (sockServer.bind(ip, port, listenMax)) {
+				sockServer.close();
+				return true;
+			}
+		}
+		sockServer.close();
+		return false;
+	}
+	
+>>>>>>> work
 }

@@ -1,32 +1,41 @@
 package bjd.util;
 
-import junit.framework.Assert;
-
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
-
+/**
+ * テストの性格上、リソース解放のdisposeは省略する
+ * @author SIN
+ *
+ */
 public class ListBaseTest {
 
-	//ListBaseを継承すｔるクラスを定義
+	//テストのためにListBaseを継承するクラスを定義する
 	class OneClass implements IDispose {
 		private String s;
+
 		public OneClass(String s) {
 			this.s = s;
 		}
+
 		public String getS() {
 			return s;
 		}
+
 		@Override
 		public void dispose() {
 		}
 	}
+
 	class TestClass extends ListBase<OneClass> {
 		public void add(OneClass o) {
 			getAr().add(o);
 		}
 	}
-		
+
 	@Test
+<<<<<<< HEAD
 	public final void 要素を３つ追加してsizeを確認する() {
 		
 		TestClass ts = new TestClass();
@@ -40,49 +49,115 @@ public class ListBaseTest {
 
 	@Test
 	public final void 拡張forループで要素を取り出す() {
+=======
+	public void 要素を３つ追加してsizeは3になる() throws Exception {
+		//setUp
+		TestClass sut = new TestClass();
+		sut.add(new OneClass("1"));
+		sut.add(new OneClass("2"));
+		sut.add(new OneClass("3"));
 
-		TestClass ts = new TestClass();
+		int expected = 3;
 
-		ts.add(new OneClass("1"));
-		ts.add(new OneClass("2"));
-		ts.add(new OneClass("3"));
+		//exercise
+		int actual = sut.size();
 
-		StringBuilder sb = new StringBuilder();
-		for (OneClass o : ts) {
-			sb.append(o.getS());
-		}
-		Assert.assertEquals(sb.toString(), "123");
+		//verify
+		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
+	public void 要素を３つ追加してforループを回す() throws Exception {
+		//setUp
+		TestClass sut = new TestClass();
+		sut.add(new OneClass("1"));
+		sut.add(new OneClass("2"));
+		sut.add(new OneClass("3"));
+>>>>>>> work
+
+		int expected = 3;
+
+		//exercise
+		int actual = 0;
+		for (OneClass o : sut) {
+			actual++;
+		}
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void 要素を３つ追加してwhileで回す() throws Exception {
+		//setUp
+		TestClass sut = new TestClass();
+		sut.add(new OneClass("1"));
+		sut.add(new OneClass("2"));
+		sut.add(new OneClass("3"));
+
+		int expected = 3;
+
+		//exercise
+		int actual = 0;
+		while (sut.hasNext()) {
+			sut.next();
+			actual++;
+		}
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+<<<<<<< HEAD
 	public final void 要素を３つ追加してremobveの後要素を確認する() {
+=======
+	public void 要素を３つ追加してgetSで取得する() throws Exception {
+		//setUp
+		TestClass sut = new TestClass();
+		sut.add(new OneClass("1"));
+		sut.add(new OneClass("2"));
+		sut.add(new OneClass("3"));
+>>>>>>> work
 
-		TestClass ts = new TestClass();
+		String expected = "123";
 
-		ts.add(new OneClass("1"));
-		ts.add(new OneClass("2"));
-		ts.add(new OneClass("3"));
-		ts.remove(0);
+		//exercise
 		StringBuilder sb = new StringBuilder();
-		for (OneClass o : ts) {
+		for (OneClass o : sut) {
 			sb.append(o.getS());
 		}
-		Assert.assertEquals(sb.toString(), "23");
+		String actual = sb.toString();
+
+		//verify
+		assertThat(actual, is(expected));
 	}
+<<<<<<< HEAD
 	
 	@Test
 	public final void 要素を３つ追加してwhileで回す() {
+=======
+>>>>>>> work
 
-		TestClass ts = new TestClass();
+	@Test
+	public void 要素を３つ追加してremobveで一部の要素を削除する() throws Exception {
+		//setUp
+		TestClass sut = new TestClass();
+		sut.add(new OneClass("1"));
+		sut.add(new OneClass("2"));
+		sut.add(new OneClass("3"));
+		sut.remove(0);
 
-		ts.add(new OneClass("1"));
-		ts.add(new OneClass("2"));
-		ts.add(new OneClass("3"));
+		String expected = "23";
 
+		//exercise
 		StringBuilder sb = new StringBuilder();
-		while (ts.hasNext()) {
-			sb.append(ts.next().getS());
+		for (OneClass o : sut) {
+			sb.append(o.getS());
 		}
-		Assert.assertEquals(sb.toString(), "123");
+		String actual = sb.toString();
+
+		//verify
+		assertThat(actual, is(expected));
 	}
 }

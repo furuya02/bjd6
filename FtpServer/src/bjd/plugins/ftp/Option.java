@@ -9,6 +9,10 @@ import bjd.ctrl.CtrlComboBox;
 import bjd.ctrl.CtrlDat;
 import bjd.ctrl.CtrlFolder;
 import bjd.ctrl.CtrlHidden;
+<<<<<<< HEAD
+=======
+import bjd.ctrl.CtrlInt;
+>>>>>>> work
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.CtrlTextBox;
 import bjd.ctrl.OneCtrl;
@@ -47,7 +51,11 @@ public final class Option extends OneOption {
 		pageList.add(page1("Basic", isJp() ? "基本設定" : "Basic"));
 		pageList.add(page2("VirtualFolder", isJp() ? "仮想フォルダ" : "Virtual Folder", kernel.getRunMode(), kernel.getEditBrowse()));
 		pageList.add(page3("User", isJp() ? "利用者" : "User", kernel.getRunMode(), kernel.getEditBrowse()));
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> work
 		pageList.add(pageAcl());
 		add(new OneVal("tab", null, Crlf.NEXTLINE, new CtrlTabPage("tabPage", pageList)));
 
@@ -61,6 +69,11 @@ public final class Option extends OneOption {
 				isJp() ? "バナーメッセージ" : "Banner Message", 35)));
 		onePage.add(new OneVal("useSyst", false, Crlf.NEXTLINE, new CtrlCheckBox(
 				isJp() ? "SYSTコマンドを有効にする ( セキュリティリスクの高いオプションです。必要のない限りチェックしないでください。)" : "Validate a SYST command")));
+<<<<<<< HEAD
+=======
+		onePage.add(new OneVal("reservationTime", 5000, Crlf.NEXTLINE, new CtrlInt(
+				isJp() ? "認証失敗時の保留時間(ミリ秒)" : "Reservation time in certification failure (msec)", 6)));
+>>>>>>> work
 		return onePage;
 	}
 
@@ -83,7 +96,11 @@ public final class Option extends OneOption {
 
 		ListVal liseVal = new ListVal();
 		liseVal.add(new OneVal("accessControl", 0, Crlf.NEXTLINE, new CtrlComboBox(isJp() ? "アクセス制限" : "Access Control", new String[] { "FULL", "DOWN", "UP" }, 100)));
+<<<<<<< HEAD
 		liseVal.add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ホームディレクトリ" : "Home Derectory",  40, runMode, editBrowse)));
+=======
+		liseVal.add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ホームディレクトリ" : "Home Derectory", 40, runMode, editBrowse)));
+>>>>>>> work
 		liseVal.add(new OneVal("userName", "", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "ユーザ名" : "User Name", 30)));
 		liseVal.add(new OneVal("password", "", Crlf.NEXTLINE, new CtrlHidden(isJp() ? "パスワード" : "Password", 30)));
 		onePage.add(new OneVal("user", null, Crlf.NEXTLINE, new CtrlDat(isJp() ? "利用者（アクセス権）の指定" : "User List", liseVal, 360, isJp())));

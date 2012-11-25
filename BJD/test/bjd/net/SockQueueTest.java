@@ -75,7 +75,11 @@ public final class SockQueueTest {
 
 	@Test
 	public void SockQueue_スペース確認() {
+<<<<<<< HEAD
 		int max = 1048560;
+=======
+		int max = 2000000;
+>>>>>>> work
 
 		TestUtil.prompt("sockQueue = new SockQueue()");
 		SockQueue sockQueu = new SockQueue();

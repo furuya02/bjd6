@@ -105,7 +105,11 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 					ar.add(className);
 				}
 			}
+<<<<<<< HEAD
 			//jarIn.close();
+=======
+			jarIn.close();
+>>>>>>> work
 			return (String[]) ar.toArray(new String[0]);
 		} catch (Exception ex) {
 			ex.printStackTrace();

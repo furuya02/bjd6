@@ -76,6 +76,7 @@ public final class MainForm implements WindowListener {
 		//*************************************************
 		ListView listView = new ListView("listViewLog");
 <<<<<<< HEAD
+<<<<<<< HEAD
 		listView.addColumn("日時");
 		listView.addColumn("種類");
 		listView.addColumn("スレッドID");
@@ -93,6 +94,8 @@ public final class MainForm implements WindowListener {
 		listView.setColWidth(6, 200);
 		listView.setColWidth(7, 300);
 =======
+=======
+>>>>>>> work
 //		listView.addColumn("日時");
 //		listView.addColumn("種類");
 //		listView.addColumn("スレッドID");
@@ -109,6 +112,9 @@ public final class MainForm implements WindowListener {
 //		listView.setColWidth(5, 70);
 //		listView.setColWidth(6, 200);
 //		listView.setColWidth(7, 300);
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		JMenuBar menuBar = new JMenuBar();

@@ -49,9 +49,15 @@ public final class Server extends OneServer {
 
 		//５秒間待機して、１行受信に成功したら、その内容をechoして終了する
 <<<<<<< HEAD
+<<<<<<< HEAD
 		int timeout = 5000; //５秒間
 		//１行受信
 		byte[] buf = sockTcp.lineRecv(timeout, this);
+=======
+		int sec = 5; //５秒間
+		//１行受信
+		byte[] buf = sockTcp.lineRecv(sec, this);
+>>>>>>> work
 =======
 		int sec = 5; //５秒間
 		//１行受信

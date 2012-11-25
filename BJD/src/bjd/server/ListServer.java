@@ -51,11 +51,15 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	private void initialize(ListPlugin listPlugin) {
 		getAr().clear();
 
+
+		
 		for (OneOption op : kernel.getListOption()) {
+
 
 			if (!op.getUseServer()) { //サーバオプション以外は対象外にする
 				continue;
 			}
+
 
 			//プラグイン情報の検索
 			OnePlugin onePlugin = listPlugin.get(op.getNameTag());

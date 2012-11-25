@@ -47,6 +47,7 @@ public final class OnePlugin implements IDispose {
 			URL url = file.getCanonicalFile().toURI().toURL();
 			URLClassLoader loader = new URLClassLoader(new URL[] { url });
 			Class cobj = loader.loadClass(className);
+			//loader.close(); //これを実行すると例外が発生する
 			return cobj.getConstructor(args);
 		} catch (IOException e) {
 			throw new Exception("IOException");

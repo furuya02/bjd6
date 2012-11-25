@@ -60,7 +60,8 @@ public class Logger {
 	}
 
 	/**
-	 * ログ出力
+	 * ログ出力<br>
+	 * 【オーバーライド可能（テストで使用）】
 	 * @param logKind
 	 * @param sockBase
 	 * @param messageNo
@@ -129,12 +130,21 @@ public class Logger {
 			case 9000013:
 				message = "tcpQueue().Dequeue()";
 				break;
+<<<<<<< HEAD
 			case 9000014:
 				message = "SendBinaryFile(string fileName) socket.Send()";
 				break;
 			case 9000015:
 				message = "SendBinaryFile(string fileName,long rangeFrom,long rangeTo) socket.Send()";
 				break;
+=======
+//			case 9000014:
+//				message = "SendBinaryFile(string fileName) socket.Send()";
+//				break;
+//			case 9000015:
+//				message = "SendBinaryFile(string fileName,long rangeFrom,long rangeTo) socket.Send()";
+//				break;
+>>>>>>> work
 			case 9000016:
 				message = isJp ? "このアドレスからの接続は許可されていません(ACL)" : "Connection from this address is not admitted.(ACL)";
 				break;
@@ -178,9 +188,15 @@ public class Logger {
 			case 9000031:
 				message = isJp ? "ログファイルの初期化に失敗しました" : "Failed in initialization of logfile";
 				break;
+<<<<<<< HEAD
 			//case 9000032:
 			//	message = isJp ? "ログ削除" : "Delete LogFile";
 			//	break;
+=======
+			case 9000032:
+				message = isJp ? "ログ保存場所" : "a save place of LogFile";
+				break;
+>>>>>>> work
 			case 9000033:
 				message = isJp ? "ファイル保存時にエラーが発生しました" : "An error occurred in a File save";
 				break;
@@ -217,9 +233,15 @@ public class Logger {
 			case 9000044:
 				message = isJp ? "サーバ側が切断されました" : "The server side was cut off";
 				break;
+<<<<<<< HEAD
 			//case 9000045:
 			//	message = isJp ? "ログ削除処理で日付変換に例外が発生しました" : "An exception occurred in date conversion by log elimination processing";
 			//	break;
+=======
+			case 9000045:
+				message = isJp ? "「ログ保存場所」が指定されていません" : "\"log save place\" is not appointed";
+				break;
+>>>>>>> work
 			case 9000046:
 				message = isJp ? "socket.send()でエラーが発生しました" : "socket.send()";
 				break;

@@ -13,7 +13,11 @@ import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 =======
 import bjd.test.TestUtil;
 >>>>>>> work
@@ -42,6 +46,7 @@ public final class ServerTest {
 		}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 //		@Override
 //		protected void onSubThread(SockAccept sockAccept) {
 //			for (int i = 3; i >= 0 && isLife(); i--) {
@@ -55,6 +60,8 @@ public final class ServerTest {
 //			}
 //		}
 =======
+=======
+>>>>>>> work
 		//		@Override
 		//		protected void onSubThread(SockAccept sockAccept) {
 		//			for (int i = 3; i >= 0 && isLife(); i--) {
@@ -67,6 +74,9 @@ public final class ServerTest {
 		//				Util.sleep(1000);
 		//			}
 		//		}
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		//		@Override
@@ -84,7 +94,11 @@ public final class ServerTest {
 				}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 				TestUtil.dispPrompt(this, String.format("接続中...あと%d回待機", i));
+=======
+				TestUtil.prompt(String.format("接続中...あと%d回待機", i));
+>>>>>>> work
 =======
 				TestUtil.prompt(String.format("接続中...あと%d回待機", i));
 >>>>>>> work
@@ -110,8 +124,13 @@ public final class ServerTest {
 		myServer.start();
 		for (int i = 10; i > 0; i--) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this, String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
             Util.sleep(1);
+=======
+			TestUtil.prompt(String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
+			Util.sleep(1);
+>>>>>>> work
 =======
 			TestUtil.prompt(String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
 			Util.sleep(1);
