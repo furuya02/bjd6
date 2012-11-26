@@ -3,7 +3,10 @@ package bjd.server;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 
 >>>>>>> work
 import bjd.Kernel;
@@ -56,7 +59,10 @@ public abstract class OneServer extends ThreadBase {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 	protected final Logger getLogger() {
@@ -64,6 +70,9 @@ public abstract class OneServer extends ThreadBase {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -76,6 +85,7 @@ public abstract class OneServer extends ThreadBase {
 	}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 	protected final int getTimeout() {
@@ -84,11 +94,16 @@ public abstract class OneServer extends ThreadBase {
 >>>>>>> work
 
 =======
+=======
+>>>>>>> work
 
 	protected final int getTimeout() {
 		return timeout;
 	}
 
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	public abstract String getMsg(int messageNo);
 
@@ -153,6 +168,7 @@ public abstract class OneServer extends ThreadBase {
 		if (this.oneBind == null) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			Ip ip = null;
 			try {
 				ip = new Ip("127.0.0.1");
@@ -160,6 +176,9 @@ public abstract class OneServer extends ThreadBase {
 				//127.0.0.1で例外となるようなら設計問題とするしかない
 				Util.runtimeException("new Ip(127.0.0.1)");
 			}
+=======
+			Ip ip = new Ip(IpKind.V4_LOCALHOST);
+>>>>>>> work
 =======
 			Ip ip = new Ip(IpKind.V4_LOCALHOST);
 >>>>>>> work
@@ -367,6 +386,9 @@ public abstract class OneServer extends ThreadBase {
 		sockObj.resolve((boolean) conf.get("useResolve"), logger);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 
@@ -381,6 +403,7 @@ public abstract class OneServer extends ThreadBase {
 				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
@@ -393,6 +416,8 @@ public abstract class OneServer extends ThreadBase {
 		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
 				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -441,6 +466,7 @@ public abstract class OneServer extends ThreadBase {
 		byte[] recvbuf = sockTcp.lineRecv(timeout, this);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 		//切断された場合
 >>>>>>> work
@@ -454,6 +480,8 @@ public abstract class OneServer extends ThreadBase {
 		}
 		
 =======
+=======
+>>>>>>> work
 		//切断された場合
 		if (recvbuf == null) {
 			return null;
@@ -464,6 +492,9 @@ public abstract class OneServer extends ThreadBase {
 			return new Cmd("", "", "");
 		}
 
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 		//CRLFの排除
 		recvbuf = Inet.trimCrlf(recvbuf);

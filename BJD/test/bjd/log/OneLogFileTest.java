@@ -28,6 +28,7 @@ public final class OneLogFileTest {
 	
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public void 一度disposeしたファイルに正常に追加できるかどうか() {
 
 
@@ -90,6 +91,8 @@ public final class OneLogFileTest {
 		(new File(fileName)).delete();
 
 =======
+=======
+>>>>>>> work
 	public void 一度disposeしたファイルに正常に追加できるかどうか() throws Exception {
 		
 		//setUp
@@ -116,6 +119,9 @@ public final class OneLogFileTest {
 		
 		//verify
 		assertThat(actual, is(expected));
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	}
 }

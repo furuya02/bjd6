@@ -13,8 +13,11 @@ import bjd.ctrl.ListView;
 import bjd.option.Conf;
 import bjd.test.TestUtil;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+>>>>>>> work
 import bjd.util.Util;
 
 /**
@@ -22,6 +25,9 @@ import bjd.util.Util;
  * @author SIN
  *
  */
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 public final class WindowSizeTest {
 
@@ -64,6 +70,7 @@ public final class WindowSizeTest {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	// 後処理
 	private void after(File file) {
 		file.delete();
@@ -73,6 +80,9 @@ public final class WindowSizeTest {
 	public void listViewのカラムの復元() {
 =======
 	@Test
+=======
+	@Test
+>>>>>>> work
 	public void listViewのカラムサイズを保存して復元する() throws Exception {
 		//setUp
 		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
@@ -82,6 +92,9 @@ public final class WindowSizeTest {
 		listView.setColWidth(0, 111);
 		sut.save(listView); // カラムサイズ保存
 		listView.dispose();
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		int expected = 111;
@@ -91,6 +104,7 @@ public final class WindowSizeTest {
 		listView.addColumn("col1");
 		sut.read(listView); // カラムサイズ読込
 		int actual = listView.getColWidth(0);
+<<<<<<< HEAD
 
 		//verify
 		assertThat(actual, is(expected));
@@ -108,6 +122,21 @@ public final class WindowSizeTest {
 
 		int expected = 100;
 
+=======
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void listViewのカラムサイズが保存されていない場合最低値100を読み出される() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+		int expected = 100;
+
+>>>>>>> work
 		//exercise
 		ListView listView = new ListView("name"); //初期化
 		listView.addColumn("col1");
@@ -118,6 +147,7 @@ public final class WindowSizeTest {
 		assertThat(actual, is(expected));
 	}
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		//１カラム目のサイズ
 		int actual = listView.getColWidth(0);
@@ -145,18 +175,41 @@ public final class WindowSizeTest {
 		sut.read(frame); // サイズ読込
 		int actual = frame.getWidth();
 
+=======
+	@Test
+	public void JFrameのサイズが保存された状態でgetWidthで値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+		//JFrameの値を保存する 200,100,30,40
+		initJFrame(sut);
+		int expected = 200;
+
+		//exercise
+		JFrame frame = new JFrame("name");
+		sut.read(frame); // サイズ読込
+		int actual = frame.getWidth();
+
+>>>>>>> work
 		//verify
 		assertThat(actual, is(expected));
 	}
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public void listViewのカラムの復元_保存データが無いとき最低値100を読み出す() {
 =======
+=======
+>>>>>>> work
 	public void JFrameのサイズが保存された状態でgetHeightで値を読み出す() throws Exception {
 
 		//setUp
 		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		//JFrameの値を保存する 200,100,30,40
@@ -172,6 +225,7 @@ public final class WindowSizeTest {
 		assertThat(actual, is(expected));
 	}
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		//１カラム目のサイズ
 		int actual = listView.getColWidth(0);
@@ -190,6 +244,14 @@ public final class WindowSizeTest {
 		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
 >>>>>>> work
 
+=======
+	@Test
+	public void JFrameのサイズが保存された状態でgetXで値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+>>>>>>> work
 		//JFrameの値を保存する 200,100,30,40
 		initJFrame(sut);
 		int expected = 30;
@@ -202,6 +264,7 @@ public final class WindowSizeTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 	@Test
@@ -250,10 +313,41 @@ public final class WindowSizeTest {
 		int expected = 800;
 >>>>>>> work
 
+=======
+
+	@Test
+	public void JFrameのサイズが保存された状態でgetYで値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+		//JFrameの値を保存する 200,100,30,40
+		initJFrame(sut);
+		int expected = 40;
+
+		//exercise
+		JFrame frame = new JFrame("name");
+		sut.read(frame); // サイズ読込
+		int actual = frame.getY();
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void JFrameのサイズが保存されていない状態でgetWidthでデフォルト値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+		int expected = 800;
+
+>>>>>>> work
 		//exercise
 		JFrame frame = new JFrame("name");
 		sut.read(frame); // サイズ読込
 		int actual = frame.getWidth();
+<<<<<<< HEAD
 <<<<<<< HEAD
 		int expected = 200;
 		assertThat(actual, is(expected));
@@ -292,13 +386,37 @@ public final class WindowSizeTest {
 		sut.read(frame); // サイズ読込
 		int actual = frame.getHeight();
 
+=======
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void JFrameのサイズが保存されていない状態でgetHeightでデフォルト値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+		int expected = 400;
+
+		//exercise
+		JFrame frame = new JFrame("name");
+		sut.read(frame); // サイズ読込
+		int actual = frame.getHeight();
+
+>>>>>>> work
 		//verify
 		assertThat(actual, is(expected));
 	}
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public void JFrameのサイズの復元_保存データが無いときデフォルト値を読み出す() {
+=======
+	public void JFrameのサイズが保存されていない状態でgetXでデフォルト値を読み出す() throws Exception {
+>>>>>>> work
 =======
 	public void JFrameのサイズが保存されていない状態でgetXでデフォルト値を読み出す() throws Exception {
 >>>>>>> work
@@ -306,6 +424,7 @@ public final class WindowSizeTest {
 		//setUp
 		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		//		JFrame frame = new JFrame(tag);
 		//		windowSize.save(frame); // サイズ保存
@@ -355,6 +474,26 @@ public final class WindowSizeTest {
 		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
 >>>>>>> work
 
+=======
+		int expected = 0;
+
+		//exercise
+		JFrame frame = new JFrame("name");
+		sut.read(frame); // サイズ読込
+		int actual = frame.getX();
+
+		//verify
+		assertThat(actual, is(expected));
+
+	}
+
+	@Test
+	public void JFrameのサイズが保存されていない状態でgetYでデフォルト値を読み出す() throws Exception {
+
+		//setUp
+		WindowSize sut = new WindowSize(createConf(), TestUtil.getTmpPath(tmpDir));
+
+>>>>>>> work
 		int expected = 0;
 
 		//exercise

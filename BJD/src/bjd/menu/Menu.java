@@ -65,6 +65,7 @@ public final class Menu implements ActionListener, IDispose {
 	}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	
 	
 	
@@ -72,11 +73,16 @@ public final class Menu implements ActionListener, IDispose {
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 
 	/**
 	 * メニュー構築（内部テーブルの初期化） 通常用
 	 */
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -88,12 +94,17 @@ public final class Menu implements ActionListener, IDispose {
 		//全削除
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		//menuBar.removeAll();
 		//while (menuBar.getMenuCount() > 0) {
 		//	JMenu m =  menuBar.getMenu(0);
 		//	m.removeAll();
 			//menuBar.remove(m);
 		//}
+=======
+		ar.clear();
+		dispose();
+>>>>>>> work
 =======
 		ar.clear();
 		dispose();
@@ -124,9 +135,14 @@ public final class Menu implements ActionListener, IDispose {
 		addListMenu(m, helpMenu());
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 		//setJang();
 		setEnable(); //状況に応じた有効無効
+=======
+		
+		menuBar.updateUI(); //メニューバーの再描画
+>>>>>>> work
 =======
 		
 		menuBar.updateUI(); //メニューバーの再描画
@@ -146,7 +162,11 @@ public final class Menu implements ActionListener, IDispose {
 		for (OneMenu o : subMenu) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			addOneMenu(owner, o); 
+=======
+			addSubMenu(owner, o);
+>>>>>>> work
 =======
 			addSubMenu(owner, o);
 >>>>>>> work
@@ -203,6 +223,7 @@ public final class Menu implements ActionListener, IDispose {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	//言語設定
 	//void setJang() {
 		//while (menuBar.getMenuCount() > 0) {
@@ -218,6 +239,11 @@ public final class Menu implements ActionListener, IDispose {
 	//}
 	
 	//状況に応じた有効/無効
+=======
+	/**
+	 * 状況に応じた有効/無効のセット
+	 */
+>>>>>>> work
 =======
 	/**
 	 * 状況に応じた有効/無効のセット

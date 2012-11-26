@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.test.TestUtil;
 
 public final class ListViewTest {
@@ -26,10 +27,24 @@ public final class ListViewTest {
 
 		//setUp
 >>>>>>> work
+=======
+/**
+ * ListViewのdisposeは、コントロール等の資源の解放だが、テストの場合は継続してプロセスが起動するわけではないので省略できる
+ * @author SIN
+ *
+ */
+public final class ListViewTest {
+
+	@Test
+	public void addColumnでカラムを追加しgetColumnCountでその数を確認する() throws Exception {
+
+		//setUp
+>>>>>>> work
 		ListView sut = new ListView("listView");
 		sut.addColumn("1");
 		sut.addColumn("2");
 		sut.addColumn("3");
+<<<<<<< HEAD
 <<<<<<< HEAD
 		TestUtil.prompt("listView.addColumn(\"1\") addColumn(\"2\") addColumn(\"3\")");
 
@@ -50,11 +65,26 @@ public final class ListViewTest {
 		assertThat(actual, is(expected));
 
 >>>>>>> work
+=======
+		int expected = 3;
+		
+		//exercise
+		int actual = sut.getColumnCount();
+
+		//verify
+		assertThat(actual, is(expected));
+
+>>>>>>> work
 	}
 
 	@Test
 	public void itemAddで行を追加しgetRowCountでその数を確認する() {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+		//setUp
+>>>>>>> work
 =======
 
 		//setUp
@@ -64,6 +94,7 @@ public final class ListViewTest {
 		listView.itemAdd(new String[] { "1" });
 		listView.itemAdd(new String[] { "2" });
 		listView.itemAdd(new String[] { "3" });
+<<<<<<< HEAD
 <<<<<<< HEAD
 		TestUtil.prompt("listView.itemAdd(new String[]{\"1\"} itemAdd(new String[]{\"2\"} itemAdd(new String[]{\"3\"}");
 
@@ -79,14 +110,27 @@ public final class ListViewTest {
 		int actual = listView.getRowCount();
 >>>>>>> work
 
+=======
+		int expected = 3;
+
+		//exercise
+		int actual = listView.getRowCount();
+
+>>>>>>> work
 		//verify
 		assertThat(actual, is(expected));
 	}
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public void itemClear_全行削除_で行数は0になる() {
 
+=======
+	public void itemClearで全行削除すると行数は0になる() {
+
+		//setUp
+>>>>>>> work
 =======
 	public void itemClearで全行削除すると行数は0になる() {
 
@@ -97,6 +141,7 @@ public final class ListViewTest {
 		listView.itemAdd(new String[] { "1" });
 		listView.itemAdd(new String[] { "2" });
 		listView.itemAdd(new String[] { "3" });
+<<<<<<< HEAD
 <<<<<<< HEAD
 		TestUtil.prompt("listView.itemAdd(new String[]{\"1\"} itemAdd(new String[]{\"2\"} itemAdd(new String[]{\"3\"}");
 
@@ -116,6 +161,14 @@ public final class ListViewTest {
 		int actual = listView.getRowCount();
 >>>>>>> work
 
+=======
+		listView.itemClear();
+		int expected = 0;
+
+		//exercise
+		int actual = listView.getRowCount();
+
+>>>>>>> work
 		//verify
 		assertThat(actual, is(expected));
 	}
@@ -123,6 +176,7 @@ public final class ListViewTest {
 	@Test
 	public void setColWidthで設定した値をgetColWidthで取得する() {
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		ListView listView = new ListView("listView");
 		listView.addColumn("Col1");
@@ -140,11 +194,19 @@ public final class ListViewTest {
 		//setUp
 		ListView listView = new ListView("listView");
 		listView.addColumn("Col1");
+=======
+		//setUp
+		ListView listView = new ListView("listView");
+		listView.addColumn("Col1");
+>>>>>>> work
 		listView.setColWidth(0, 100);
 		int expected = 100;
 
 		//exercise
 		int actual = listView.getColWidth(0);
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		//verify
@@ -153,8 +215,14 @@ public final class ListViewTest {
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public void setTextで値を設定しgetTextで取得する() {
 
+=======
+	public void setTextでitemに設定した値をgetTextで取得する() {
+
+		//setUp
+>>>>>>> work
 =======
 	public void setTextでitemに設定した値をgetTextで取得する() {
 
@@ -164,6 +232,7 @@ public final class ListViewTest {
 		listView.addColumn("Col1");
 		listView.itemAdd(new String[] { "1" });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		String expected = "1";
 		listView.itemAdd(new String[] { expected });
@@ -230,6 +299,33 @@ public final class ListViewTest {
 <<<<<<< HEAD
 		TestUtil.prompt(String.format("listView.getColumnText(0)=\"%s\"", actual));
 =======
+>>>>>>> work
+=======
+		listView.setText(0, 0, "2");
+		String expected = "2";
+		
+		//exercise
+		String actual = listView.getText(0, 0);
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void setColumnTextでカラムに設定した値をgetColumnTextで取得する() {
+
+		//setUp
+		ListView listView = new ListView("listView");
+		listView.addColumn("default");
+		
+		listView.setColumnText(0, "1");
+		String expected = "1";
+
+		//exercise
+		String actual = listView.getColumnText(0);
+
+		//verify
+		assertThat(actual, is(expected));
 >>>>>>> work
 
 	}

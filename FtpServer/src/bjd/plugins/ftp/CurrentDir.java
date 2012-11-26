@@ -128,6 +128,7 @@ final class CurrentDir {
 			paramStr = paramStr.substring(1);
 		}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		//１階層づつ処理する
 		String[] tmp = paramStr.split("[\\|/]");
 		for (String name : tmp) { //.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries)) {
@@ -136,6 +137,8 @@ final class CurrentDir {
 				oneMount = keepOneMount;
 				return false;
 =======
+=======
+>>>>>>> work
 		if (!paramStr.equals("")) {
 			//１階層づつ処理する
 			String[] tmp = paramStr.split("[\\|/]");
@@ -145,6 +148,9 @@ final class CurrentDir {
 					oneMount = keepOneMount;
 					return false;
 				}
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 			}
 		}

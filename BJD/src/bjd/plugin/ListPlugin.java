@@ -106,7 +106,11 @@ public final class ListPlugin extends ListBase<OnePlugin> {
 				}
 			}
 <<<<<<< HEAD
+<<<<<<< HEAD
 			//jarIn.close();
+=======
+			jarIn.close();
+>>>>>>> work
 =======
 			jarIn.close();
 >>>>>>> work

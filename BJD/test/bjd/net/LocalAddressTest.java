@@ -6,13 +6,17 @@ import org.junit.Test;
 
 import bjd.ValidObjException;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.test.TestUtil;
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 
 public final class LocalAddressTest {
 
 	@Test
+<<<<<<< HEAD
 <<<<<<< HEAD
 	public void remoteStrで取得したテキストで改めてLocalAddressを生成して同じかどうかを確認() {
 =======
@@ -60,10 +64,29 @@ public final class LocalAddressTest {
 		assertThat(actual, is(expected));
 	}
 
+=======
+	public void remoteStrで取得したテキストで改めてLocalAddressを生成して同じかどうかを確認() throws Exception {
+
+		//setUp
+		LocalAddress localAddress = LocalAddress.getInstance();
+		String expected = localAddress.remoteStr();
+		
+		//exercise
+		LocalAddress sut = new LocalAddress(expected);
+		String actual = sut.remoteStr();
+
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+>>>>>>> work
 	@Test(expected = ValidObjException.class)
 	public void 無効な文字列で初期化すると例外_ValidObjException_が発生する() throws Exception {
 		//exercise
 		new LocalAddress("XXX");
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	}
 	

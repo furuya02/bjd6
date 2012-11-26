@@ -16,7 +16,11 @@ import bjd.net.IpKind;
 import bjd.net.ProtocolKind;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.util.TestUtil;
+=======
+import bjd.test.TestUtil;
+>>>>>>> work
 =======
 import bjd.test.TestUtil;
 >>>>>>> work

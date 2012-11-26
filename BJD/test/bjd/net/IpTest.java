@@ -24,7 +24,11 @@ public class IpTest {
 	@RunWith(Theories.class)
 	public static final class 文字列のコンストラクタで生成してtoStringで確認する {
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> work
 =======
 		
 >>>>>>> work
@@ -75,7 +79,10 @@ public class IpTest {
 	@RunWith(Theories.class)
 	public static final class 文字列のコンストラクタで生成してIP_getInetAddress及びtoStringで確認する {
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 
@@ -184,7 +191,10 @@ public class IpTest {
 	public static final class getIpV6の確認 {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 		@DataPoints
@@ -242,12 +252,17 @@ public class IpTest {
 		@Theory
 		public void test(Fixture fx) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			Ip ip = null;
 			try {
 				ip = new Ip(fx.ipStr);
 			} catch (ValidObjException ex) {
 				Assert.fail(ex.getMessage());
 			}
+=======
+
+			Ip ip = TestUtil.createIp(fx.ipStr);
+>>>>>>> work
 =======
 
 			Ip ip = TestUtil.createIp(fx.ipStr);
@@ -284,7 +299,10 @@ public class IpTest {
 	public static final class 演算子イコールイコールの判定_null判定 {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 		
 >>>>>>> work
 		@DataPoints
@@ -319,7 +337,10 @@ public class IpTest {
 		@Theory
 		public void test(Fixture fx) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 			
@@ -384,7 +405,10 @@ public class IpTest {
 	public static final class getAddrV6HとgetAddrV6Lで取得した値からIpオブジェクトを再構築する {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 		@DataPoints
@@ -426,6 +450,10 @@ public class IpTest {
 	public static final class 文字列によるコンストラクタで例外_IllegalArgumentException_が発生することを確認する {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> work
 =======
 
 >>>>>>> work

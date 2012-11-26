@@ -198,8 +198,13 @@ public final class SockTcp extends SockObj {
 	public byte[] recv(int len, int timeout, ILife iLife) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.SECOND, timeout);
+=======
+
+		Timeout tout = new Timeout(timeout);
+>>>>>>> work
 =======
 
 		Timeout tout = new Timeout(timeout);
@@ -254,7 +259,10 @@ public final class SockTcp extends SockObj {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 	//	public byte[] recv(int len, int timeout, ILife iLife) {
 	//
 	//		Timeout tout = new Timeout(timeout);
@@ -298,11 +306,15 @@ public final class SockTcp extends SockObj {
 	//		//trace(TraceKind.Recv, buffer, false);//noEncode = false;テキストかバイナリかは不明
 	//		return buffer;
 	//	}
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	/**
 	 * １行受信<br>
 	 * 切断・タイムアウトでnullが返される
 	 * 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 	 * @param timeout タイムアウト値(ms)
@@ -317,6 +329,8 @@ public final class SockTcp extends SockObj {
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 	 * @param sec タイムアウト値(sec)
 	 * @param iLife 継続確認インターフェース
 	 * @return 受信データ
@@ -326,6 +340,9 @@ public final class SockTcp extends SockObj {
 
 		Timeout tout = new Timeout(sec * 1000);
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -346,7 +363,11 @@ public final class SockTcp extends SockObj {
 			}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			if (c.compareTo(Calendar.getInstance()) < 0) {
+=======
+			if (tout.isFinish()) {
+>>>>>>> work
 =======
 			if (tout.isFinish()) {
 >>>>>>> work
@@ -361,8 +382,11 @@ public final class SockTcp extends SockObj {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public int send(byte[] buf) {
 =======
+=======
+>>>>>>> work
 	/**
 	 * １行のString受信
 	 * @param charsetName エンコード名
@@ -391,11 +415,15 @@ public final class SockTcp extends SockObj {
 	}
 
 	public int send(byte[] buf, int start, int length) {
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 		try {
 			if (oneSsl != null) {
 				//return oneSsl.Write(buffer, buffer.length);
 			}
+<<<<<<< HEAD
 <<<<<<< HEAD
 			if (getSockState() == SockState.CONNECT) {
 				ByteBuffer byteBuffer = ByteBuffer.allocate(buf.length);
@@ -405,6 +433,8 @@ public final class SockTcp extends SockObj {
 				Util.sleep(1); //次の動作が実行されるようにsleepを置く
 				return len;
 =======
+=======
+>>>>>>> work
 			ByteBuffer byteBuffer = ByteBuffer.allocate(length);
 			byteBuffer.put(buf, start, length);
 			byteBuffer.flip();
@@ -415,6 +445,9 @@ public final class SockTcp extends SockObj {
 					Util.sleep(10);
 				}
 				size += written;
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 			}
 			return size;
@@ -427,12 +460,18 @@ public final class SockTcp extends SockObj {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
+=======
+>>>>>>> work
 	public int send(byte[] buf) {
 		return send(buf, 0, buf.length);
 	}
 
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	/**
 	 * 1行送信<br>
@@ -441,6 +480,9 @@ public final class SockTcp extends SockObj {
 	 * @return 送信バイト数
 	 */
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -452,7 +494,10 @@ public final class SockTcp extends SockObj {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 	/**
@@ -465,7 +510,11 @@ public final class SockTcp extends SockObj {
 		try {
 			byte[] buf = str.getBytes(charsetName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 			int l = lineSend(buf);
+=======
+			lineSend(buf);
+>>>>>>> work
 =======
 			lineSend(buf);
 >>>>>>> work
@@ -486,6 +535,9 @@ public final class SockTcp extends SockObj {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -503,7 +555,10 @@ public final class SockTcp extends SockObj {
 		setError("close()");
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 }

@@ -176,6 +176,7 @@ public final class Inet {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	//クライアントソケットを作成して相手先に接続する
 	//        static public TcpObj Connect(ILife iLife, Kernel kernel, Logger logger, Ip ip, Int32 port, Ssl ssl) {
 	//            //float fff = 0;
@@ -206,6 +207,8 @@ public final class Inet {
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 	/**
 	 * クライアントソケットを作成して相手先に接続する<br>
 	 * 失敗した時nullが返る
@@ -223,6 +226,10 @@ public final class Inet {
 		while (iLife.isLife()) {
 			if (sockTcp.getSockState() == SockState.CONNECT) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+				Util.sleep(5); //サーバ側がちょっと安定してから返す
+>>>>>>> work
 =======
 				Util.sleep(5); //サーバ側がちょっと安定してから返す
 >>>>>>> work
@@ -238,6 +245,9 @@ public final class Inet {
 		return null;
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work

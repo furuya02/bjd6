@@ -22,6 +22,7 @@ import bjd.sock.SockTcp;
 import bjd.sock.SockUdp;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.util.TestUtil;
 import bjd.util.Util;
 
@@ -29,11 +30,16 @@ public class OneServerTest2 implements ILife{
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public class OneServerTest2 implements ILife {
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -71,7 +77,11 @@ public class OneServerTest2 implements ILife {
 
 		private void tcp(SockTcp sockTcp) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			while (isLife() && sockTcp.getSockState() == SockState.CONNECT) {
+=======
+			while (super.isLife() && sockTcp.getSockState() == SockState.CONNECT) {
+>>>>>>> work
 =======
 			while (super.isLife() && sockTcp.getSockState() == SockState.CONNECT) {
 >>>>>>> work
@@ -96,7 +106,11 @@ public class OneServerTest2 implements ILife {
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public final void EchoServer_TCP() {
+=======
+	public final void OneServerを継承したEchoServer_TCP版_を使用して接続する() {
+>>>>>>> work
 =======
 	public final void OneServerを継承したEchoServer_TCP版_を使用して接続する() {
 >>>>>>> work
@@ -137,7 +151,11 @@ public class OneServerTest2 implements ILife {
 				Util.sleep(100);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 				TestUtil.dispPrompt("Thread.sleep(100)");
+=======
+				TestUtil.prompt("Thread.sleep(100)");
+>>>>>>> work
 =======
 				TestUtil.prompt("Thread.sleep(100)");
 >>>>>>> work
@@ -150,8 +168,13 @@ public class OneServerTest2 implements ILife {
 			if (0 < len) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 				byte[] b = sockTcp.recv(len, timeout,this);
 				TestUtil.dispPrompt(this, String.format("sockTcp.recv()=%dbyte", b.length));
+=======
+				byte[] b = sockTcp.recv(len, timeout, this);
+				TestUtil.prompt(String.format("sockTcp.recv()=%dbyte", b.length));
+>>>>>>> work
 =======
 				byte[] b = sockTcp.recv(len, timeout, this);
 				TestUtil.prompt(String.format("sockTcp.recv()=%dbyte", b.length));
@@ -174,7 +197,11 @@ public class OneServerTest2 implements ILife {
 
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public final void EchoServer_UDP() {
+=======
+	public final void OneServerを継承したEchoServer_UDP版_を使用して接続する() {
+>>>>>>> work
 =======
 	public final void OneServerを継承したEchoServer_UDP版_を使用して接続する() {
 >>>>>>> work
@@ -209,7 +236,11 @@ public class OneServerTest2 implements ILife {
 			SockUdp sockUdp = new SockUdp(ip, port, timeout, null, buf);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			TestUtil.dispPrompt(this,
+=======
+			TestUtil.prompt(
+>>>>>>> work
 =======
 			TestUtil.prompt(
 >>>>>>> work
@@ -222,7 +253,11 @@ public class OneServerTest2 implements ILife {
 				Util.sleep(100);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 				TestUtil.dispPrompt("Thread.sleep(100)");
+=======
+				TestUtil.prompt("Thread.sleep(100)");
+>>>>>>> work
 =======
 				TestUtil.prompt("Thread.sleep(100)");
 >>>>>>> work
@@ -245,7 +280,11 @@ public class OneServerTest2 implements ILife {
 
 	@Override
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public boolean isLife() {
+=======
+	public final boolean isLife() {
+>>>>>>> work
 =======
 	public final boolean isLife() {
 >>>>>>> work

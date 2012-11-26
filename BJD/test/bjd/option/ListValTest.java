@@ -12,6 +12,7 @@ import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.OnePage;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.test.TestUtil;
 
 public class ListValTest {
@@ -45,22 +46,49 @@ public class ListValTest {
 =======
 		//verify
 >>>>>>> work
+=======
+
+/**
+ * テストでは、リソースの開放（dispose）を省略する
+ * @author SIN
+ *
+ */
+public class ListValTest {
+
+	@Test
+	public void パターン１で作成したListValをgetListで取得する() throws Exception {
+		//setUp
+		ListVal sut = createListVal1();
+		String expected = "n1,n2,n3,n4,n5,n6,n7,n8,";
+
+		//exercise
+		String actual = arrayToString(sut.getList(null));
+
+		//verify
+>>>>>>> work
 		assertThat(actual, is(expected));
 	}
 	
 	@Test
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public final void getListで取得した値の確認_パターン２() {
 =======
+=======
+>>>>>>> work
 	public void パターン２で作成したListValをgetListで取得する() throws Exception {
 		//setUp
 		ListVal sut = createListVal2();
 		String expected = "n0,n1,n2,";
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		//exercise
 		String actual = arrayToString(sut.getList(null));
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		//listValを名前覧にする
 		String actual = arrayToString(listVal.getList(null));
@@ -69,10 +97,14 @@ public class ListValTest {
 =======
 		//verify
 >>>>>>> work
+=======
+		//verify
+>>>>>>> work
 		assertThat(actual, is(expected));
 	}
 	
 	@Test
+<<<<<<< HEAD
 <<<<<<< HEAD
 	public final void searchで検索に成功するとオブジェクトが返る() {
 		
@@ -103,6 +135,20 @@ public class ListValTest {
 	}
 
 	@Test
+=======
+	public void 存在するデータを検査するとnull以外が返る() throws Exception {
+		//setUp
+		ListVal sut = createListVal1();
+
+		//exercise
+		Object actual = sut.search("n1");
+
+		//verify
+		assertThat(actual, is(notNullValue()));
+	}
+
+	@Test
+>>>>>>> work
 	public void 存在しないデータを検査するとnullが返る() throws Exception {
 		//setUp
 		ListVal sut = createListVal1();
@@ -112,6 +158,9 @@ public class ListValTest {
 
 		//verify
 		assertThat(actual, is(nullValue()));
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	}
 

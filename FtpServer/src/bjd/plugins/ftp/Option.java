@@ -10,6 +10,10 @@ import bjd.ctrl.CtrlDat;
 import bjd.ctrl.CtrlFolder;
 import bjd.ctrl.CtrlHidden;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import bjd.ctrl.CtrlInt;
+>>>>>>> work
 =======
 import bjd.ctrl.CtrlInt;
 >>>>>>> work
@@ -52,7 +56,11 @@ public final class Option extends OneOption {
 		pageList.add(page2("VirtualFolder", isJp() ? "仮想フォルダ" : "Virtual Folder", kernel.getRunMode(), kernel.getEditBrowse()));
 		pageList.add(page3("User", isJp() ? "利用者" : "User", kernel.getRunMode(), kernel.getEditBrowse()));
 <<<<<<< HEAD
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> work
 =======
 
 >>>>>>> work
@@ -70,6 +78,11 @@ public final class Option extends OneOption {
 		onePage.add(new OneVal("useSyst", false, Crlf.NEXTLINE, new CtrlCheckBox(
 				isJp() ? "SYSTコマンドを有効にする ( セキュリティリスクの高いオプションです。必要のない限りチェックしないでください。)" : "Validate a SYST command")));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+		onePage.add(new OneVal("reservationTime", 5000, Crlf.NEXTLINE, new CtrlInt(
+				isJp() ? "認証失敗時の保留時間(ミリ秒)" : "Reservation time in certification failure (msec)", 6)));
+>>>>>>> work
 =======
 		onePage.add(new OneVal("reservationTime", 5000, Crlf.NEXTLINE, new CtrlInt(
 				isJp() ? "認証失敗時の保留時間(ミリ秒)" : "Reservation time in certification failure (msec)", 6)));
@@ -97,7 +110,11 @@ public final class Option extends OneOption {
 		ListVal liseVal = new ListVal();
 		liseVal.add(new OneVal("accessControl", 0, Crlf.NEXTLINE, new CtrlComboBox(isJp() ? "アクセス制限" : "Access Control", new String[] { "FULL", "DOWN", "UP" }, 100)));
 <<<<<<< HEAD
+<<<<<<< HEAD
 		liseVal.add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ホームディレクトリ" : "Home Derectory",  40, runMode, editBrowse)));
+=======
+		liseVal.add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ホームディレクトリ" : "Home Derectory", 40, runMode, editBrowse)));
+>>>>>>> work
 =======
 		liseVal.add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ホームディレクトリ" : "Home Derectory", 40, runMode, editBrowse)));
 >>>>>>> work

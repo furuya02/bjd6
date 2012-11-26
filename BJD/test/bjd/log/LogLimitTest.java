@@ -26,6 +26,19 @@ public final class LogLimitTest {
 		return new LogLimit(dat, isDisplay);
 	}
 	
+<<<<<<< HEAD
+	@Test
+	public void 指定文字列を表示する_で初期化された場合_AAA_は表示する() throws Exception {
+
+		//setUp
+		boolean isDisplay = true; //表示する
+		LogLimit sut = create(isDisplay);
+
+		boolean expected = true; 
+
+		//exercise
+		boolean actual = sut.isDisplay("AAA");
+=======
 	@Test
 	public void 指定文字列を表示する_で初期化された場合_AAA_は表示する() throws Exception {
 
@@ -43,6 +56,154 @@ public final class LogLimitTest {
 	}
 
 	@Test
+	public void 指定文字列を表示する_で初期化された場合_表示A_は表示する() throws Exception {
+
+		//setUp
+		boolean isDisplay = true; //表示する
+		LogLimit sut = create(isDisplay);
+
+		boolean expected = true; 
+
+		//exercise
+		boolean actual = sut.isDisplay("表示A");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void 指定文字列を表示する_で初期化された場合_表A123_は表示する() throws Exception {
+
+		//setUp
+		boolean isDisplay = true; //表示する
+		LogLimit sut = create(isDisplay);
+
+		boolean expected = true; 
+
+		//exercise
+		boolean actual = sut.isDisplay("表A123");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void 指定文字列を表示する_で初期化された場合_123_は表示する() throws Exception {
+
+		//setUp
+		boolean isDisplay = true; //表示する
+		LogLimit sut = create(isDisplay);
+
+		boolean expected = true; 
+
+		//exercise
+		boolean actual = sut.isDisplay("123");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void 指定文字列を表示する_で初期化された場合_12アイウ_は表示する() throws Exception {
+
+		//setUp
+		boolean isDisplay = true; //表示する
+		LogLimit sut = create(isDisplay);
+
+		boolean expected = true; 
+
+		//exercise
+		boolean actual = sut.isDisplay("12アイウ");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	
+	@Test
+	public void 指定文字列を表示しない_で初期化された場合_AAA_は表示しない() throws Exception {
+
+		//setUp
+		boolean isDisplay = false; //表示しない
+		LogLimit sut = create(isDisplay);
+		
+		boolean expected = false; 
+
+		//exercise
+		boolean actual = sut.isDisplay("AAA");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void 指定文字列を表示しない_で初期化された場合_表示A_は表示しない() throws Exception {
+
+		//setUp
+		boolean isDisplay = false; //表示しない
+		LogLimit sut = create(isDisplay);
+		
+		boolean expected = false; 
+
+		//exercise
+		boolean actual = sut.isDisplay("表示A");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void 指定文字列を表示しない_で初期化された場合_表A123_は表示しない() throws Exception {
+
+		//setUp
+		boolean isDisplay = false; //表示しない
+		LogLimit sut = create(isDisplay);
+		
+		boolean expected = false; 
+
+		//exercise
+		boolean actual = sut.isDisplay("表A123");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	
+	
+	@Test
+	public void 指定文字列を表示しない_で初期化された場合_123_は表示しない() throws Exception {
+
+		//setUp
+		boolean isDisplay = false; //表示しない
+		LogLimit sut = create(isDisplay);
+		
+		boolean expected = false; 
+
+		//exercise
+		boolean actual = sut.isDisplay("123");
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+	@Test
+	public void 指定文字列を表示しない_で初期化された場合_12アイウ_は表示しない() throws Exception {
+
+		//setUp
+		boolean isDisplay = false; //表示しない
+		LogLimit sut = create(isDisplay);
+		
+		boolean expected = false; 
+
+		//exercise
+		boolean actual = sut.isDisplay("12アイウ");
+>>>>>>> work
+		
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+<<<<<<< HEAD
 	public void 指定文字列を表示する_で初期化された場合_表示A_は表示する() throws Exception {
 
 		//setUp
@@ -194,6 +355,10 @@ public final class LogLimitTest {
 	}
 
 	@Test
+	public void 指定した文字列が表示対象か否かの判断() {
+		
+>>>>>>> work
+=======
 	public void 指定した文字列が表示対象か否かの判断() {
 		
 >>>>>>> work

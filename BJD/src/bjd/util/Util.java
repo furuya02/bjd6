@@ -107,6 +107,14 @@ public final class Util {
 		}
 	}
 
+	public static void sleep(int n) {
+		try {
+			Thread.sleep(n);
+		} catch (InterruptedException e) {
+			runtimeException("Thread.sleep() => InterruptedException");
+		}
+	}
+
 	/**
 	 * ファイル選択ダイログの表示<br>
 	 * 前回の選択を記憶している

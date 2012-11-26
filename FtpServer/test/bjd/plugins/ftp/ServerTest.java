@@ -1,6 +1,7 @@
 package bjd.plugins.ftp;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.junit.Test;
 
 import bjd.test.TmpOption;
@@ -87,6 +88,8 @@ namespace FtpServerTest {
 }
  * */
 =======
+=======
+>>>>>>> work
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -717,4 +720,7 @@ public final class ServerTest implements ILife {
 	}
 
 }
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work

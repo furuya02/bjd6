@@ -178,6 +178,7 @@ public final class Kernel implements IDispose {
 		switch (runMode) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		case Normal:
 			menuOnClick("StartStop_Start"); //メニュー選択イベント
 			break;
@@ -188,6 +189,8 @@ public final class Kernel implements IDispose {
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 			case Normal:
 				menuOnClick("StartStop_Start"); //メニュー選択イベント
 				break;
@@ -196,6 +199,9 @@ public final class Kernel implements IDispose {
 				//                RemoteClient.Start();
 				break;
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -257,13 +263,17 @@ public final class Kernel implements IDispose {
 		}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
 		//最初にOptionBasicのlangだけを読み出す
 		isJp = OptionIni.getInstance().isJp();
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> work
 
@@ -277,6 +287,8 @@ public final class Kernel implements IDispose {
 		editBrowse = (boolean) confBasic.get("editBrowse");
 >>>>>>> work
 =======
+=======
+>>>>>>> work
 
 		listOption = new ListOption(this, listPlugin);
 
@@ -285,6 +297,9 @@ public final class Kernel implements IDispose {
 		Conf confBasic = new Conf(listOption.get("Basic"));
 		editBrowse = (boolean) confBasic.get("editBrowse");
 
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 
 		//OptionLog
@@ -297,6 +312,10 @@ public final class Kernel implements IDispose {
 				//LogFileの初期化
 				String saveDirectory = (String) confOption.get("saveDirectory");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+				saveDirectory = replaceOptionEnv(saveDirectory);
+>>>>>>> work
 =======
 				saveDirectory = replaceOptionEnv(saveDirectory);
 >>>>>>> work
@@ -341,6 +360,10 @@ public final class Kernel implements IDispose {
 		remoteServer = listServer.get("RemoteServer");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> work
 =======
 
 >>>>>>> work
@@ -513,6 +536,7 @@ public final class Kernel implements IDispose {
 		} else {
 			listServer.stop();
 		}
+<<<<<<< HEAD
 	}
 
 	private void start() {
@@ -543,6 +567,8 @@ public final class Kernel implements IDispose {
 		} else {
 			listServer.stop();
 		}
+=======
+>>>>>>> work
 	}
 
 	/**
@@ -576,6 +602,7 @@ public final class Kernel implements IDispose {
 			switch (cmd) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			case "StartStop_Start":
 				start();
 				break;
@@ -601,6 +628,8 @@ public final class Kernel implements IDispose {
 =======
 =======
 >>>>>>> work
+=======
+>>>>>>> work
 				case "StartStop_Start":
 					start();
 					break;
@@ -624,6 +653,9 @@ public final class Kernel implements IDispose {
 					Util.runtimeException(String.format("cmd=%s", cmd));
 					break;
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 =======
 >>>>>>> work
@@ -668,10 +700,13 @@ public final class Kernel implements IDispose {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	public static String ChangeTag(String getValue) {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 =======
+=======
+>>>>>>> work
 	public String changeTag(String src) {
 		String[] tagList = new String[] { "$h", "$v", "$p", "$d", "$a", "$s" };
 
@@ -718,6 +753,9 @@ public final class Kernel implements IDispose {
 			}
 		}
 		return src;
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 	}
 }

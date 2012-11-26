@@ -13,7 +13,10 @@ import java.util.Iterator;
 import bjd.ILife;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import bjd.ThreadBase;
+=======
+>>>>>>> work
 =======
 >>>>>>> work
 =======
@@ -192,7 +195,10 @@ public class SockServer extends SockObj {
 		return null;
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> work
 	/**
 	 * bindが可能かどうかの確認
 	 * @param ip
@@ -212,5 +218,8 @@ public class SockServer extends SockObj {
 		return false;
 	}
 	
+<<<<<<< HEAD
+>>>>>>> work
+=======
 >>>>>>> work
 }
