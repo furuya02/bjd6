@@ -11,16 +11,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 import bjd.ILife;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-import bjd.ThreadBase;
-=======
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 import bjd.net.InetKind;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
@@ -194,11 +184,6 @@ public class SockServer extends SockObj {
 		sockServer.close();
 		return null;
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> work
 	/**
 	 * bindが可能かどうかの確認
 	 * @param ip
@@ -218,8 +203,4 @@ public class SockServer extends SockObj {
 		return false;
 	}
 	
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 }

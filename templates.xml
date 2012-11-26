@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="「未実装」例外" enabled="true" name="prn">Util.designProblem("未実装");</template><template autoinsert="true" context="java" deleted="false" description="デバッグ用println" enabled="true" name="prn">//TODO Debug Print&#13;
-System.out.println(String.format("",));</template><template autoinsert="true" context="java" deleted="false" description="実行時例外（設計不良）" enabled="true" name="prn">Util.runtimeError(String.format("",));&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="例外（設計に問題あります）" enabled="true" name="prn">throw new UnsupportedOperationException("*.java *() 設計に問題があります");&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="テスト用プロンプト（クラス名がテスト名になっている場合）" enabled="true" name="pro">TestUtil.promptClass(String.format(</template><template autoinsert="true" context="java" deleted="false" description="テスト用プロンプト（メソッド名がテスト名になっている場合）" enabled="true" name="pro">TestUtil.promptMethod(String.format(</template></templates>
-=======
-=======
->>>>>>> work
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Testの定型句" enabled="true" name="test">@Test&#13;
 public void xxx() throws Exception {&#13;
 	//setUp&#13;
@@ -19,9 +10,4 @@ public void xxx() throws Exception {&#13;
 	//tearDown&#13;
 	sut.dispose();&#13;
 }&#13;
-<<<<<<< HEAD
 </template></templates>
->>>>>>> work
-=======
-</template></templates>
->>>>>>> work

@@ -22,19 +22,7 @@ import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.sock.SockObj;
 import bjd.sock.SockState;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-import bjd.util.TestUtil;
-=======
 import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
 import bjd.util.Util;
 
 public class OneServerTest {

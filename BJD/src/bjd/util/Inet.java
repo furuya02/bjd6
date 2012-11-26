@@ -174,41 +174,6 @@ public final class Inet {
 
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	//クライアントソケットを作成して相手先に接続する
-	//        static public TcpObj Connect(ILife iLife, Kernel kernel, Logger logger, Ip ip, Int32 port, Ssl ssl) {
-	//            //float fff = 0;
-	//
-	//            //TcpObj tcpObj = new TcpObj(kernel, logger, ip, port, fff, ssl);
-	//            var tcpObj = new TcpObj(kernel, logger, ip, port, ssl);
-	//
-	//            Util.sleep(0);
-	//            while (iLife.isLife()) {
-	//                if (tcpObj.State == SocketObjState.Connect) {
-	//                    return tcpObj;
-	//                }
-	//                if (tcpObj.State == SocketObjState.Error) {
-	//                    tcpObj.Close();//2009.06.01追加
-	//                    return null;
-	//                }
-	//                if (tcpObj.State == SocketObjState.Disconnect) {
-	//                    //相手から即効で切られた場合
-	//                    tcpObj.Close();//2009.06.10追加
-	//                    return null;
-	//                }
-	//                //Ver5.0.0-a11 勝負
-	//                Util.sleep(10);
-	//            }
-	//            tcpObj.Close();//2009.06.01追加
-	//            return null;
-	//        }
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 	/**
 	 * クライアントソケットを作成して相手先に接続する<br>
 	 * 失敗した時nullが返る
@@ -225,14 +190,7 @@ public final class Inet {
 		Util.sleep(0);
 		while (iLife.isLife()) {
 			if (sockTcp.getSockState() == SockState.CONNECT) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 				Util.sleep(5); //サーバ側がちょっと安定してから返す
->>>>>>> work
-=======
-				Util.sleep(5); //サーバ側がちょっと安定してから返す
->>>>>>> work
 				return sockTcp;
 			}
 			if (sockTcp.getSockState() == SockState.Error) {
@@ -244,13 +202,6 @@ public final class Inet {
 		sockTcp.close();
 		return null;
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 
 	/**
 	 * 指定した長さのランダム文字列を取得する（チャレンジ文字列用）

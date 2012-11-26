@@ -1,9 +1,7 @@
 package bjd.sock;
 
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 
 import java.net.InetSocketAddress;
 
@@ -14,19 +12,7 @@ import org.junit.Test;
 import bjd.net.Ip;
 import bjd.net.IpKind;
 import bjd.net.ProtocolKind;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-import bjd.util.TestUtil;
-=======
 import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
 import bjd.util.Util;
 
 public final class SockServerTest {

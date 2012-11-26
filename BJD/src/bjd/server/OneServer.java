@@ -2,13 +2,7 @@ package bjd.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> work
 
->>>>>>> work
 import bjd.Kernel;
 import bjd.ThreadBase;
 import bjd.acl.AclKind;
@@ -57,25 +51,10 @@ public abstract class OneServer extends ThreadBase {
 		return conf;
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 	protected final Logger getLogger() {
 		return logger;
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 	protected final String getNameTag() {
 		return nameTag;
 	}
@@ -83,28 +62,11 @@ public abstract class OneServer extends ThreadBase {
 	protected final boolean isJp() {
 		return isJp;
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-	protected final int getTimeout() {
-		return timeout;
-	}
->>>>>>> work
-
-=======
-=======
->>>>>>> work
 
 	protected final int getTimeout() {
 		return timeout;
 	}
 
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 	public abstract String getMsg(int messageNo);
 
 	//子スレッド管理
@@ -166,25 +128,7 @@ public abstract class OneServer extends ThreadBase {
 		}
 		//DEBUG用
 		if (this.oneBind == null) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-			Ip ip = null;
-			try {
-				ip = new Ip("127.0.0.1");
-			} catch (ValidObjException ex) {
-				//127.0.0.1で例外となるようなら設計問題とするしかない
-				Util.runtimeException("new Ip(127.0.0.1)");
-			}
-=======
 			Ip ip = new Ip(IpKind.V4_LOCALHOST);
->>>>>>> work
-=======
-			Ip ip = new Ip(IpKind.V4_LOCALHOST);
->>>>>>> work
-=======
-			Ip ip = new Ip(IpKind.V4_LOCALHOST);
->>>>>>> work
 			this.oneBind = new OneBind(ip, ProtocolKind.Tcp);
 		}
 
@@ -384,13 +328,6 @@ public abstract class OneServer extends ThreadBase {
 
 		//クライアントのホスト名を逆引きする
 		sockObj.resolve((boolean) conf.get("useResolve"), logger);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> work
-=======
->>>>>>> work
 
 		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
 		logger.set(LogKind.DETAIL, sockObj, 9000002, String.format("count=%d Local=%s Remote=%s", count(), sockObj
@@ -402,25 +339,6 @@ public abstract class OneServer extends ThreadBase {
 		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
 				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-		//_subThreadの中でSockObjは破棄する（ただしUDPの場合は、クローンなのでClose()してもsocketは破棄されない）
-		logger.set(LogKind.DETAIL, sockObj, 9000002, String.format("count=%d Local=%s Remote=%s", count(), sockObj
-				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
-
-		onSubThread(sockObj); //接続単位の処理
-		sockObj.close();
-
-		logger.set(LogKind.DETAIL, sockObj, 9000003, String.format("count=%d Local=%s Remote=%s", count(), sockObj
-				.getLocalAddress().toString(), sockObj.getRemoteAddress().toString()));
-
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 	}
 
 	//RemoteServerでのみ使用される
@@ -464,24 +382,6 @@ public abstract class OneServer extends ThreadBase {
 			return null;
 		}
 		byte[] recvbuf = sockTcp.lineRecv(timeout, this);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-		//切断された場合
->>>>>>> work
-		if (recvbuf == null) {
-			return null;
-		}
-
-		//受信待機中の場合
-		if (recvbuf.length == 0) {
-			return new Cmd("", "", "");
-		}
-		
-=======
-=======
->>>>>>> work
 		//切断された場合
 		if (recvbuf == null) {
 			return null;
@@ -492,10 +392,6 @@ public abstract class OneServer extends ThreadBase {
 			return new Cmd("", "", "");
 		}
 
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 		//CRLFの排除
 		recvbuf = Inet.trimCrlf(recvbuf);
 

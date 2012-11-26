@@ -1,24 +1,11 @@
 package bjd;
 
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-import bjd.util.TestUtil;
-=======
 import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
-=======
-import bjd.test.TestUtil;
->>>>>>> work
 import bjd.util.Util;
 
 public class ThreadBaseTest {
@@ -54,53 +41,14 @@ public class ThreadBaseTest {
 
 	@Test
 	public final void start及びstopでisRunnigの状態を確認する() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
 		MyThread sut = new MyThread();
->>>>>>> work
-=======
-
-		MyThread sut = new MyThread();
->>>>>>> work
 
 		sut.start();
 		TestUtil.prompt("start()");
 		assertThat(sut.isRunnig(), is(true));
 		TestUtil.prompt("isRunnig()=true start()から返った時点で、isRunnig()はTrueになっている");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-		myThread.start();
-		TestUtil.prompt("myThread.start()");
-		assertThat(myThread.isRunnig(), is(true));
-		TestUtil.prompt("isRunnig()=true start()から返った時点で、isRunnig()はTrueになっている");
-
-		myThread.stop();
-		TestUtil.prompt("myThread.stop()");
-		assertThat(myThread.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false stop()から返った時点で、isRunnig()はfalseになっている");
-
-		myThread.stop();
-		TestUtil.prompt("myThread.stop() stop()が重複しても問題ない");
-
-		//start()から返った時点で、isRunnig()はTrueになっている
-		myThread.start();
-		TestUtil.prompt("myThread.start()");
-		assertThat(myThread.isRunnig(), is(true));
-		TestUtil.prompt("isRunnig()=true");
-
-		myThread.start(); //start()が重複しても問題ない
-		TestUtil.prompt("myThread.start() start()が重複しても問題ない");
-
-		myThread.stop();
-		TestUtil.prompt("myThread.stop()");
-		assertThat(myThread.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false");
-
-		myThread.dispose();
-=======
 		sut.stop();
 		TestUtil.prompt("stop()");
 		assertThat(sut.isRunnig(), is(false));
@@ -124,32 +72,6 @@ public class ThreadBaseTest {
 		TestUtil.prompt("isRunnig()=false");
 
 		sut.dispose();
->>>>>>> work
-=======
-		sut.stop();
-		TestUtil.prompt("stop()");
-		assertThat(sut.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false stop()から返った時点で、isRunnig()はfalseになっている");
-
-		sut.stop();
-		TestUtil.prompt("stop() stop()が重複しても問題ない");
-
-		//start()から返った時点で、isRunnig()はTrueになっている
-		sut.start();
-		TestUtil.prompt("start()");
-		assertThat(sut.isRunnig(), is(true));
-		TestUtil.prompt("isRunnig()=true");
-
-		sut.start(); //start()が重複しても問題ない
-		TestUtil.prompt("start() start()が重複しても問題ない");
-
-		sut.stop();
-		TestUtil.prompt("stop()");
-		assertThat(sut.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false");
-
-		sut.dispose();
->>>>>>> work
 		TestUtil.prompt("myThread.dispose()");
 	}
 
@@ -159,16 +81,6 @@ public class ThreadBaseTest {
 		MyThread sut = new MyThread();
 
 		for (int i = 0; i < 5; i++) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-			TestUtil.prompt(String.format("[i=%d]", i));
-			myThread.start();
-			assertThat(myThread.isRunnig(), is(true));
-			myThread.stop();
-			assertThat(myThread.isRunnig(), is(false));
-=======
-=======
->>>>>>> work
 			TestUtil.prompt(String.format("start() i=%d", i));
 			sut.start();
 			TestUtil.prompt("isRunning() = true");
@@ -177,10 +89,6 @@ public class ThreadBaseTest {
 			sut.stop();
 			TestUtil.prompt("isRunning() = false");
 			assertThat(sut.isRunnig(), is(false));
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 		}
 
 		sut.dispose();
@@ -190,18 +98,6 @@ public class ThreadBaseTest {
 	public final void new及びstart_stop_disposeしてisRunnigの状態を確認する_負荷テスト() {
 
 		for (int i = 0; i < 3; i++) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-			TestUtil.prompt(String.format("[i=%d]", i));
-			MyThread myThread = new MyThread();
-			myThread.start();
-			assertThat(myThread.isRunnig(), is(true));
-			myThread.stop();
-			assertThat(myThread.isRunnig(), is(false));
-			myThread.dispose();
-=======
-=======
->>>>>>> work
 			TestUtil.prompt(String.format("new i=%d", i));
 			MyThread sut = new MyThread();
 			TestUtil.prompt("start()");
@@ -214,10 +110,6 @@ public class ThreadBaseTest {
 			assertThat(sut.isRunnig(), is(false));
 			TestUtil.prompt("dispose()");
 			sut.dispose();
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 		}
 	}
 

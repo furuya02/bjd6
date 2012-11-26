@@ -176,21 +176,6 @@ public final class Kernel implements IDispose {
 		}
 
 		switch (runMode) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-		case Normal:
-			menuOnClick("StartStop_Start"); //メニュー選択イベント
-			break;
-		case Remote:
-			//                RemoteClient = new RemoteClient(this);
-			//                RemoteClient.Start();
-			break;
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 			case Normal:
 				menuOnClick("StartStop_Start"); //メニュー選択イベント
 				break;
@@ -198,13 +183,6 @@ public final class Kernel implements IDispose {
 				//                RemoteClient = new RemoteClient(this);
 				//                RemoteClient.Start();
 				break;
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 		}
 
 		//        switch (RunMode){
@@ -261,34 +239,10 @@ public final class Kernel implements IDispose {
 		for (OnePlugin o : listPlugin) {
 			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
 		}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
 		//最初にOptionBasicのlangだけを読み出す
 		isJp = OptionIni.getInstance().isJp();
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-
-		listOption = new ListOption(this, listPlugin);
-
-		//OptionBasic
-		Conf confBasic = new Conf(listOption.get("Basic"));
-<<<<<<< HEAD
-		isJp = ((int) confBasic.get("lang") == 0) ? true : false;
-=======
-		editBrowse = (boolean) confBasic.get("editBrowse");
->>>>>>> work
-=======
-=======
->>>>>>> work
 
 		listOption = new ListOption(this, listPlugin);
 
@@ -297,10 +251,6 @@ public final class Kernel implements IDispose {
 		Conf confBasic = new Conf(listOption.get("Basic"));
 		editBrowse = (boolean) confBasic.get("editBrowse");
 
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 
 		//OptionLog
 		Conf confOption = new Conf(listOption.get("Log"));
@@ -311,14 +261,7 @@ public final class Kernel implements IDispose {
 			if (runMode == RunMode.Normal || runMode == RunMode.Service) {
 				//LogFileの初期化
 				String saveDirectory = (String) confOption.get("saveDirectory");
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 				saveDirectory = replaceOptionEnv(saveDirectory);
->>>>>>> work
-=======
-				saveDirectory = replaceOptionEnv(saveDirectory);
->>>>>>> work
 				int normalLogKind = (int) confOption.get("normalLogKind");
 				int secureLogKind = (int) confOption.get("secureLogKind");
 				int saveDays = (int) confOption.get("saveDays");
@@ -359,14 +302,7 @@ public final class Kernel implements IDispose {
 		//        }
 		remoteServer = listServer.get("RemoteServer");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> work
-=======
-
->>>>>>> work
 		view.setColumnText(); //Logビューのカラムテキストの初期化
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）
 
@@ -536,39 +472,6 @@ public final class Kernel implements IDispose {
 		} else {
 			listServer.stop();
 		}
-<<<<<<< HEAD
-	}
-
-	private void start() {
-
-		//サービス登録されている場合の処理
-		if (runMode == RunMode.NormalRegist) {
-			//            var setupService = new SetupService(this);
-			//            if (setupService.Status != ServiceControllerStatus.Running) {
-			//                setupService.Job(ServiceCmd.Start);
-			//            }
-		} else {
-			if (listServer.size() == 0) {
-				logger.set(LogKind.ERROR, null, 9000030, "");
-			} else {
-				listServer.start();
-			}
-		}
-	}
-
-	private void stop() {
-
-		//サービス登録されている場合の処理
-		if (runMode == RunMode.NormalRegist) {
-			//            var setupService = new SetupService(this);
-			//            if (setupService.Status == ServiceControllerStatus.Running) {
-			//                setupService.Job(ServiceCmd.Stop);
-			//            }
-		} else {
-			listServer.stop();
-		}
-=======
->>>>>>> work
 	}
 
 	/**
@@ -600,36 +503,6 @@ public final class Kernel implements IDispose {
 			//            dlg.ShowDialog();
 		} else if (cmd.indexOf("StartStop_") == 0) {
 			switch (cmd) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-			case "StartStop_Start":
-				start();
-				break;
-			case "StartStop_Stop":
-				stop();
-				break;
-			case "StartStop_Restart":
-				stop();
-				Util.sleep(300);
-				start();
-				break;
-			case "StartStop_Reload":
-				stop();
-				listInitialize();
-				start();
-				break;
-			case "StartStop_Service":
-				//SetupService(); //サービスの設定
-				break;
-			default:
-				Util.runtimeException(String.format("cmd=%s", cmd));
-				break;
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 				case "StartStop_Start":
 					start();
 					break;
@@ -652,13 +525,6 @@ public final class Kernel implements IDispose {
 				default:
 					Util.runtimeException(String.format("cmd=%s", cmd));
 					break;
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 
 			}
 			view.setColor(); //ウインドのカラー初期化
@@ -699,14 +565,6 @@ public final class Kernel implements IDispose {
 
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-	public static String ChangeTag(String getValue) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-=======
-=======
->>>>>>> work
 	public String changeTag(String src) {
 		String[] tagList = new String[] { "$h", "$v", "$p", "$d", "$a", "$s" };
 
@@ -753,9 +611,5 @@ public final class Kernel implements IDispose {
 			}
 		}
 		return src;
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
 	}
 }

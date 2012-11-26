@@ -16,8 +16,7 @@ import bjd.net.OneBind;
 import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.option.OneOption;
-import bjd.plugin.ListPlugin;
-import bjd.plugin.OnePlugin;
+
 import bjd.server.OneServer;
 import bjd.test.TestUtil;
 

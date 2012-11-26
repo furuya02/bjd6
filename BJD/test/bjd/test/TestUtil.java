@@ -1,5 +1,8 @@
 package bjd.test;
 
+import java.io.File;
+import java.io.IOException;
+
 import junit.framework.Assert;
 import bjd.Kernel;
 import bjd.ValidObjException;
@@ -13,6 +16,36 @@ import bjd.util.Util;
 public final class TestUtil {
 	private TestUtil() {
 		//デフォルトコンストラクタの隠蔽
+	}
+
+	/**
+	 * テンポラリディレクトリの作成<br>
+	 * 最初に呼ばれたとき、ディレクトリが存在しないので、新規に作成される
+	 * @return
+	 */
+	public static String getTmpDir(String tmpDir) {
+		String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
+		String dir = String.format("%s\\%s", currentDir, tmpDir);
+		File file = new File(dir);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		return dir;
+	}
+
+	/**
+	 * 指定したテンポラリディレクトリ(tmpDir)の中での作成可能なテンポラリファイル(もしくはディレクトリ)名を生成する
+	 * @return テンポラリファイル（ディレクトリ）名(パス)
+	 * @throws IOException 
+	 */
+	public static String getTmpPath(String tmpDir) throws IOException {
+		final String prefix = "test";
+		final String suffix = ".ts";
+		File file = File.createTempFile(prefix, suffix, new File(getTmpDir(tmpDir)));
+		if (file.exists()) {
+			file.delete();
+		}
+		return file.getPath();
 	}
 
 	/**
@@ -31,6 +64,8 @@ public final class TestUtil {
 		Util.runtimeException(String.format("%s not found", optionName));
 		return null; //k実行時例外により、ここは実行されない
 	}
+
+	static String lastBanner = "";
 
 	/**
 	 * テスト用のプロンプト
@@ -54,7 +89,14 @@ public final class TestUtil {
 			className = m[m.length - 1];
 			methodName = n[1];
 		}
-		System.out.println(String.format("%s %s> %s", className, methodName, msg));
+		String banner = String.format("%s %s", className, methodName);
+		if (!banner.equals(lastBanner)) {
+			lastBanner = banner;
+			System.out.println("-------------------------------------------------------------------");
+			System.out.println(banner);
+			System.out.println("-------------------------------------------------------------------");
+		}
+		System.out.println(msg);
 	}
 
 	/**

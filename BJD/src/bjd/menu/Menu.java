@@ -63,56 +63,18 @@ public final class Menu implements ActionListener, IDispose {
 		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
 		addListMenu(m, subMenu);
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
-	
-	
-	//メニュー構築（内部テーブルの初期化）
-=======
-=======
->>>>>>> work
-=======
->>>>>>> work
 
 	/**
 	 * メニュー構築（内部テーブルの初期化） 通常用
 	 */
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> work
-=======
->>>>>>> work
-=======
->>>>>>> work
 	public void initialize() {
 		if (menuBar == null) {
 			return;
 		}
 
 		//全削除
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-		//menuBar.removeAll();
-		//while (menuBar.getMenuCount() > 0) {
-		//	JMenu m =  menuBar.getMenu(0);
-		//	m.removeAll();
-			//menuBar.remove(m);
-		//}
-=======
 		ar.clear();
 		dispose();
->>>>>>> work
-=======
-		ar.clear();
-		dispose();
->>>>>>> work
-=======
-		ar.clear();
-		dispose();
->>>>>>> work
 		
 		//「ファイル」メニュー
 		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
@@ -133,24 +95,8 @@ public final class Menu implements ActionListener, IDispose {
 		//「ヘルプ」メニュー
 		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null));
 		addListMenu(m, helpMenu());
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-		//setJang();
-		setEnable(); //状況に応じた有効無効
-=======
 		
 		menuBar.updateUI(); //メニューバーの再描画
->>>>>>> work
-=======
-		
-		menuBar.updateUI(); //メニューバーの再描画
->>>>>>> work
-=======
-		
-		menuBar.updateUI(); //メニューバーの再描画
->>>>>>> work
 	}
 
 	/**
@@ -160,19 +106,7 @@ public final class Menu implements ActionListener, IDispose {
 	 */
 	void addListMenu(JMenu owner, ListMenu subMenu) {
 		for (OneMenu o : subMenu) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-			addOneMenu(owner, o); 
-=======
 			addSubMenu(owner, o);
->>>>>>> work
-=======
-			addSubMenu(owner, o);
->>>>>>> work
-=======
-			addSubMenu(owner, o);
->>>>>>> work
 		}
 	}
 
@@ -221,39 +155,9 @@ public final class Menu implements ActionListener, IDispose {
 		kernel.menuOnClick(e.getActionCommand());
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	//言語設定
-	//void setJang() {
-		//while (menuBar.getMenuCount() > 0) {
-			//JMenu m =  menuBar.getMenu(0);
-			//m.set
-			//m.removeAll();
-			//menuBar.remove(m);
-		//}
-//
-//		for (OneMenu oneMenu : subar) {
-//			o.Value.Text = kernel.Jp?o.Key.JpTitle:o.Key.EnTitle;
-//		}
-	//}
-	
-	//状況に応じた有効/無効
-=======
 	/**
 	 * 状況に応じた有効/無効のセット
 	 */
->>>>>>> work
-=======
-	/**
-	 * 状況に応じた有効/無効のセット
-	 */
->>>>>>> work
-=======
-	/**
-	 * 状況に応じた有効/無効のセット
-	 */
->>>>>>> work
 	public void setEnable() {
 		if (kernel.getRunMode() == RunMode.NormalRegist) { //サービス登録されている場合
 			//サーバの起動停止はできない
