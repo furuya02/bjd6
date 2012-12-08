@@ -3,6 +3,8 @@ package bjd.plugins.ftp;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,7 +33,7 @@ public final class ServerTest implements ILife {
 	private String bannerStr = "220 FTP ( BlackJumboDog Version TEST ) ready\r\n";
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeClass() throws Exception {
 
 		//設定ファイルの退避と上書き
 		op = new TmpOption("FtpServerTest.ini");
