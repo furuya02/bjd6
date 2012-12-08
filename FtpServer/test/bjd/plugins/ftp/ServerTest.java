@@ -26,8 +26,8 @@ import bjd.util.Util;
 
 public final class ServerTest implements ILife {
 
-	private static TmpOption op; //設定ファイルの上書きと退避
-	private static Server sv; //サーバ
+	private static TmpOption op = null; //設定ファイルの上書きと退避
+	private static Server sv = null; //サーバ
 	private SockTcp cl; //クライアント
 
 	private String bannerStr = "220 FTP ( BlackJumboDog Version TEST ) ready\r\n";
@@ -36,8 +36,7 @@ public final class ServerTest implements ILife {
 	public static void beforeClass() throws Exception {
 
 		//設定ファイルの退避と上書き
-		op = new TmpOption("FtpServerTest.ini");
-
+		op = new TmpOption("c:\\dev\\bjd6\\FtpServer\\test\\FtpServerTest.ini");
 		OneBind oneBind = new OneBind(new Ip(IpKind.V4_LOCALHOST), ProtocolKind.Tcp);
 		Kernel kernel = new Kernel();
 		Option option = new Option(kernel, "");
@@ -73,6 +72,15 @@ public final class ServerTest implements ILife {
 	public void tearDown() {
 		//クライアント停止
 		cl.close();
+	}
+
+	//共通処理(ログイン成功)
+	void login(String userName) {
+		assertThat(cl.stringRecv(1, this), is(bannerStr));
+		cl.stringSend(String.format("USER %s", userName));
+		assertThat(cl.stringRecv(1, this), is(String.format("331 Password required for %s.\r\n", userName)));
+		cl.stringSend(String.format("PASS %s", userName));
+		assertThat(cl.stringRecv(1, this), is(String.format("230 User %s logged in.\r\n", userName)));
 	}
 
 	@Test
@@ -187,12 +195,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void 認証後にUSERコマンドを送るとエラーが返る() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+		
 		//user
 		cl.stringSend("USER user1");
 		assertThat(cl.stringRecv(1, this), is("530 Already logged in.\r\n"));
@@ -202,12 +207,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void 認証後にPASSコマンドを送るとエラーが返る() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//pass
 		cl.stringSend("PASS user1");
 		assertThat(cl.stringRecv(1, this), is("530 Already logged in.\r\n"));
@@ -217,12 +219,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void PWDコマンド() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//pwd
 		cl.stringSend("PWD");
 		assertThat(cl.stringRecv(1, this), is("257 \"/\" is current directory.\r\n"));
@@ -232,12 +231,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void SYSTコマンド() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//syst
 		cl.stringSend("SYST");
 		assertThat(cl.stringRecv(1, this), is("215 Windows 7\r\n"));
@@ -247,12 +243,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void TYPEコマンド() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//type
 		cl.stringSend("TYPE A");
 		assertThat(cl.stringRecv(1, this), is("200 Type set 'A'\r\n"));
@@ -266,11 +259,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void PORTコマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		int port = 256; //テストの連続のためにPORTコマンドのテストとはポート番号をずらす必要がある
 		cl.stringSend("PORT 127,0,0,1,0,256");
@@ -283,11 +273,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void PORTコマンド_パラメータ誤り() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("PORT 127,3,x,x,1,0,256");
 		assertThat(cl.stringRecv(1, this), is("501 Illegal PORT command.\r\n"));
@@ -297,11 +284,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void PASVコマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("PASV");
 
@@ -319,11 +303,8 @@ public final class ServerTest implements ILife {
 
 	@Test
 	public void EPSVコマンド() {
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("EPSV");
 
@@ -336,11 +317,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void EPRTコマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		int port = 252; //テストの連続のためにPORTコマンドのテストとはポート番号をずらす必要がある
 		cl.stringSend("EPRT |2|::1|252|");
@@ -353,11 +331,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void EPORTコマンド_パラメータ誤り() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("EPRT |x|");
 		assertThat(cl.stringRecv(1, this), is("501 Illegal EPRT command.\r\n"));
@@ -367,11 +342,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void MKD_RMDコマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("MKD test");
 		assertThat(cl.stringRecv(1, this), is("257 Mkd command successful.\r\n"));
@@ -383,11 +355,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void MKDコマンド_既存の名前を指定するとエラーとなる() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("MKD home0");
 		assertThat(cl.stringRecv(1, this), is("451 Mkd error.\r\n"));
@@ -397,25 +366,19 @@ public final class ServerTest implements ILife {
 	@Test
 	public void RMDコマンド_存在しない名前を指定するとエラーとなる() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("RMD test");
 		assertThat(cl.stringRecv(1, this), is("451 Rmd error.\r\n"));
 
 	}
-	
+
 	@Test
 	public void RETRコマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		//port
 		int port = 250;
@@ -428,19 +391,15 @@ public final class ServerTest implements ILife {
 		assertThat(cl.stringRecv(1, this), is("150 Opening ASCII mode data connection for 3.txt (24 bytes).\r\n"));
 		Util.sleep(10);
 		assertThat(dl.length(), is(24));
-		
+
 		dl.close();
 	}
-
 
 	@Test
 	public void STOR_DELEマンド() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		//port
 		int port = 249;
@@ -456,38 +415,142 @@ public final class ServerTest implements ILife {
 		dl.close();
 
 		assertThat(cl.stringRecv(1, this), is("226 Transfer complete.\r\n"));
-		
+
 		//dele
 		cl.stringSend("DELE 0.txt");
 		assertThat(cl.stringRecv(1, this), is("250 Dele command successful.\r\n"));
-		
+
 	}
-	
+
+	@Test
+	public void UPユーザはRETRに失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user2");
+
+		//port
+		int port = 250;
+		cl.stringSend("PORT 127,0,0,1,0,250");
+		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
+
+		//retr
+		cl.stringSend("RETR 3.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+		//		Util.sleep(10);
+		//		assertThat(dl.length(), is(24));
+
+		dl.close();
+	}
+
+	@Test
+	public void UPユーザはDELEに失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user2");
+
+		//dele
+		cl.stringSend("DELE 1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+	}
+
+	@Test
+	public void UPユーザはRNFR_RNTO_ファイル名変更_に失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user2");
+
+		cl.stringSend("RNFR 1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+		cl.stringSend("RNTO $$$.1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+	}
+
+	@Test
+	public void DOWNユーザはSTORに失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user3");
+
+		//port
+		int port = 249;
+		cl.stringSend("PORT 127,0,0,1,0,249");
+		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
+
+		//stor
+		cl.stringSend("STOR 0.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+	}
+
+	@Test
+	public void DOWNユーザはDELEに失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user3");
+
+		//dele
+		cl.stringSend("DELE 1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+	}
+
+	@Test
+	public void DOWNユーザはRETRコに成功する() {
+
+		//共通処理(ログイン成功)
+		login("user3");
+
+		//port
+		int port = 250;
+		cl.stringSend("PORT 127,0,0,1,0,250");
+		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
+
+		//retr
+		cl.stringSend("RETR 3.txt");
+		assertThat(cl.stringRecv(1, this), is("150 Opening ASCII mode data connection for 3.txt (24 bytes).\r\n"));
+		Util.sleep(10);
+		assertThat(dl.length(), is(24));
+
+		dl.close();
+	}
+
+	@Test
+	public void DOWNユーザはRNFR_RNTO_ファイル名変更_に失敗する() {
+
+		//共通処理(ログイン成功)
+		login("user3");
+
+		cl.stringSend("RNFR 1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+		cl.stringSend("RNTO $$$.1.txt");
+		assertThat(cl.stringRecv(1, this), is("550 Permission denied.\r\n"));
+
+	}
+
 	@Test
 	public void DELEマンド_存在しない名前を指定するとエラーとなる() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		//dele
 		cl.stringSend("DELE 0.txt");
 		assertThat(cl.stringRecv(1, this), is("451 Dele error.\r\n"));
-		
-	}
 
+	}
 
 	@Test
 	public void LISTコマンド() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		//port
 		int port = 251;
@@ -516,12 +579,9 @@ public final class ServerTest implements ILife {
 
 	@Test
 	public void CWDコマンドで有効なディレクトリに移動() {
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//cwd
 		cl.stringSend("CWD home0");
 		assertThat(cl.stringRecv(1, this), is("250 CWD command successful.\r\n"));
@@ -531,12 +591,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void CWDコマンドで無効なディレクトリに移動しようとするとエラーが返る() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//cwd
 		cl.stringSend("CWD xxx");
 		assertThat(cl.stringRecv(1, this), is("550 xxx: No such file or directory.\r\n"));
@@ -547,12 +604,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void CWDコマンドでルートより上に移動しようとするとエラーが返る() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//cwd
 		cl.stringSend("CWD home0");
 		assertThat(cl.stringRecv(1, this), is("250 CWD command successful.\r\n"));
@@ -564,12 +618,9 @@ public final class ServerTest implements ILife {
 	@Test
 	public void CDUPコマンド() {
 
-		//login
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
+
 		//cwd
 		cl.stringSend("CWD home0");
 		assertThat(cl.stringRecv(1, this), is("250 CWD command successful.\r\n"));
@@ -585,11 +636,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void RNFR_RNTOコマンド_ファイル名変更() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("RNFR 1.txt");
 		assertThat(cl.stringRecv(1, this), is("350 File exists, ready for destination name.\r\n"));
@@ -607,11 +655,8 @@ public final class ServerTest implements ILife {
 	@Test
 	public void RNFR_RNTOコマンド_ディレクトリ名変更() {
 
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
-		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
-		cl.stringSend("PASS user1");
-		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
+		//共通処理(ログイン成功)
+		login("user1");
 
 		cl.stringSend("RNFR home0");
 		assertThat(cl.stringRecv(1, this), is("350 File exists, ready for destination name.\r\n"));
