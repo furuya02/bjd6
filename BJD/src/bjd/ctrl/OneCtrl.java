@@ -270,7 +270,7 @@ public abstract class OneCtrl {
 	 * CtrlDatで入力が入っているかどうかでボタン
 	 * @return
 	 */
-	public final boolean isComplete() {
+	public boolean isComplete() {
 		if (panel != null) {
 			return abstractIsComplete();
 		}

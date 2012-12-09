@@ -274,7 +274,8 @@ public class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListen
 	//ボタン状態の初期化
 	private void buttonsInitialise() {
 		//コントロールの入力が完了しているか
-		boolean isComplete = listVal.isComplete();
+		//boolean isComplete = listVal.isComplete();
+		boolean isComplete = isComplete();
 		//チェックリストボックスのデータ件数
 		int count = checkListBox.getItemCount();
 		//チェックリストボックスの選択行
@@ -344,10 +345,10 @@ public class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListen
 	//***********************************************************************
 	//コントロールの入力が完了しているか
 	//***********************************************************************
-	//@Override
-	//public boolean isComplete() {
-	//	return listVal.isComplete();
-	//}
+	@Override
+	public boolean isComplete() {
+		return listVal.isComplete();
+	}
 
 	//***********************************************************************
 	// コントロールの値の読み書き
