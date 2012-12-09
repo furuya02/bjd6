@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import bjd.Kernel;
 import bjd.ctrl.CtrlComboBox;
-import bjd.ctrl.CtrlDat;
 import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.CtrlTextBox;
