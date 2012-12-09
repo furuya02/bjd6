@@ -21,7 +21,7 @@ import bjd.util.MsgKind;
 import bjd.util.Util;
 
 //public class CtrlDat extends OneCtrl implements ActionListener, ListSelectionListener, ICtrlEventListener {
-public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListener {
+public class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListener {
 
 	private JPanel border = null;
 	private JButton[] buttonList = null;

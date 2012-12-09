@@ -74,6 +74,18 @@ public final class ListOption extends ListBase<OneOption> {
 		for (OnePlugin onePlugin : listPlugin) {
 			OneOption oneOption = onePlugin.createOption(kernel);
 			add(oneOption);
+
+			//DnsServerのプラグイン固有オプションの生成
+			if (oneOption.getNameTag().equals("Dns")) {
+				OneOption o = onePlugin.createOption(kernel, "bjd.plugins.dns.OptionDnsDomain", "DnsDomain");
+				if (add(o)) {
+					for (OneDat e : (Dat) o.getValue("domainList")) {
+						if (e.isEnable()) {
+							add(onePlugin.createOption(kernel, "bjd.plugins.dns.OptionDnsResource", String.format("Resource-%s", e.getStrList().get(0))));
+						}
+					}
+				}
+			}
 		}
 
 		/*
@@ -178,8 +190,9 @@ public final class ListOption extends ListBase<OneOption> {
 		for (OneOption a : getAr()) {
 			ListMenu menu = mainMenu;
 
-			if (a.getNameTag().equals("DnsServer")) {
-				OneMenu m = mainMenu.add(new OneMenu("Option_DnsServer0", "DNSサーバ", "DNS Server", 'D', null));
+			if (a.getNameTag().equals("Dns")) {
+				OneMenu m = new OneMenu("Option_DnsServer0", "DNSサーバ", "DNS Server", 'D', null);
+				mainMenu.add(m);
 				dnsMenu = new ListMenu();
 				m.setSubMenu(dnsMenu);
 				menu = dnsMenu;
@@ -187,59 +200,77 @@ public final class ListOption extends ListBase<OneOption> {
 				if (dnsMenu != null && dnsMenu.size() == 1) {
 					dnsMenu.add(new OneMenu()); //セパレータ
 				}
-				menu = dnsMenu;
-			} else if (a.getNameTag().equals("Pop3Server") || a.getNameTag().equals("SmtpServer")) {
-				if (mailMenu == null) {
-					OneMenu m = mainMenu.add(new OneMenu("Option_MailServer0", "メールサーバ", "Mail Server", 'M', null));
-					mailMenu = new ListMenu();
-					m.setSubMenu(mailMenu);
+				if (dnsMenu != null) {
+					menu = dnsMenu;
 				}
-				menu = mailMenu;
-			} else if (a.getNameTag().indexOf("Ml") == 0) {
-				if (mailMenu != null && mailMenu.size() == 3) {
-					mailMenu.add(new OneMenu()); // セパレータ
-				}
-				menu = mailMenu;
-			} else if (a.getNameTag().equals("VirtualHost")) {
-				OneMenu m = mainMenu.add(new OneMenu("Option_WebServer0", "Webサーバ", "Web Server", 'W', null));
-				webMenu = new ListMenu();
-				m.setSubMenu(webMenu);
-				menu = webMenu;
-			} else if (a.getNameTag().indexOf("Web-") == 0) {
-				if (webMenu != null && webMenu.size() == 1) {
-					webMenu.add(new OneMenu()); // セパレータ
-				}
-				menu = webMenu;
-			} else if (a.getNameTag().indexOf("Tunnel-") == 0) {
-				if (countTunnel == 0) {
-					if (proxyMenu != null) {
-						proxyMenu.add(new OneMenu()); // セパレータ
-					}
-				}
-				countTunnel++;
-				menu = proxyMenu;
-			} else if (a.getNameTag().indexOf("Proxy") == 0 || a.getNameTag().equals("TunnelList")) {
-				if (proxyMenu == null) {
-					OneMenu m = mainMenu.add(new OneMenu("Option_Proxy", "プロキシサーバ", "Proxyl Server", 'P', null));
-					proxyMenu = new ListMenu();
-					m.setSubMenu(proxyMenu);
-				}
-				menu = proxyMenu;
 			}
 
 			String nameTag = String.format("Option_%s", a.getNameTag());
+			menu.add(new OneMenu(nameTag, a.getJpMenu(), a.getEnMenu(), a.getMnemonic(), null));
 
-			if (a.getNameTag().equals("MailBox")) {
-				if (mailMenu != null) {
-					mailMenu.insert(0, new OneMenu()); // セパレータ
-					mailMenu.insert(0, new OneMenu(nameTag, a.getJpMenu(), a.getEnMenu(), a.getMnemonic(), null));
-				}
-			} else {
-				if (menu != null) {
-					menu.add(new OneMenu(nameTag, a.getJpMenu(), a.getEnMenu(), a.getMnemonic(), null));
-				}
-			}
+			/*
+						if (a.getNameTag().equals("Dns")) {
+							OneMenu m = mainMenu.add(new OneMenu("Option_DnsServer0", "DNSサーバ", "DNS Server", 'D', null));
+							dnsMenu = new ListMenu();
+							m.setSubMenu(dnsMenu);
+							menu = dnsMenu;
+						} else if (a.getNameTag().equals("DnsDomain") || a.getNameTag().indexOf("Resource-") == 0) {
+							if (dnsMenu != null && dnsMenu.size() == 1) {
+								dnsMenu.add(new OneMenu()); //セパレータ
+							}
+							menu = dnsMenu;
+						} else if (a.getNameTag().equals("Pop3Server") || a.getNameTag().equals("SmtpServer")) {
+							if (mailMenu == null) {
+								OneMenu m = mainMenu.add(new OneMenu("Option_MailServer0", "メールサーバ", "Mail Server", 'M', null));
+								mailMenu = new ListMenu();
+								m.setSubMenu(mailMenu);
+							}
+							menu = mailMenu;
+						} else if (a.getNameTag().indexOf("Ml") == 0) {
+							if (mailMenu != null && mailMenu.size() == 3) {
+								mailMenu.add(new OneMenu()); // セパレータ
+							}
+							menu = mailMenu;
+						} else if (a.getNameTag().equals("VirtualHost")) {
+							OneMenu m = mainMenu.add(new OneMenu("Option_WebServer0", "Webサーバ", "Web Server", 'W', null));
+							webMenu = new ListMenu();
+							m.setSubMenu(webMenu);
+							menu = webMenu;
+						} else if (a.getNameTag().indexOf("Web-") == 0) {
+							if (webMenu != null && webMenu.size() == 1) {
+								webMenu.add(new OneMenu()); // セパレータ
+							}
+							menu = webMenu;
+						} else if (a.getNameTag().indexOf("Tunnel-") == 0) {
+							if (countTunnel == 0) {
+								if (proxyMenu != null) {
+									proxyMenu.add(new OneMenu()); // セパレータ
+								}
+							}
+							countTunnel++;
+							menu = proxyMenu;
+						} else if (a.getNameTag().indexOf("Proxy") == 0 || a.getNameTag().equals("TunnelList")) {
+							if (proxyMenu == null) {
+								OneMenu m = mainMenu.add(new OneMenu("Option_Proxy", "プロキシサーバ", "Proxyl Server", 'P', null));
+								proxyMenu = new ListMenu();
+								m.setSubMenu(proxyMenu);
+							}
+							menu = proxyMenu;
+						}
 
+						String nameTag = String.format("Option_%s", a.getNameTag());
+
+						if (a.getNameTag().equals("MailBox")) {
+							if (mailMenu != null) {
+								mailMenu.insert(0, new OneMenu()); // セパレータ
+								mailMenu.insert(0, new OneMenu(nameTag, a.getJpMenu(), a.getEnMenu(), a.getMnemonic(), null));
+							}
+						} else {
+							if (menu != null) {
+								menu.add(new OneMenu(nameTag, a.getJpMenu(), a.getEnMenu(), a.getMnemonic(), null));
+							}
+						}
+			*/
 		}
 		return mainMenu;
 	}

@@ -22,7 +22,7 @@ public final class Menu implements ActionListener, IDispose {
 	private Kernel kernel;
 	private JMenuBar menuBar;
 	private ArrayList<JMenuItem> ar = new ArrayList<>();
-	
+
 	/**
 	 * @param kernel
 	 * @param menuBar
@@ -75,7 +75,7 @@ public final class Menu implements ActionListener, IDispose {
 		//全削除
 		ar.clear();
 		dispose();
-		
+
 		//「ファイル」メニュー
 		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
 		addListMenu(m, fileMenu());
@@ -95,7 +95,7 @@ public final class Menu implements ActionListener, IDispose {
 		//「ヘルプ」メニュー
 		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null));
 		addListMenu(m, helpMenu());
-		
+
 		menuBar.updateUI(); //メニューバーの再描画
 	}
 
@@ -121,20 +121,40 @@ public final class Menu implements ActionListener, IDispose {
 			owner.addSeparator();
 			return;
 		}
+		if (oneMenu.getSubMenu().size() != 0) {
+			JMenu m = createMenu(oneMenu);
+			addListMenu(m, oneMenu.getSubMenu()); //再帰処理
+			owner.add(m);
+		} else {
+			JMenuItem menuItem = createMenuItem(oneMenu);
+			JMenuItem item = (JMenuItem) owner.add(menuItem);
+			ar.add(item);
+		}
+	}
 
+	JMenu createMenu(OneMenu oneMenu) {
+		JMenu m = new JMenu(oneMenu.getTitle(kernel.isJp()));
+		m.setActionCommand(oneMenu.getName());
+		m.setMnemonic(oneMenu.getMnemonic());
+		//		JMenuにはアクセラレータを設定できない
+		//		if (oneMenu.getStrAccelerator() != null) {
+		//			m.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
+		//		}
+		m.addActionListener(this);
+		m.setName(oneMenu.getTitle(kernel.isJp()));
+		return m;
+	}
+
+	JMenuItem createMenuItem(OneMenu oneMenu) {
 		JMenuItem menuItem = new JMenuItem(oneMenu.getTitle(kernel.isJp()));
 		menuItem.setActionCommand(oneMenu.getName());
 		menuItem.setMnemonic(oneMenu.getMnemonic());
 		if (oneMenu.getStrAccelerator() != null) {
-			//KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)
-			//String strAccelerator = keyStroke.toString();
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
 		}
 		menuItem.addActionListener(this);
 		menuItem.setName(oneMenu.getTitle(kernel.isJp()));
-
-		JMenuItem item = owner.add(menuItem);
-		ar.add(item);
+		return menuItem;
 	}
 
 	/**
@@ -229,7 +249,7 @@ public final class Menu implements ActionListener, IDispose {
 		ListMenu subMenu = new ListMenu();
 		subMenu.add(new OneMenu("StartStop_Start", "サーバ起動", "Start", 'S', null));
 		subMenu.add(new OneMenu("StartStop_Stop", "サーバ停止", "Stop", 'P', null));
-		subMenu.add(new OneMenu("StartStop_Restart", "サーバ再起動", "Restart", 'R', null)); 
+		subMenu.add(new OneMenu("StartStop_Restart", "サーバ再起動", "Restart", 'R', null));
 		subMenu.add(new OneMenu("StartStop_Service", "サービス設定", "Service", 'S', null));
 		return subMenu;
 	}

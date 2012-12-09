@@ -46,7 +46,7 @@ public final class CtrlGroup extends OneCtrl {
 		Dimension dimension = listVal.getSize();
 
 		// borderのサイズ指定
-		border.setSize(getDlgWidth() - 22, (int) dimension.getHeight() + 25); // 横はコンストラクタ、縦は、含まれるコントロールで決まる
+		border.setSize(getDlgWidth() - 35, (int) dimension.getHeight() + 25); // 横はダイアログ幅、縦は、含まれるコントロールで決まる
 
 		// オフセット移動
 		left += border.getWidth();

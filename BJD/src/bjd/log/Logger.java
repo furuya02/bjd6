@@ -219,7 +219,7 @@ public class Logger {
 				message = isJp ? "サーバ側が切断されました" : "The server side was cut off";
 				break;
 			case 9000045:
-				message = isJp ? "「ログ保存場所」が指定されていません" : "\"log save place\" is not appointed";
+				message = isJp ? "「オプション(O)-ログ表示(L)-基本設定-ログの保存場所」が指定されていません" : "\"log save place\" is not appointed";
 				break;
 			case 9000046:
 				message = isJp ? "socket.send()でエラーが発生しました" : "socket.send()";

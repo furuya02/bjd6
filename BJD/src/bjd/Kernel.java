@@ -237,7 +237,7 @@ public final class Kernel implements IDispose {
 		//isTest=trueの場合、パスを""にして、プラグイン0個で初期化さあせる
 		ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
 		for (OnePlugin o : listPlugin) {
-			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
+			tmpLogger.set(LogKind.NORMAL, null, 9000008, String.format("%sServer", o.getName()));
 		}
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
@@ -246,11 +246,9 @@ public final class Kernel implements IDispose {
 
 		listOption = new ListOption(this, listPlugin);
 
-
 		//OptionBasic
 		Conf confBasic = new Conf(listOption.get("Basic"));
 		editBrowse = (boolean) confBasic.get("editBrowse");
-
 
 		//OptionLog
 		Conf confOption = new Conf(listOption.get("Log"));
@@ -286,7 +284,6 @@ public final class Kernel implements IDispose {
 		tmpLogger.release(logger);
 
 		listServer = new ListServer(this, listPlugin);
-		
 
 		//listTool = new ListTool(this);
 
@@ -301,7 +298,6 @@ public final class Kernel implements IDispose {
 		//            }
 		//        }
 		remoteServer = listServer.get("RemoteServer");
-
 
 		view.setColumnText(); //Logビューのカラムテキストの初期化
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）

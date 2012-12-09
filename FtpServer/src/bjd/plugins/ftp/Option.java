@@ -101,27 +101,3 @@ public final class Option extends OneOption {
 
 	}
 }
-/*
- * 
-
-        {//PAGE 利用者 ////////////////////////////////////////////////////////////////////////////
-            var list = new ListVal();
-            {//DAT
-                var l = new ListVal();
-                l.Add(new OneVal("accessControl", 0, Crlf.NEXTLINE, new CtrlComboBox(isJp() ? "アクセス制限" : "Access Control", new List<string> { "FULL", "DOWN", "UP" })));
-                l.Add(new OneVal("homeDirectory", "", Crlf.NEXTLINE, new CtrlBrowse(isJp() ? "ホームディレクトリ" : "Home Derectory", BrowseType.Folder, 400, kernel)));
-                l.Add(new OneVal("user", "", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "ユーザ名" : "User Name", 100)));
-                l.Add(new OneVal("pass", "", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "パスワード" : "Password", 100, true)));
-                list.Add(new OneVal("user", null, Crlf.NEXTLINE, new CtrlDat(isJp() ? "利用者（アクセス権）の指定" : "User List", l, 600, 360, kernel.Jp)));
-            }//DAT
-            Add(new OneVal("User", list, Crlf.NEXTLINE, new CtrlTabPage(isJp() ? "利用者" : "User")));
-        }//PAGE 利用者 ////////////////////////////////////////////////////////////////////////////
-
-        Init();//ValListの初期化
-    }
-    //コントロールの変化
-    override public void OnChange() {
-        var b = (bool)GetCtrl("useServer").GetValue();
-        GetCtrl("Basic").SetEnable(b);
-    }
-     * */
