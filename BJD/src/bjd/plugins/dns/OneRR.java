@@ -45,6 +45,12 @@ public final class OneRR {
 	public String getName() {
 		return name;
 	}
+	public byte[] getData() {
+		return data;
+	}
+	public int getTtl2() {
+		return ttl2;
+	}
 
 	@Override
 	public String toString() {
@@ -107,9 +113,6 @@ public final class OneRR {
 		}
 		return "";
 	}
-
-
-
 }
 /*
 namespace DnsServer {
