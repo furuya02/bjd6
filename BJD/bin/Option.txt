@@ -2,7 +2,7 @@ BOOL=BasicuseExitDlg=false
 BOOL=BasicuseLastSize=true
 BOOL=BasicisWindowOpen=true
 BOOL=BasicuseAdminPassword=false
-HIDE_STRING=Basicpassword=60392a0d922b9077
+HIDE_STRING=Basicpassword=***
 STRING=BasicserverName=
 BOOL=BasiceditBrowse=false
 LIST=Basiclang=0
