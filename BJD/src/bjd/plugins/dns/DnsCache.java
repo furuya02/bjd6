@@ -344,7 +344,8 @@ public class DnsCache {
 				int soaExpire = (int) oneOption.getValue("soaExpire");
 				int soaMinimum = (int) oneOption.getValue("soaMinimum");
 
-				byte[] data = Bytes.create(DnsUtil.str2DnsName(ns), DnsUtil.str2DnsName(soaMail), Util.htonl(soaSerial), Util.htonl(soaRefresh), Util.htonl(soaRetry), Util.htonl(soaExpire), Util.htonl(soaMinimum));
+				byte[] data = Bytes.create(DnsUtil.str2DnsName(ns), DnsUtil.str2DnsName(soaMail), Util.htonl(soaSerial), Util.htonl(soaRefresh), Util.htonl(soaRetry), Util.htonl(soaExpire),
+						Util.htonl(soaMinimum));
 
 				Add(new OneRR(domainName, DnsType.Soa, ttl, data));
 			}

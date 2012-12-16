@@ -17,6 +17,9 @@ public final class OneField implements IField {
 	public String getName() {
 		return name;
 	}
+	public int getSize(){
+		return size;
+	}
 
 	public boolean set(byte[] val) {
 		if (val.length == size) {
