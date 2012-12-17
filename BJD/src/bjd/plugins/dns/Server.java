@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import bjd.Kernel;
 import bjd.log.LogKind;
 import bjd.log.Logger;
+import bjd.net.Ip;
 import bjd.net.OneBind;
 import bjd.option.Conf;
 import bjd.option.Dat;
@@ -13,18 +14,21 @@ import bjd.option.OneOption;
 import bjd.server.OneServer;
 import bjd.sock.SockObj;
 import bjd.sock.SockUdp;
+import bjd.util.BitConverter;
 
 public final class Server extends OneServer {
 
-    //キャッシュ
-    private DnsCache _rootCache;
-    private ArrayList<DnsCache> _cacheList = new ArrayList<DnsCache>();
+	//キャッシュ
+	private DnsCache _rootCache;
+	private ArrayList<DnsCache> _cacheList = new ArrayList<DnsCache>();
 
-    public Server(Kernel kernel, Conf conf, OneBind oneBind) {
+	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel, "Dns", conf, oneBind);
-
+		
+		
+		
 		//ルートキャッシュ
-        String filename = String.format("%s\\%s",kernel.getProgDir(),OneOption.getValue("rootCache"));
+        String filename = String.format("%s\\%s",kernel.getProgDir(),getConf().get("rootCache"));
         if (File.Exists(filename)) {
             _rootCache = new DnsCache( OneOption, filename);//named.ca読み込み用コンストラクタ
             getLogger().set(LogKind.DETAIL, null, 6, filename);
@@ -34,11 +38,11 @@ public final class Server extends OneServer {
 
         //自己の管理するドメインの一覧を取得する
         OneOption op = kernel.getListOption().get("DnsDomain");
-        //List<String> domainList = new List<String>();
+        //ArrayList<String> domainList = new ArrayList<String>();
         for (OneDat o : (Dat)op.getValue("domainList")) {
             if (o.isEnable()) {
                 //ドメインごとのリソースの読込
-                String domainName = o.StrList[0];
+                String domainName = o.getStrList().get(0);
                 OneOption res = kernel.getListOption().get("Resource-" + domainName);
                 //Assembly asm = Assembly.GetExecutingAssembly();
                 //op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
@@ -49,7 +53,7 @@ public final class Server extends OneServer {
         }
 	}
 
-    @Override
+	@Override
 	protected void onStopServer() {
 
 	}
@@ -79,70 +83,71 @@ public final class Server extends OneServer {
         DnsCache targetCache;
 
         //パケットの読込(受信パケットrp)            
-        var rp = new PacketDns(Logger);
-        if (!rp.Read(udpObj.UdpBuffer)) {
+        
+        PacketDns rp = new PacketDns(getLogger());
+        if (!rp.Read(sockUdp.UdpBuffer)) {
             return; //データ解釈に失敗した場合は、処理なし
         }
 
         // ドメイン名取得
-        var domainName = "";
+        String domainName = "";
         //.が存在する場合、.以降をデフォルトのドメイン名として取得する
-        int index = rp.RequestName.IndexOf('.');
+        int index = rp.getRequestName().indexOf('.');
         if (index != -1)
-            domainName = rp.RequestName.SubString(index + 1);
+            domainName = rp.getRequestName().substring(index + 1);
 
         //Ver5.0.0-a9
-        //if (rp.DnsType == DNS_TYPE.A || rp.DnsType == DNS_TYPE.CNAME) {
-        if (rp.DnsType == DnsType.A || rp.DnsType == DnsType.Aaaa || rp.DnsType == DnsType.Cname) {
+        //if (rp.getDnsType() == DNS_TYPE.A || rp.getDnsType() == DNS_TYPE.CNAME) {
+        if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Cname) {
             // （ドメイン名自身にアドレスが指定されている可能性が有る）
             // A CNAME の場合、リクエスト名がホスト名を含まないドメイン名である可能性があるため
             // 対象ドメインのキャッシュからＡレコードが存在するかどうかの確認を行う
-            foreach (DnsCache cache in _cacheList) {
-                if (cache.DomainName == rp.RequestName) {
-                    if (cache.Find(rp.RequestName, DnsType.A)) {
-                        domainName = rp.RequestName;
+            for (DnsCache cache : _cacheList) {
+                if (cache.DomainName.equals(rp.getRequestName())) {
+                    if (cache.Find(rp.getRequestName(), DnsType.A)) {
+                        domainName = rp.getRequestName();
                     }
                 }
 
             }
-        } else if (rp.DnsType == DnsType.Mx || rp.DnsType == DnsType.Ns || rp.DnsType == DnsType.Soa) {
+        } else if (rp.getDnsType() == DnsType.Mx || rp.getDnsType() == DnsType.Ns || rp.getDnsType() == DnsType.Soa) {
             //MX NS SOA リクエストの場合亜h、requestName自体がドメイン名となる
-            domainName = rp.RequestName;
+            domainName = rp.getRequestName();
         }
         //ログ出力（リクエスト解釈完了）
-        getLogger().set(LogKind.Normal,udpObj,8,String.Format("{0} {1} (domain={2})",rp.DnsType,rp.RequestName,domainName));//Query
+        getLogger().set(LogKind.NORMAL,sockUdp,8,String.format("%s %s (domain=%s)",rp.getDnsType(),rp.getRequestName(),domainName));//Query
 
-        var aa = false; // ドメインオーソリティ(管理ドメインかそうでないか)
-        const bool ra = true; //再帰可能
+        boolean aa = false; // ドメインオーソリティ(管理ドメインかそうでないか)
+        boolean ra = true; //再帰可能
 
         targetCache = _rootCache;//デフォルトはルートキャッシュ
 
-        if (rp.DnsType == DnsType.Ptr) {
-            if (rp.RequestName.ToUpper() == "1.0.0.127.IN-ADDR.ARPA.") {
+        if (rp.getDnsType() == DnsType.Ptr) {
+            if (rp.getRequestName().toUpperCase().equals("1.0.0.127.IN-ADDR.ARPA.")) {
                 //キャッシュはデフォルトであるルートキャッシュが使用される
                 aa = true;
-                getLogger().set(LogKind.Detail,udpObj,9,"");//"request to a domain under auto (localhost)"
+                getLogger().set(LogKind.DETAIL,sockUdp,9,"");//"request to a domain under auto (localhost)"
             } else {
-                foreach (DnsCache cache in _cacheList) {
-                    if (cache.Find(rp.RequestName, DnsType.Ptr)) {
+                for(DnsCache cache : _cacheList) {
+                    if (cache.Find(rp.getRequestName(), DnsType.Ptr)) {
                         targetCache = cache;
                         aa = true;
-                        getLogger().set(LogKind.Detail,udpObj,10,String.Format("Resource={0}",targetCache.DomainName));//"request to a domain under management"
+                        getLogger().set(LogKind.DETAIL,sockUdp,10,String.format("Resource={0}",targetCache.DomainName));//"request to a domain under management"
                         break;
                     }
                 }
             }
         } else {//A
-            if (rp.RequestName.ToUpper() == "LOCALHOST") {
+            if (rp.getRequestName().toUpperCase().equals("LOCALHOST")) {
                 //キャッシュはデフォルトであるルートキャッシュが使用される
                 aa = true;
-                getLogger().set(LogKind.Detail,udpObj,11,"");//"request to a domain under auto (localhost)"
+                getLogger().set(LogKind.DETAIL,sockUdp,11,"");//"request to a domain under auto (localhost)"
             } else {
-                foreach (DnsCache cache in _cacheList) {
-                    if (cache.DomainName.ToUpper() == domainName.ToUpper()) {//大文字で比較される
+                for (DnsCache cache : _cacheList) {
+                    if (cache.DomainName.toUpperCase().equals(domainName.toUpperCase())) {//大文字で比較される
                         targetCache = cache;
                         aa = true;
-                        getLogger().set(LogKind.Detail,udpObj,12,String.Format("Resource={0}",domainName));//"request to a domain under management"
+                        getLogger().set(LogKind.DETAIL,sockUdp,12,String.format("Resource=%s",domainName));//"request to a domain under management"
                         break;
                     }
                 }
@@ -154,8 +159,9 @@ public final class Server extends OneServer {
             targetCache.TtlClear();// 有効時間を過ぎたデータを削除する
 
         //管理するドメインでなく、かつ 再帰要求が無い場合は、処理を終わる
-        if (!(aa) && !(rp.Rd))
+        if (!(aa) && !(rp.getRd())){
             return;
+        }
 
         //aa ドメインオーソリティ
         //rs 再帰可能
@@ -164,133 +170,133 @@ public final class Server extends OneServer {
         //********************************************************
         //パケットの生成(送信パケットsp)            
         //********************************************************
-        var sp = new PacketDns(Logger);
+        PacketDns sp = new PacketDns(getLogger());
         
         // (A)「ヘッダ」作成
-        const bool qr = true; //応答
-        sp.CreateHeader(rp.Id,qr,aa,rp.Rd,ra);//ヘッダの作成
+        boolean qr = true; //応答
+        sp.createHeader(rp.getId(),qr,aa,rp.getRd(),ra);//ヘッダの作成
         
         // (B)「質問セクション」の追加
-        sp.AddRR(RRKind.QD, rp.RequestName,rp.DnsType,0,new byte[0]);//質問フィールドの追加
+        sp.addRR(RRKind.QD, rp.getRequestName(),rp.getDnsType(),0,new byte[0]);//質問フィールドの追加
         if (!aa){
             //ドメインオーソリティ（権威サーバ）で無い場合
             //ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
-            const int depth = 0;
-            SearchLoop(rp.RequestName, rp.DnsType, depth, udpObj.RemoteAddr);
+            int depth = 0;
+            SearchLoop(rp.getRequestName(), rp.getDnsType(), depth, sockUdp.getRemoteAddress());
         }
 
         // (B)「回答セクション」作成
-        var ansList = targetCache.Search(rp.RequestName, rp.DnsType);
-        getLogger().set(LogKind.Detail,udpObj,13,String.Format("Answer Resurce ({0}) Max={1}",rp.DnsType,ansList.Count));//"Search LocalCache"
-        if (0 < ansList.Count) {//検索でヒットした場合
-            foreach (var oneRR in ansList) {
-                getLogger().set(LogKind.Detail,udpObj,14,String.Format("{0} {1}",rp.DnsType,oneRR));//"Answer"
+        ArrayList<OneRR> ansList = targetCache.Search(rp.getRequestName(), rp.getDnsType());
+        getLogger().set(LogKind.DETAIL,sockUdp,13,String.format("Answer Resurce ({0}) Max={1}",rp.getDnsType(),ansList.size()));//"Search LocalCache"
+        if (0 < ansList.size()) {//検索でヒットした場合
+            for (OneRR oneRR : ansList) {
+                getLogger().set(LogKind.DETAIL,sockUdp,14,String.format("{0} {1}",rp.getDnsType(),oneRR));//"Answer"
                 
-                sp.AddRR(RRKind.AN,rp.RequestName,rp.DnsType,oneRR.Ttl2,oneRR.Data);
-                if (rp.DnsType == DnsType.Mx || rp.DnsType == DnsType.Cname || rp.DnsType == DnsType.Ns) {
+                sp.addRR(RRKind.AN,rp.getRequestName(),rp.getDnsType(),oneRR.getTtl2(),oneRR.getData());
+                if (rp.getDnsType() == DnsType.Mx || rp.getDnsType() == DnsType.Cname || rp.getDnsType() == DnsType.Ns) {
 
 
                     //追加情報が必要な場合 （Aレコード）をパケットに追加する
-                    List<OneRR> rr = targetCache.Search(oneRR.N1,DnsType.A);
-                    foreach (OneRR r in rr) {
-                        sp.AddRR(RRKind.AR, oneRR.N1, DnsType.A, r.Ttl2, r.Data);
+                    ArrayList<OneRR> rr = targetCache.Search(oneRR.N1,DnsType.A);
+                    for (OneRR r : rr) {
+                        sp.addRR(RRKind.AR, oneRR.N1, DnsType.A, r.getTtl2(), r.getData());
                     }
 
                     //追加情報が必要な場合 （AAAAレコード）をパケットに追加する
                     rr = targetCache.Search(oneRR.N1,DnsType.Aaaa);
-                    foreach (OneRR r in rr) {
-                        sp.AddRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,r.Ttl2,r.Data);
+                    for (OneRR r : rr) {
+                        sp.addRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,r.getTtl2(),r.getData());
                     }
                 }
             }
         } else {//検索でヒットしない場合
-            if (rp.DnsType == DnsType.A){
+            if (rp.getDnsType() == DnsType.A){
                 // CNAMEに定義されていないかどうかを確認する
                 int loop = 0;
-                List<OneRR> rrList = targetCache.Search(rp.RequestName, DnsType.Cname);
+                ArrayList<OneRR> rrList = targetCache.Search(rp.getRequestName(), DnsType.Cname);
                 //Ver5.7.3 みずき氏から情報提供いただきました
-                //getLogger().set(LogKind.Detail,udpObj,15,String.Format("({0}) Max={1}",DnsType.Cname,rrList.Count));//"Search LocalCache"
+                //getLogger().set(LogKind.DETAIL,sockUdp,15,String.format("({0}) Max={1}",DnsType.Cname,rrList.size()));//"Search LocalCache"
                 //foreach (var oneRR in rrList) {
-                //    getLogger().set(LogKind.Detail,udpObj,16,String.Format("{0}",oneRR));//"Answer CNAME"
-                //    sp.AddRR(RRKind.AN,rp.RequestName,DnsType.Cname,oneRR.Ttl2,oneRR.Data);
+                //    getLogger().set(LogKind.DETAIL,sockUdp,16,String.format("{0}",oneRR));//"Answer CNAME"
+                //    sp.addRR(RRKind.AN,rp.getRequestName(),DnsType.Cname,oneRR.getTtl2(),oneRR.getData());
                 //    var rr = targetCache.Search(oneRR.N1,DnsType.A);
 
 
                 //    foreach (OneRR r in rr) {
-                //        sp.AddRR(RRKind.AN,r.Name, DnsType.A, r.Ttl2, r.Data);
+                //        sp.addRR(RRKind.AN,r.Name, DnsType.A, r.Ttl2, r.Data);
                 //    }
                 //}
                 Loop:
                 if (loop++ <= 15){
-                    getLogger().set(LogKind.Detail, udpObj, 15,String.Format("({0}) Max={1} Loop={2}", DnsType.Cname, rrList.Count, loop));//"Search LocalCache"
-                    foreach (var oneRR in rrList){
-                        getLogger().set(LogKind.Detail, udpObj, 16, String.Format("{0}", oneRR)); //"Answer CNAME"
-                        sp.AddRR(RRKind.AN, oneRR.Name, DnsType.Cname, oneRR.Ttl2, oneRR.Data);
+                    getLogger().set(LogKind.DETAIL, sockUdp, 15,String.format("({0}) Max={1} Loop={2}", DnsType.Cname, rrList.size(), loop));//"Search LocalCache"
+                    for (OneRR oneRR : rrList){
+                        getLogger().set(LogKind.DETAIL, sockUdp, 16, String.format("{0}", oneRR)); //"Answer CNAME"
+                        sp.addRR(RRKind.AN, oneRR.getName(), DnsType.Cname, oneRR.getTtl2(), oneRR.getData());
                         var rr = targetCache.Search(oneRR.N1, DnsType.A);
                         if (rr.Count == 0){
                             rrList = targetCache.Search(oneRR.N1, DnsType.Cname);
                             goto Loop;
                         }
-                        foreach (OneRR r in rr){
-                            sp.AddRR(RRKind.AN, r.Name, DnsType.A, r.Ttl2, r.Data);
+                        for (OneRR r : rr){
+                            sp.addRR(RRKind.AN, r.Name, DnsType.A, r.Ttl2, r.Data);
                         }
                     }
                 }
             }
         }
 
-        if (rp.DnsType == DnsType.A || rp.DnsType == DnsType.Aaaa || rp.DnsType == DnsType.Soa) {
+        if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa) {
             // (C)「権威セクション」「追加情報セクション」作成
-            List<OneRR> authList = targetCache.Search(domainName,DnsType.Ns);
-            getLogger().set(LogKind.Detail,udpObj,13,String.Format("Authority Resurce({0}) Max={1}",DnsType.Ns,authList.Count));
-            foreach (OneRR oneRR in authList) {
-                sp.AddRR(RRKind.NS,oneRR.Name,DnsType.Ns,oneRR.Ttl2,oneRR.Data);
+            ArrayList<OneRR> authList = targetCache.Search(domainName,DnsType.Ns);
+            getLogger().set(LogKind.DETAIL,sockUdp,13,String.format("Authority Resurce({0}) Max={1}",DnsType.Ns,authList.Count));
+            for (OneRR oneRR : authList) {
+                sp.addRR(RRKind.NS,oneRR.getName(),DnsType.Ns,oneRR.getTtl2(),oneRR.getData());
                 //「追加情報」
-                var addList = targetCache.Search(oneRR.N1,DnsType.A);
-                foreach (OneRR rr in addList) {
-                    sp.AddRR(RRKind.AR,oneRR.N1,DnsType.A,rr.Ttl2,rr.Data);
+                ArrayList<OneRR> addList = targetCache.Search(oneRR.N1,DnsType.A);
+                for (OneRR rr : addList) {
+                    sp.addRR(RRKind.AR,oneRR.N1,DnsType.A,rr.getTtl2(),rr.getData());
                 }
                 addList = targetCache.Search(oneRR.N1,DnsType.Aaaa);
-                foreach (OneRR rr in addList) {
-                    sp.AddRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,rr.Ttl2,rr.Data);
+                for (OneRR rr : addList) {
+                    sp.addRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,rr.getTtl2(),rr.getData());
                 }
 
             }
         }
 
-        udpObj.SendTo(sp.Get());//送信
-        //udpObj.Close();UDPソケット(udpObj)はクローンなのでクローズしても、処理されない※Close()を呼び出しても問題はない
+        sockUdp.SendTo(sp.get());//送信
+        //sockUdp.Close();UDPソケット(sockUdp)はクローンなのでクローズしても、処理されない※Close()を呼び出しても問題はない
 		sockUdp.close();
 	}
-	
 
+	//ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
+	boolean SearchLoop(String requestName,DnsType dnsType,int depth,Ip remoteAddr) {
 
-     //ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
-     bool SearchLoop(String requestName,DnsType dnsType,int depth,Ip remoteAddr) {
-
-         if (depth > 15)
+         if (depth > 15){
              return false;
+         }
 
          String domainName = requestName;
-         int index = requestName.IndexOf('.');
-         if (index != -1)
-             domainName = requestName.SubString(index + 1);
+         int index = requestName.indexOf('.');
+         if (index != -1){
+             domainName = requestName.substring(index + 1);
+         }
 
          // ネームサーバ情報取得
          //ターゲットドメインのネームサーバを検索する
-         var nsList = new List<String>();
-         var rrList = _rootCache.Search(domainName, DnsType.Ns);
-         if (0 < rrList.Count) {
+         ArrayList<String> nsList = new ArrayList<String>();
+         ArrayList<OneRR> rrList = _rootCache.Search(domainName, DnsType.Ns);
+         if (0 < rrList.size()) {
              nsList.AddRange(rrList.Select(t => t.N1));
-         } else {//キャッシュに存在しない場合は、ルートサーバをランダムにセットする
+         } else { //キャッシュに存在しない場合は、ルートサーバをランダムにセットする
              rrList = _rootCache.Search(".", DnsType.Ns);
 
              var random = new Random(Environment.TickCount);
-             int center = random.Next(rrList.Count);//センタ位置をランダムに決定する
-             for (int i = center; i < rrList.Count; i++)//センタ以降の一覧を取得
-                 nsList.Add(rrList[i].N1);
+             int center = random.Next(rrList.size());//センタ位置をランダムに決定する
+             for (int i = center; i < rrList.size(); i++)//センタ以降の一覧を取得
+                 nsList.Add(rrList.get(i).N1);
              for (int i = 0; i < center; i++)//センタ以前の一覧をコピー
-                 nsList.Add(rrList[i].N1);
+                 nsList.Add(rrList.get(i).N1);
          }
 
          while (true) {
@@ -300,78 +306,80 @@ public final class Server extends OneServer {
              if (dnsType == DnsType.A) {
                  //DNS_TYPE.Aの場合、CNAME及びそのAレコードがキャッシュされている場合、蓄積完了となる
                  rrList = _rootCache.Search(requestName, DnsType.Cname);
-                 var find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
-                 if (find)
+                 boolean find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
+                 if (find){
                      break;
+                 }
                  //Ver5.5.4 CNAMEが発見された場合は、そのIPアドレス取得に移行する
-                 if (rrList.Count > 0) {
-                     requestName = rrList[0].N1;
+                 if (rrList.size() > 0) {
+                     requestName = rrList.get(0).N1;
                  }
              }
              
              //ネームサーバ一覧から、そのアドレスの一覧を作成する
-             var nsAddrList = new List<Ip>();
-             foreach (String ns in nsList) {
+             ArrayList<Ip> nsAddrList = new ArrayList<Ip>();
+             for (String ns : nsList) {
                  rrList = _rootCache.Search(ns,DnsType.A);
                  if (dnsType == DnsType.Aaaa){
                  //AAAAでの検索の場合、AAAAのアドレス情報も有効にする
-                     var tmpList = _rootCache.Search(domainName,DnsType.Aaaa);
+                	 ArrayList<OneRR> tmpList = _rootCache.Search(domainName,DnsType.Aaaa);
                      rrList.AddRange(tmpList);
                  }
 
 
-                 if (rrList.Count == 0) {
+                 if (rrList.size() == 0) {
                      if (!SearchLoop(ns, dnsType, depth + 1, remoteAddr))//再帰処理
                          return false;
                      rrList = _rootCache.Search(ns,dnsType);
-                     if (rrList.Count == 0)
+                     if (rrList.size() == 0)
                          return false;
                  }
 
-                 foreach (OneRR oneRR in rrList) {
-                     uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.Data, 0));
-                     var tmpIp = new Ip(addr);
+                 for (OneRR oneRR : rrList) {
+                     uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.getData(), 0));
+                     Ip tmpIp = new Ip(addr);
 
-                     if (oneRR.DnsType == DnsType.Aaaa) {
-                         UInt64 v6H = BitConverter.ToUInt64(oneRR.Data,0);
-                         UInt64 v6L = BitConverter.ToUInt64(oneRR.Data,8);
+                     if (oneRR.getDnsType() == DnsType.Aaaa) {
+                         long v6H = BitConverter.ToUInt64(oneRR.getData(),0);
+                         long v6L = BitConverter.ToUInt64(oneRR.getData(),8);
                          tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
                      }
-                     var find = nsAddrList.Any(ip => ip == tmpIp);
+                     boolean find = nsAddrList.Any(ip => ip == tmpIp);
                      if (!find) {
-                         nsAddrList.Add(tmpIp);
+                         nsAddrList.add(tmpIp);
                      }
                  }
 
              }
-             nsList.Clear();
+             nsList.clear();
 
              //ネームサーバのアドレスが取得できない場合、処理の継続はできない（検索不能）
-             if (nsAddrList.Count == 0)
+             if (nsAddrList.size() == 0){
                  return false;
+             }
                  
              //0:検索中 1:発見 2:権威サーバ取得 (ドメインオーソリティからの名前エラーの場合は処理停止goto end)
              int state = 0;
-             foreach (Ip ip in nsAddrList) {
+             for (Ip ip : nsAddrList) {
 
                  //PacketDns rp = Lookup(ip.AddrV4, requestName, dnsType);
                  PacketDns rp = Lookup(ip,requestName,dnsType,remoteAddr);
                  if (rp != null) {
-                     if (rp.GetAA()) {//権威サーバの応答の場合
+                     if (rp.getAA()) {//権威サーバの応答の場合
                          //ホストが存在しない　若しくは　回答フィールドが0の場合、処理停止
-                         if (rp.GetRcode() == 3 || rp.GetCount(RRKind.AN) == 0) {
+                         if (rp.getRcode() == 3 || rp.getCount(RRKind.AN) == 0) {
                              goto end;
                          }
                      }
-                     if (0 < rp.GetCount(RRKind.AN)) {//回答フィールドが存在する場合
+                     if (0 < rp.getCount(RRKind.AN)) {//回答フィールドが存在する場合
                          return true;
                          //break;
                      }
                      // 求めている回答は得ていないが、権威サーバを教えられた場合
                      // ネームサーバのリストを差し替える
-                     for (int n = 0; n < rp.GetCount(RRKind.NS); n++) {
-                         OneRR oneRR = rp.GetRR(RRKind.NS, n);
-                         if (oneRR.DnsType == DnsType.Ns) {
+                     for (int n = 0; n < rp.getCount(RRKind.NS); n++) {
+                         OneRR oneRR = rp.getRR(RRKind.NS, n);
+                         if (oneRR.getDnsType() == DnsType.Ns) {
                              nsList.Add(oneRR.N1);
                              state = 2;//ネームサーバリストを取得した
                          }
@@ -385,60 +393,62 @@ public final class Server extends OneServer {
 end:
          return false;
      }
-     
-     //addrは通常オーダで指定されている
-     //private PacketDns Lookup(Ip ip, String requestName, DNS_TYPE dnsType,RemoteInfo remoteInfo) {
-     private PacketDns Lookup(Ip ip, String requestName, DnsType dnsType,Ip remoteAddr) {
 
-         //Ip ip = new Ip(addr);
-         getLogger().set(LogKind.Detail,null, 17, String.Format("{0} Server={1} Type={2}", requestName, ip, dnsType));//"Lookup"
+	//addrは通常オーダで指定されている
+	//private PacketDns Lookup(Ip ip, String requestName, DNS_TYPE dnsType,RemoteInfo remoteInfo) {
+	private PacketDns Lookup(Ip ip, String requestName, DnsType dnsType, Ip remoteAddr) {
 
-         //受信タイムアウト
-         const int timeout = 3;
+		//Ip ip = new Ip(addr);
+		getLogger().set(LogKind.DETAIL, null, 17, String.format("{0} Server={1} Type={2}", requestName, ip, dnsType));//"Lookup"
 
-         //リクエストパケットの生成
-         var sp = new PacketDns(Logger);
-         var random = new Random(Environment.TickCount);
-         var id = (ushort)random.Next(0xFFFF);//識別子をランダムに決定する
-         const bool qr = false; //要求
-         const bool aa = false; //権威なし
-         var rd = (bool)OneOption.GetValue("useRD");//再帰要求を使用するかどうか
-         const bool ra = false; //再帰無効
-         sp.CreateHeader(id, qr, aa, rd, ra);//ヘッダ生成
-         sp.AddRR(RRKind.QD,requestName,dnsType,0,new byte[0]);//QR(質問)フィールド追加
+		//受信タイムアウト
+		int timeout = 3;
 
-         const int port = 53;
-         var udpObj = new UdpObj(Kernel, Logger, ip, port);
+		//リクエストパケットの生成
+		PacketDns sp = new PacketDns(getLogger());
+		var random = new Random(Environment.TickCount);
+		var id = (ushort) random.Next(0xFFFF);//識別子をランダムに決定する
+		boolean qr = false; //要求
+		boolean aa = false; //権威なし
+		boolean rd = (boolean) getConf().get("useRD");//再帰要求を使用するかどうか
+		boolean ra = false; //再帰無効
+		sp.CreateHeader(id, qr, aa, rd, ra);//ヘッダ生成
+		sp.addRR(RRKind.QD, requestName, dnsType, 0, new byte[0]);//QR(質問)フィールド追加
 
-         udpObj.SendTo(sp.Get());//送信
-         if (udpObj.ReceiveFrom(timeout)) {//受信
+		int port = 53;
+		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
+		SockUdp sockUdp = new SockUdp(Kernel, getLogger(), ip, port);
 
-             var rp = new PacketDns(Logger);
-             rp.Read(udpObj.UdpBuffer);
+		sockUdp.send(sp.get());//送信
+		if (sockUdp.ReceiveFrom(timeout)) {//受信
 
-             String str = String.Format("requestName={0} count[{1},{2},{3},{4}] rcode={5} AA={6}", requestName
-                                         , rp.GetCount(RRKind.QD)
-                                         , rp.GetCount(RRKind.AN)
-                                         , rp.GetCount(RRKind.NS)
-                                         , rp.GetCount(RRKind.AR)
-                                         , rp.GetRcode()
-                                         , rp.GetAA());
-             getLogger().set(LogKind.Detail,udpObj,18,str);//"Lookup"
+			PacketDns rp = new PacketDns(getLogger());
+			rp.Read(sockUdp.UdpBuffer);
 
-             //質問フィールの以外のリソースデータをキャッシュする
-             for (int rr = 1; rr < 4; rr++) {
-                 int m = rp.GetCount((RRKind)rr);
-                 for (int n = 0; n < m; n++) {
-                     var oneRR = rp.GetRR((RRKind)rr, n);
-                     _rootCache.Add(oneRR);
-                 }
-             }
-             return rp;
-         }
+			String str = String.format("requestName=%s count[%d,%d,%d,%d] rcode=%s AA=%s", requestName
+					, rp.getCount(RRKind.QD)
+					, rp.getCount(RRKind.AN)
+					, rp.getCount(RRKind.NS)
+					, rp.getCount(RRKind.AR)
+					, rp.getRcode()
+					, rp.getAA());
+			getLogger().set(LogKind.DETAIL, sockUdp, 18, str);//"Lookup"
 
-         getLogger().set(LogKind.Error,udpObj,5,String.Format("addr={0} requestName={1} dnsType={2}",remoteAddr,requestName,dnsType));//Lookup() パケット受信でタイムアウトが発生しました。
-         return null;
-     }
+			//質問フィールの以外のリソースデータをキャッシュする
+			//for (int rr = 1; rr < 4; rr++) {
+			for (RRKind rr : RRKind.values()) {
+				int m = rp.getCount(rr);
+				for (int n = 0; n < m; n++) {
+					OneRR oneRR = rp.getRR(rr, n);
+					_rootCache.Add(oneRR);
+				}
+			}
+			return rp;
+		}
+
+		getLogger().set(LogKind.ERROR, sockUdp, 5, String.format("addr=%s requestName=%s dnsType=%s", remoteAddr, requestName, dnsType));//Lookup() パケット受信でタイムアウトが発生しました。
+		return null;
+	}
 
 	public String getMsg(int messageNo) {
 		switch (messageNo) {

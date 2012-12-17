@@ -30,6 +30,19 @@ public final class BitConverter {
 		buf.flip();
 		return buf.getInt();
 	}
+	public static long ToInt64(byte[] data, int offSet) {
+		ByteBuffer buf = ByteBuffer.allocate(8);
+		buf.put(data, offSet, 8);
+		buf.flip();
+		return buf.getLong();
+	}
+	public static long ToUInt64(byte[] data, int offSet) {
+		ByteBuffer buf = ByteBuffer.allocate(8);
+		buf.put(data, offSet, 8);
+		buf.flip();
+		return buf.getLong();
+	}
+
 	public static byte[] GetBytes(int i) {
 		byte[] buf = new byte[4];
         buf[3] = (byte) (0x000000ff & (i));
