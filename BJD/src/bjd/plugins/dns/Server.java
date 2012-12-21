@@ -1,5 +1,7 @@
 package bjd.plugins.dns;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import bjd.Kernel;
@@ -25,15 +27,18 @@ public final class Server extends OneServer {
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel, "Dns", conf, oneBind);
 		
-		
-		
 		//ルートキャッシュ
         String filename = String.format("%s\\%s",kernel.getProgDir(),getConf().get("rootCache"));
-        if (File.Exists(filename)) {
-            _rootCache = new DnsCache( OneOption, filename);//named.ca読み込み用コンストラクタ
-            getLogger().set(LogKind.DETAIL, null, 6, filename);
+        if((new File(filename)).exists()){
+            try {
+                //named.ca読み込み用コンストラクタ
+				_rootCache = new DnsCache(conf, filename);
+	            getLogger().set(LogKind.DETAIL, null, 6, filename);
+			} catch (IOException e) {
+				getLogger().set(LogKind.ERROR,null, 2,String.format("filename=%s",filename));
+			}
         } else {
-            getLogger().set(LogKind.ERROR, null, 21, filename);
+            getLogger().set(LogKind.ERROR, null, 3, filename);
         }
 
         //自己の管理するドメインの一覧を取得する
@@ -45,10 +50,10 @@ public final class Server extends OneServer {
                 String domainName = o.getStrList().get(0);
                 OneOption res = kernel.getListOption().get("Resource-" + domainName);
                 //Assembly asm = Assembly.GetExecutingAssembly();
-                //op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
+                //)op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
 
                 Dat resource = (Dat)res.getValue("resourceList");
-                _cacheList.add(new DnsCache(getLogger(), OneOption, resource, domainName + "."));//.zone読み込み用コンストラクタ
+                _cacheList.add(new DnsCache(getLogger(), conf, resource, domainName + "."));//.zone読み込み用コンストラクタ
             }
         }
 	}
@@ -103,7 +108,7 @@ public final class Server extends OneServer {
             // A CNAME の場合、リクエスト名がホスト名を含まないドメイン名である可能性があるため
             // 対象ドメインのキャッシュからＡレコードが存在するかどうかの確認を行う
             for (DnsCache cache : _cacheList) {
-                if (cache.DomainName.equals(rp.getRequestName())) {
+                if (cache.getDomainName().equals(rp.getRequestName())) {
                     if (cache.Find(rp.getRequestName(), DnsType.A)) {
                         domainName = rp.getRequestName();
                     }
@@ -132,7 +137,7 @@ public final class Server extends OneServer {
                     if (cache.Find(rp.getRequestName(), DnsType.Ptr)) {
                         targetCache = cache;
                         aa = true;
-                        getLogger().set(LogKind.DETAIL,sockUdp,10,String.format("Resource={0}",targetCache.DomainName));//"request to a domain under management"
+                        getLogger().set(LogKind.DETAIL,sockUdp,10,String.format("Resource={0}",targetCache.getDomainName()));//"request to a domain under management"
                         break;
                     }
                 }
@@ -144,7 +149,7 @@ public final class Server extends OneServer {
                 getLogger().set(LogKind.DETAIL,sockUdp,11,"");//"request to a domain under auto (localhost)"
             } else {
                 for (DnsCache cache : _cacheList) {
-                    if (cache.DomainName.toUpperCase().equals(domainName.toUpperCase())) {//大文字で比較される
+                    if (cache.getDomainName().toUpperCase().equals(domainName.toUpperCase())) {//大文字で比較される
                         targetCache = cache;
                         aa = true;
                         getLogger().set(LogKind.DETAIL,sockUdp,12,String.format("Resource=%s",domainName));//"request to a domain under management"
@@ -197,15 +202,15 @@ public final class Server extends OneServer {
 
 
                     //追加情報が必要な場合 （Aレコード）をパケットに追加する
-                    ArrayList<OneRR> rr = targetCache.Search(oneRR.N1,DnsType.A);
+                    ArrayList<OneRR> rr = targetCache.Search(oneRR.getName(),DnsType.A);
                     for (OneRR r : rr) {
-                        sp.addRR(RRKind.AR, oneRR.N1, DnsType.A, r.getTtl2(), r.getData());
+                        sp.addRR(RRKind.AR, oneRR.getName(), DnsType.A, r.getTtl2(), r.getData());
                     }
 
                     //追加情報が必要な場合 （AAAAレコード）をパケットに追加する
-                    rr = targetCache.Search(oneRR.N1,DnsType.Aaaa);
+                    rr = targetCache.Search(oneRR.getName(),DnsType.Aaaa);
                     for (OneRR r : rr) {
-                        sp.addRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,r.getTtl2(),r.getData());
+                        sp.addRR(RRKind.AR,oneRR.getName(),DnsType.Aaaa,r.getTtl2(),r.getData());
                     }
                 }
             }
@@ -219,7 +224,7 @@ public final class Server extends OneServer {
                 //foreach (var oneRR in rrList) {
                 //    getLogger().set(LogKind.DETAIL,sockUdp,16,String.format("{0}",oneRR));//"Answer CNAME"
                 //    sp.addRR(RRKind.AN,rp.getRequestName(),DnsType.Cname,oneRR.getTtl2(),oneRR.getData());
-                //    var rr = targetCache.Search(oneRR.N1,DnsType.A);
+                //    var rr = targetCache.Search(oneRR.getName(),DnsType.A);
 
 
                 //    foreach (OneRR r in rr) {
@@ -232,13 +237,13 @@ public final class Server extends OneServer {
                     for (OneRR oneRR : rrList){
                         getLogger().set(LogKind.DETAIL, sockUdp, 16, String.format("{0}", oneRR)); //"Answer CNAME"
                         sp.addRR(RRKind.AN, oneRR.getName(), DnsType.Cname, oneRR.getTtl2(), oneRR.getData());
-                        var rr = targetCache.Search(oneRR.N1, DnsType.A);
-                        if (rr.Count == 0){
-                            rrList = targetCache.Search(oneRR.N1, DnsType.Cname);
+                        ArrayList<OneRR> rr = targetCache.Search(oneRR.getName(), DnsType.A);
+                        if (rr.size() == 0){
+                            rrList = targetCache.Search(oneRR.getName(), DnsType.Cname);
                             goto Loop;
                         }
                         for (OneRR r : rr){
-                            sp.addRR(RRKind.AN, r.Name, DnsType.A, r.Ttl2, r.Data);
+                            sp.addRR(RRKind.AN, r.getName(), DnsType.A, r.getTtl2(), r.getData());
                         }
                     }
                 }
@@ -252,13 +257,13 @@ public final class Server extends OneServer {
             for (OneRR oneRR : authList) {
                 sp.addRR(RRKind.NS,oneRR.getName(),DnsType.Ns,oneRR.getTtl2(),oneRR.getData());
                 //「追加情報」
-                ArrayList<OneRR> addList = targetCache.Search(oneRR.N1,DnsType.A);
+                ArrayList<OneRR> addList = targetCache.Search(oneRR.getName(),DnsType.A);
                 for (OneRR rr : addList) {
-                    sp.addRR(RRKind.AR,oneRR.N1,DnsType.A,rr.getTtl2(),rr.getData());
+                    sp.addRR(RRKind.AR,oneRR.getName(),DnsType.A,rr.getTtl2(),rr.getData());
                 }
-                addList = targetCache.Search(oneRR.N1,DnsType.Aaaa);
+                addList = targetCache.Search(oneRR.getName(),DnsType.Aaaa);
                 for (OneRR rr : addList) {
-                    sp.addRR(RRKind.AR,oneRR.N1,DnsType.Aaaa,rr.getTtl2(),rr.getData());
+                    sp.addRR(RRKind.AR,oneRR.getName(),DnsType.Aaaa,rr.getTtl2(),rr.getData());
                 }
 
             }
@@ -287,16 +292,18 @@ public final class Server extends OneServer {
          ArrayList<String> nsList = new ArrayList<String>();
          ArrayList<OneRR> rrList = _rootCache.Search(domainName, DnsType.Ns);
          if (0 < rrList.size()) {
-             nsList.AddRange(rrList.Select(t => t.N1));
+             nsList.AddRange(rrList.Select(t => t.getName()));
          } else { //キャッシュに存在しない場合は、ルートサーバをランダムにセットする
              rrList = _rootCache.Search(".", DnsType.Ns);
 
              var random = new Random(Environment.TickCount);
              int center = random.Next(rrList.size());//センタ位置をランダムに決定する
-             for (int i = center; i < rrList.size(); i++)//センタ以降の一覧を取得
-                 nsList.Add(rrList.get(i).N1);
-             for (int i = 0; i < center; i++)//センタ以前の一覧をコピー
-                 nsList.Add(rrList.get(i).N1);
+             for (int i = center; i < rrList.size(); i++){//センタ以降の一覧を取得
+                 nsList.add(rrList.get(i).getName());
+             }
+             for (int i = 0; i < center; i++){//センタ以前の一覧をコピー
+                 nsList.add(rrList.get(i).getName());
+             }
          }
 
          while (true) {
@@ -306,13 +313,13 @@ public final class Server extends OneServer {
              if (dnsType == DnsType.A) {
                  //DNS_TYPE.Aの場合、CNAME及びそのAレコードがキャッシュされている場合、蓄積完了となる
                  rrList = _rootCache.Search(requestName, DnsType.Cname);
-                 boolean find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
+                 boolean find = rrList.Any(t => _rootCache.Find(t.getName(), DnsType.A));
                  if (find){
                      break;
                  }
                  //Ver5.5.4 CNAMEが発見された場合は、そのIPアドレス取得に移行する
                  if (rrList.size() > 0) {
-                     requestName = rrList.get(0).N1;
+                     requestName = rrList.get(0).getName();
                  }
              }
              
@@ -380,7 +387,7 @@ public final class Server extends OneServer {
                      for (int n = 0; n < rp.getCount(RRKind.NS); n++) {
                          OneRR oneRR = rp.getRR(RRKind.NS, n);
                          if (oneRR.getDnsType() == DnsType.Ns) {
-                             nsList.Add(oneRR.N1);
+                             nsList.add(oneRR.getName());
                              state = 2;//ネームサーバリストを取得した
                          }
                      }
@@ -417,7 +424,7 @@ end:
 
 		int port = 53;
 		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
-		SockUdp sockUdp = new SockUdp(Kernel, getLogger(), ip, port);
+		SockUdp sockUdp = new SockUdp(kernel, getLogger(), ip, port);
 
 		sockUdp.send(sp.get());//送信
 		if (sockUdp.ReceiveFrom(timeout)) {//受信
@@ -456,12 +463,12 @@ end:
 				return isJp() ? "標準問合(OPCODE=0)以外のリクエストには対応できません" : "Because I am different from 0 in OPCODE,can't process it.";
 			case 1:
 				return isJp() ? "質問エントリーが１でないパケットは処理できません" : "Because I am different from 1 a question entry,can't process it.";
-			//case 2:
-			//	return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
+			case 2:
+				return isJp() ? "ルートキャッシュの読み込みに失敗しました" : " Failed in reading of route cash.";
 			case 3:
-				return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
-			case 4:
-				return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
+				return isJp() ? "ルートキャッシュが見つかりません" : "Root chace is not found";
+//			case 4:
+//				return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
 			case 5:
 				return isJp() ? "Lookup() パケット受信でタイムアウトが発生しました。" : "Timeout occurred in Lookup()";
 			case 6:
@@ -494,8 +501,6 @@ end:
 				return isJp() ? "A(PTR)レコードにIPv6アドレスを指定できません" : "IPv6 cannot address it in an A(PTR) record";
 			case 20:
 				return isJp() ? "AAAAレコードにIPv4アドレスを指定できません" : "IPv4 cannot address it in an AAAA record";
-			case 21:
-				return isJp() ? "ルートキャッシュが見つかりません" : "Root chace is not found";
 			//case 22:
 			//	return isJp() ? "バイト計算に矛盾が生じています" : "Contradiction produces it in a byte calculation";
 			default:

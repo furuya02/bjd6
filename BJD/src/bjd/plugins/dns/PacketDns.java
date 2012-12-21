@@ -34,7 +34,7 @@ public final class PacketDns {
 	// byte [] p.Get();//内部バッファの取得（HeaderDnsとar(List<OneRR>)を結合(名前の圧縮及びHeaderのCountの修正)して返す）
 
 	// 内部バッファ
-	private DnsHeader dnsHeader = null;
+	private PacketDnsHeader dnsHeader = null;
 	//private ArrayList<OneRR>[] _ar = new ArrayList<OneRR>[4];
 	private ArrayList<OneRR>[] ar = new ArrayList[4];
 
@@ -80,7 +80,7 @@ public final class PacketDns {
 	//******************************************************
 	public void createHeader(short id, boolean qr, boolean aa, boolean rd, boolean ra) {
 
-		dnsHeader = new DnsHeader();
+		dnsHeader = new PacketDnsHeader();
 		try {
 			dnsHeader.setId(id);
 		} catch (IOException e) {
@@ -125,7 +125,7 @@ public final class PacketDns {
 	}
 
 	public byte[] get() {
-		byte[] buffer = new byte[12]; //ヘッダ分（12byte）の確保
+		//byte[] buffer = new byte[12]; //ヘッダ分（12byte）の確保
 		for (int rr = 0; rr < 4; rr++) {
 			//フィールド数をインクメント
 			//_headerDns.Count[rr] = Util.htons((ushort)_ar[rr].Count);
@@ -141,12 +141,12 @@ public final class PacketDns {
 				//byte[] dataName = Compress(buffer, DnsUtil.str2DnsName(oneRR.getName()));
 				byte[] dataName = (new Compress(buffer, DnsUtil.str2DnsName(oneRR.getName()))).getData();
 				//Type
-				short type = DnsUtil.dnsType2Short(oneRR.getDnsType());
+				//short type = DnsUtil.dnsType2Short(oneRR.getDnsType());
 				//Class
 				short cls = 0x0100;
 
 				// buffer + name + type + class
-				buffer = Bytes.create(buffer, dataName, type, cls);
+				//buffer = Bytes.create(buffer, dataName, type, cls);
 				if (rr == 0) { //質問フィールド[QD]の場合は、ここまで
 					continue;
 				}
@@ -205,7 +205,7 @@ public final class PacketDns {
 		//            }
 		//        }
 		//        offSet += Marshal.SizeOf(typeof(HeaderDns));
-		dnsHeader = new DnsHeader(buffer, 0);
+		dnsHeader = new PacketDnsHeader(buffer, 0);
 		offSet += dnsHeader.length();
 
 		//boolean qr = ((c >> 15) == 0) ? false : true;//要求・応答
@@ -238,7 +238,7 @@ public final class PacketDns {
 				String name = u0.getHostName();
 
 				//名前以降のリソースレコードを取得
-				RRPacket rrPacket = new RRPacket(buffer, offSet);
+				PacketRR rrPacket = new PacketRR(buffer, offSet);
 
 				DnsType dnsType = rrPacket.getType();
 

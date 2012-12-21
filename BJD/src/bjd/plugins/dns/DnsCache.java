@@ -11,6 +11,7 @@ import bjd.log.Logger;
 import bjd.net.InetKind;
 import bjd.net.Ip;
 import bjd.net.IpKind;
+import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.OneDat;
 import bjd.option.OneOption;
@@ -33,6 +34,10 @@ public class DnsCache {
 
 	//プロパティ
 	private String domainName;
+	
+	public String getDomainName(){
+		return domainName;
+	}
 
 	int _soaExpire;//終了時間（オプションで指定された有効時間）
 
@@ -42,12 +47,12 @@ public class DnsCache {
 	 * @param fileName
 	 * @throws IOException IllegalArgumentException
 	 */
-	public DnsCache(OneOption oneOption, String fileName) throws IOException {
+	public DnsCache(Conf conf, String fileName) throws IOException {
 		int ttl = 0;//rootCacheは有効期限なし
 
 		//オプションを読み込んで、ローカルデータを初期化する
 		//this.oneOption = oneOption;
-		_soaExpire = (int) oneOption.getValue("soaExpire");
+		_soaExpire = (int) conf.get("soaExpire");
 
 		domainName = ".";
 		//this.defaultExpire = defaultExpire;
@@ -56,7 +61,7 @@ public class DnsCache {
 		if (file.exists()) {
 			//using (var sr = new StreamReader(fileName, Encoding.GetEncoding("Shift_JIS"))) {
 			ArrayList<String> lines = Util.textFileRead(file);
-			String tmpName = "";//全行のNAMEを保持する　NAMEは前行と同じ場合省略が可能
+			String tmpName = ""; //全行のNAMEを保持する　NAMEは前行と同じ場合省略が可能
 			for (String str : lines) {
 				String name = "";
 				//String Class = "IN";
@@ -228,13 +233,13 @@ public class DnsCache {
 	}
 
 	//リソース定義（Dat)で初期化する場合
-	public DnsCache(Logger logger, OneOption oneOption, Dat dat, String dName) {
+	public DnsCache(Logger logger, Conf conf, Dat dat, String dName) {
 		int ttl = 0; //有効期限なし
 		String ns = "";//SOA追加時に使用するため、NSレコードを見つけたときにサーバ名を保存しておく
 
 		//オプションを読み込んで、ローカルデータを初期化する
 		//this.oneOption = oneOption;
-		_soaExpire = (int) oneOption.getValue("soaExpire");
+		_soaExpire = (int) conf.get("soaExpire");
 
 		domainName = dName;
 
@@ -335,14 +340,14 @@ public class DnsCache {
 
 			//SOAレコードの追加
 			if (!ns.equals("")) { //NSサーバ名が必須
-				String soaMail = (String) oneOption.getValue("soaMail");
-				soaMail = soaMail.replace('@', '.');//@を.に置き換える
-				soaMail = soaMail + ".";//最後に.を追加する
-				int soaSerial = (int) oneOption.getValue("soaSerial");
-				int soaRefresh = (int) oneOption.getValue("soaRefresh");
-				int soaRetry = (int) oneOption.getValue("soaRetry");
-				int soaExpire = (int) oneOption.getValue("soaExpire");
-				int soaMinimum = (int) oneOption.getValue("soaMinimum");
+				String soaMail = (String) conf.get("soaMail");
+				soaMail = soaMail.replace('@', '.'); //@を.に置き換える
+				soaMail = soaMail + "."; //最後に.を追加する
+				int soaSerial = (int) conf.get("soaSerial");
+				int soaRefresh = (int) conf.get("soaRefresh");
+				int soaRetry = (int) conf.get("soaRetry");
+				int soaExpire = (int) conf.get("soaExpire");
+				int soaMinimum = (int) conf.get("soaMinimum");
 
 				byte[] data = Bytes.create(DnsUtil.str2DnsName(ns), DnsUtil.str2DnsName(soaMail), Util.htonl(soaSerial), Util.htonl(soaRefresh), Util.htonl(soaRetry), Util.htonl(soaExpire),
 						Util.htonl(soaMinimum));

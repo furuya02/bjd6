@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import bjd.net.Ip;
+import bjd.util.Buffer;
 import bjd.util.Util;
 
 /**
@@ -45,12 +46,26 @@ public final class OneRR {
 	public String getName() {
 		return name;
 	}
+
 	public byte[] getData() {
 		return data;
 	}
+
 	public int getTtl2() {
 		return ttl2;
 	}
+
+//	public String getName() {
+//		if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns || dnsType == DnsType.Soa) {
+//			return DnsUtil.dnsName2Str(data);
+//		}
+//		if (dnsType == DnsType.Mx) {
+//			byte [] dataName = new byte[data.length - 2];
+//			System.arraycopy(data,2,dataName, 0, dataName.length);  
+//			return DnsUtil.dnsName2Str(dataName);
+//		}
+//		return "";
+//	}
 
 	@Override
 	public String toString() {
@@ -69,7 +84,7 @@ public final class OneRR {
 			return ip.toString();
 		}
 		if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns) {
-			return N1();
+			return name;
 		}
 		if (dnsType == DnsType.Mx) {
 			//ushort preference = BitConverter.ToUInt16(Data, 0);
@@ -80,7 +95,7 @@ public final class OneRR {
 			byte[] dataName = Arrays.copyOfRange(data, 2, data.length - 1);
 			return String.format("%s %d", DnsUtil.dnsName2Str(dataName), Util.htons(preference));
 		}
-		return dnsType == DnsType.Soa ? N1() : "ERROR";
+		return dnsType == DnsType.Soa ? name : "ERROR";
 	}
 
 	/**
@@ -98,21 +113,22 @@ public final class OneRR {
 		//    if (_createTime + ttl < now)
 		// nowとcreateTimeはTicksから得ているので100ns単位
 		long ttl = Util.htonl(ttl2) * 10000000;
-		if (createTime + ttl >= now)
+		if (createTime + ttl >= now){
 			return true;
+		}
 		return false;
 	}
 
-	public String N1() {
-		if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns || dnsType == DnsType.Soa) {
-			return DnsUtil.dnsName2Str(data);
-		}
-		if (dnsType == DnsType.Mx) {
-			byte[] dataName = Arrays.copyOfRange(data, 2, data.length - 1);
-			return DnsUtil.dnsName2Str(dataName);
-		}
-		return "";
-	}
+//	public String N1() {
+//		if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns || dnsType == DnsType.Soa) {
+//			return DnsUtil.dnsName2Str(data);
+//		}
+//		if (dnsType == DnsType.Mx) {
+//			byte[] dataName = Arrays.copyOfRange(data, 2, data.length - 1);
+//			return DnsUtil.dnsName2Str(dataName);
+//		}
+//		return "";
+//	}
 }
 /*
 namespace DnsServer {

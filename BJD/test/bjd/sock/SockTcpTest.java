@@ -79,7 +79,7 @@ public final class SockTcpTest implements ILife {
 	public void Echoサーバに送信して溜まったデータサイズ_lengthを確認する() throws Exception {
 		//setUp
 		String addr = "127.0.0.1";
-		int port = 9992;
+		int port = 9982;
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
 
@@ -106,7 +106,7 @@ public final class SockTcpTest implements ILife {
 	@Test
 	public void Echoサーバにsendで送信てtcpQueueのlength分ずつRecvする() {
 		String addr = "127.0.0.1";
-		int port = 9992;
+		int port = 9981;
 
 		EchoServer echoServer = new EchoServer(addr, port);
 		echoServer.start();

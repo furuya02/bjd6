@@ -4,16 +4,16 @@ import java.io.IOException;
 import bjd.packet.Packet;
 import bjd.util.Util;
 
-public final class DnsHeader extends Packet {
+public final class PacketDnsHeader extends Packet {
 
 	private static int length = 12; 
 
-	public DnsHeader() {
-		super(new byte[length], 0, length); //サイズが判明している場合のコンストラクタ
+	public PacketDnsHeader() {
+		super(new byte[length], 0, length); 
 	}
 
-	public DnsHeader(byte[] data, int offset) {
-		super(data, offset, length); //サイズが判明している場合のコンストラクタ
+	public PacketDnsHeader(byte[] data, int offset) {
+		super(data, offset, length); 
 	}
 
 	private final int pID = 0;
