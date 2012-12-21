@@ -14,7 +14,7 @@ public class DnsHeaderTest {
 	public void setIdで設定した識別子をgetIdで読み出す() throws Exception {
 		//setUp
 		DnsHeader sut = new DnsHeader();
-		short id = (short)0xff34;
+		short id = (short) 0xff34;
 		//sut.setId(new byte[] { (byte) 0xfe, (byte) 0xdc });
 		sut.setId(id);
 		String expected = "0xff34";

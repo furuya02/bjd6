@@ -456,8 +456,8 @@ end:
 				return isJp() ? "標準問合(OPCODE=0)以外のリクエストには対応できません" : "Because I am different from 0 in OPCODE,can't process it.";
 			case 1:
 				return isJp() ? "質問エントリーが１でないパケットは処理できません" : "Because I am different from 1 a question entry,can't process it.";
-			case 2:
-				return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
+			//case 2:
+			//	return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
 			case 3:
 				return isJp() ? "パケットのサイズに問題があるため、処理を継続できません" : "So that size includes a problem,can't process it.";
 			case 4:
@@ -496,8 +496,8 @@ end:
 				return isJp() ? "AAAAレコードにIPv4アドレスを指定できません" : "IPv4 cannot address it in an AAAA record";
 			case 21:
 				return isJp() ? "ルートキャッシュが見つかりません" : "Root chace is not found";
-			case 22:
-				return isJp() ? "バイト計算に矛盾が生じています" : "Contradiction produces it in a byte calculation";
+			//case 22:
+			//	return isJp() ? "バイト計算に矛盾が生じています" : "Contradiction produces it in a byte calculation";
 			default:
 				return "unknown";
 
