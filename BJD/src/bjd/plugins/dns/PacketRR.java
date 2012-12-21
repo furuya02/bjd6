@@ -36,15 +36,20 @@ public final class PacketRR extends Packet {
 	 * パケットを解析するためのコンストラクタ
 	 * @param data
 	 * @param offset
+	 * @throws IOException 
 	 */
-	public PacketRR(byte[] data, int offset) {
+	public PacketRR(byte[] data, int offset) throws IOException {
 		super(data, offset);
+		if (data.length - offset < 10) {
+			throw new IOException("A lack of data");
+		}
 	}
 
 	public DnsType getType() throws IOException {
 		short d = getShort(pTYPE);
 		return short2DnsType(d);
 	}
+
 	public void setType(DnsType val) throws IOException {
 		short n = dnsType2Short(val);
 		setShort(n, pTYPE);

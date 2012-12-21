@@ -3,6 +3,7 @@ package bjd.plugins.dns;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import bjd.Kernel;
 import bjd.log.LogKind;
@@ -89,7 +90,7 @@ public final class Server extends OneServer {
 
         //パケットの読込(受信パケットrp)            
         
-        PacketDns rp = new PacketDns(getLogger());
+        PacketDns rp = new PacketDns();
         if (!rp.Read(sockUdp.UdpBuffer)) {
             return; //データ解釈に失敗した場合は、処理なし
         }
@@ -175,7 +176,7 @@ public final class Server extends OneServer {
         //********************************************************
         //パケットの生成(送信パケットsp)            
         //********************************************************
-        PacketDns sp = new PacketDns(getLogger());
+        PacketDns sp = new PacketDns();
         
         // (A)「ヘッダ」作成
         boolean qr = true; //応答
@@ -292,12 +293,17 @@ public final class Server extends OneServer {
          ArrayList<String> nsList = new ArrayList<String>();
          ArrayList<OneRR> rrList = _rootCache.Search(domainName, DnsType.Ns);
          if (0 < rrList.size()) {
-             nsList.AddRange(rrList.Select(t => t.getName()));
+//             nsList.AddRange(rrList.Select(t => t.getName()));
+        	 for(OneRR o : rrList){
+        		 nsList.add(o.getName());
+        	 }
          } else { //キャッシュに存在しない場合は、ルートサーバをランダムにセットする
              rrList = _rootCache.Search(".", DnsType.Ns);
 
-             var random = new Random(Environment.TickCount);
-             int center = random.Next(rrList.size());//センタ位置をランダムに決定する
+             //var random = new Random(Environment.TickCount);
+             //int center = random.Next(rrList.size());//センタ位置をランダムに決定する
+             Random random = new Random();             
+             int center = random.nextInt(rrList.size());//センタ位置をランダムに決定する
              for (int i = center; i < rrList.size(); i++){//センタ以降の一覧を取得
                  nsList.add(rrList.get(i).getName());
              }
@@ -330,7 +336,8 @@ public final class Server extends OneServer {
                  if (dnsType == DnsType.Aaaa){
                  //AAAAでの検索の場合、AAAAのアドレス情報も有効にする
                 	 ArrayList<OneRR> tmpList = _rootCache.Search(domainName,DnsType.Aaaa);
-                     rrList.AddRange(tmpList);
+                     //rrList.AddRange(tmpList);
+                     rrList.addAll(tmpList);
                  }
 
 
@@ -343,15 +350,24 @@ public final class Server extends OneServer {
                  }
 
                  for (OneRR oneRR : rrList) {
-                     uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.getData(), 0));
+                     //uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.getData(), 0));
+                     int addr = BitConverter.ToUInt32(oneRR.getData(), 0);
                      Ip tmpIp = new Ip(addr);
 
                      if (oneRR.getDnsType() == DnsType.Aaaa) {
                          long v6H = BitConverter.ToUInt64(oneRR.getData(),0);
                          long v6L = BitConverter.ToUInt64(oneRR.getData(),8);
-                         tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
+                         //tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
+                         tmpIp = new Ip(v6H,v6L);
                      }
-                     boolean find = nsAddrList.Any(ip => ip == tmpIp);
+                     //boolean find = nsAddrList.Any(ip => ip == tmpIp);
+                     boolean find = false;
+                     for(Ip ip : nsAddrList){
+                    	 if(ip.equals(tmpIp)){
+                    		 find=true;
+                    		 break;
+                    	 }
+                     }
                      if (!find) {
                          nsAddrList.add(tmpIp);
                      }
@@ -413,8 +429,10 @@ end:
 
 		//リクエストパケットの生成
 		PacketDns sp = new PacketDns(getLogger());
-		var random = new Random(Environment.TickCount);
-		var id = (ushort) random.Next(0xFFFF);//識別子をランダムに決定する
+//		var random = new Random(Environment.TickCount);
+//		var id = (ushort) random.Next(0xFFFF);//識別子をランダムに決定する
+		Random random = new Random();
+        int id = random.nextInt(0xFFFF);
 		boolean qr = false; //要求
 		boolean aa = false; //権威なし
 		boolean rd = (boolean) getConf().get("useRD");//再帰要求を使用するかどうか
@@ -459,10 +477,10 @@ end:
 
 	public String getMsg(int messageNo) {
 		switch (messageNo) {
-			case 0:
-				return isJp() ? "標準問合(OPCODE=0)以外のリクエストには対応できません" : "Because I am different from 0 in OPCODE,can't process it.";
-			case 1:
-				return isJp() ? "質問エントリーが１でないパケットは処理できません" : "Because I am different from 1 a question entry,can't process it.";
+			//case 0:
+			//	return isJp() ? "標準問合(OPCODE=0)以外のリクエストには対応できません" : "Because I am different from 0 in OPCODE,can't process it.";
+			//case 1:
+			//	return isJp() ? "質問エントリーが１でないパケットは処理できません" : "Because I am different from 1 a question entry,can't process it.";
 			case 2:
 				return isJp() ? "ルートキャッシュの読み込みに失敗しました" : " Failed in reading of route cash.";
 			case 3:

@@ -6,14 +6,18 @@ import bjd.util.Util;
 
 public final class PacketDnsHeader extends Packet {
 
-	private static int length = 12; 
+	private static int length = 12;
 
 	public PacketDnsHeader() {
-		super(new byte[length], 0, length); 
+		super(new byte[length], 0, length);
 	}
 
-	public PacketDnsHeader(byte[] data, int offset) {
-		super(data, offset, length); 
+	public PacketDnsHeader(byte[] data, int offset) throws IOException {
+		super(data, offset, length);
+		if (data.length - offset < length) {
+			throw new IOException("A lack of data");
+		}
+
 	}
 
 	private final int pID = 0;
@@ -76,6 +80,7 @@ public final class PacketDnsHeader extends Packet {
 	public void setCount(int rr, short count) throws IOException {
 		setShort(count, getRRPos(rr));
 	}
+
 	/**
 	 * RR数の取得
 	 * @param rr

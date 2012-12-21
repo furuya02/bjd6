@@ -16,7 +16,7 @@ import bjd.util.Util;
  *
  */
 public final class PacketDns {
-	private Logger logger;
+	//	private Logger logger;
 
 	// [受信に使用する場合]
 	// PacketDns p = new PacketDns(Kernel kernel,String nameTag);
@@ -38,8 +38,7 @@ public final class PacketDns {
 	//private ArrayList<OneRR>[] _ar = new ArrayList<OneRR>[4];
 	private ArrayList<OneRR>[] ar = new ArrayList[4];
 
-	public PacketDns(Logger logger) {
-		this.logger = logger;
+	public PacketDns() {
 		for (int i = 0; i < 4; i++) {
 			ar[i] = new ArrayList<OneRR>();
 		}
@@ -178,37 +177,21 @@ public final class PacketDns {
 		//                Marshal.StructureToPtr(_headerDns, (IntPtr)(p), true);
 		//            }
 		//        }
-		
+
 		//????
 		//dnsHeader = new DnsHeader(buffer,0);
 		return buffer;
 	}
 
-	//******************************************************
-	//パケットの解釈
-	//******************************************************
-	public boolean Read(byte[] buffer) throws IOException {
-		//受信バッファ bufferを解釈して、dnsHeader及びrrListを初期化する
-
-		if (12 > buffer.length) {
-			return false;
-		}
-
-		int offSet = 0;
-
-		//****************************************
-		//ヘッダフィールド取得
-		//****************************************
-		//        unsafe {
-		//            fixed (byte* p = buffer) {
-		//                _headerDns = (HeaderDns)Marshal.PtrToStructure((IntPtr)(p + offSet), typeof(HeaderDns));
-		//            }
-		//        }
-		//        offSet += Marshal.SizeOf(typeof(HeaderDns));
+	/**
+	 * パケット解釈のためのコンストラクタ
+	 * @param data
+	 * @throws IOException 
+	 */
+	public PacketDns(byte[] buffer) throws IOException {
+		//ヘッダの解釈
 		dnsHeader = new PacketDnsHeader(buffer, 0);
-		offSet += dnsHeader.length();
-
-		//boolean qr = ((c >> 15) == 0) ? false : true;//要求・応答
+		int offset = dnsHeader.length();
 
 		// オペコード　0:標準 1:逆 2:サーバ状態
 		//var c = (short)(Util.htons(_headerDns.Flags) & 0x7800);
@@ -217,99 +200,222 @@ public final class PacketDns {
 		int opcode = flags & 0x7800;
 
 		if (opcode != 0) { // 標準問い合せ以外は対応していない
-			logger.set(LogKind.SECURE, null, 0, String.format("OPCODE=%s", opcode)); //標準問合(OPCODE=0)以外のリクエストには対応できません。
-			return false;
+			throw new IOException(String.format("OPCODE not 0 [CPCODE=%d]", opcode));
 		}
+
 		//****************************************
 		//質問/回答/権限/追加フィールド取得
 		//****************************************
 		for (int rr = 0; rr < 4; rr++) {
 			//ushort max = Util.htons(_headerDns.Count[rr]);//対象フィールドのデータ数
 			short max = dnsHeader.getCount(rr);
-
 			if (rr == 0 && max != 1) {
-				logger.set(LogKind.SECURE, null, 1, String.format("count=%d", max)); //質問エントリーが１でないパケットは処理できません。
-				return false;
+				//質問エントリーが１でないパケットは処理できません。
+				throw new IOException(String.format("QD Entry !=0  [count=%d]", max));
 			}
 			for (int n = 0; n < max; n++) {
 				//名前の取得
-				UnCompress u0 = new UnCompress(buffer, offSet);
-				offSet = u0.getOffSet();
+				UnCompress u0 = new UnCompress(buffer, offset);
+				offset = u0.getOffSet();
 				String name = u0.getHostName();
 
 				//名前以降のリソースレコードを取得
-				PacketRR rrPacket = new PacketRR(buffer, offSet);
+				PacketRR packetRr = new PacketRR(buffer, offset);
 
-				DnsType dnsType = rrPacket.getType();
+				DnsType dnsType = packetRr.getType();
+				int ttl = packetRr.getTtl();
+				short dlen = packetRr.getDLen();
+				byte[] data = packetRr.getData();
 
-				if (rr == 0) { //質問フィールド[QD]の場合は、ここまで
+				if (rr == 0) {
+					//質問フィールド[QD]の場合は、ここまで
 					ar[rr].add(new OneRR(name, dnsType, 0, new byte[0]));
-					continue;
-				}
-
-				int ttl = rrPacket.getTtl();
-				short dlen = rrPacket.getDLen();
-				byte[] data = rrPacket.getData();
-
-				offSet += 9;
-
-				//TypeによってはNameが含まれている場合があるが、Nameは圧縮されている可能性があるので、
-				//いったん、String 戻してから、改めてリソース用に組み直したDataを作成する
-				OneRR oneRR;
-
-				if (dnsType == DnsType.A) {
-					oneRR = new OneRR(name, dnsType, ttl, data);
-				} else if (dnsType == DnsType.Aaaa) {
-					oneRR = new OneRR(name, dnsType, ttl, data);
-				} else if (dnsType == DnsType.Ns || dnsType == DnsType.Ptr || dnsType == DnsType.Cname) {
-					//oneRR = new OneRR(name, dnsType, ttl,DnsUtil.Str2DnsName(UnCompress(buffer,ref off)));
-					UnCompress u1 = new UnCompress(buffer, offSet);
-					oneRR = new OneRR(name, dnsType, ttl, DnsUtil.str2DnsName(u1.getHostName()));
-				} else if (dnsType == DnsType.Mx) {
-					short preference = BitConverter.ToUInt16(buffer, offSet);
-					UnCompress u2 = new UnCompress(buffer, offSet + 2);
-					String hostName = u2.getHostName();
-					byte[] dataName = DnsUtil.str2DnsName(u2.getHostName()); //DNS名前形式に変換
-					byte[] d = Bytes.create(preference, dataName);
-					oneRR = new OneRR(name, dnsType, ttl, d);
-				} else if (dnsType == DnsType.Soa) {
-					UnCompress u3 = new UnCompress(buffer, offSet);
-					int p = u3.getOffSet();
-					byte[] nameNs = DnsUtil.str2DnsName(u3.getHostName()); //DNS名前形式に変換
-					UnCompress u4 = new UnCompress(buffer, p);
-					p = u4.getOffSet();
-					byte[] nameMail = DnsUtil.str2DnsName(u4.getHostName()); //DNS名前形式に変換
-					int serial = BitConverter.ToUInt32(buffer, p);
-					p += 4;
-					int refresh = BitConverter.ToUInt32(buffer, p);
-					p += 4;
-					int retry = BitConverter.ToUInt32(buffer, p);
-					p += 4;
-					int expire = BitConverter.ToUInt32(buffer, p);
-					p += 4;
-					int minimum = BitConverter.ToUInt32(buffer, p);
-					p += 4;
-					byte[] d = Bytes.create(nameNs, nameMail, serial, refresh, retry, expire, minimum);
-					oneRR = new OneRR(name, dnsType, ttl, d);
-
 				} else {
-					//A NS MX SOA PTR CNAMEの6種類以外は、処理しない
-					continue;
+					//TypeによってはNameが含まれている場合があるが、Nameは圧縮されている可能性があるので、
+					//いったん、String 戻してから、改めてリソース用に組み直したDataを作成する
+					OneRR oneRR = null;
+					switch (dnsType) {
+						case A:
+						case Aaaa:
+							oneRR = new OneRR(name, dnsType, ttl, data);
+							break;
+						case Ns:
+						case Ptr:
+						case Cname:
+							//oneRR = new OneRR(name, dnsType, ttl,DnsUtil.Str2DnsName(UnCompress(buffer,ref off)));
+							UnCompress u1 = new UnCompress(buffer, offset + 2 + 2 + 4 + 2);
+							oneRR = new OneRR(name, dnsType, ttl, DnsUtil.str2DnsName(u1.getHostName()));
+							break;
+						case Mx:
+							short preference = BitConverter.ToUInt16(buffer, offSet);
+							UnCompress u2 = new UnCompress(buffer, offSet + 2);
+							String hostName = u2.getHostName();
+							byte[] dataName = DnsUtil.str2DnsName(u2.getHostName()); //DNS名前形式に変換
+							byte[] d = Bytes.create(preference, dataName);
+							oneRR = new OneRR(name, dnsType, ttl, d);
+							break;
+						case Soa:
+							UnCompress u3 = new UnCompress(buffer, offSet);
+							int p = u3.getOffSet();
+							byte[] nameNs = DnsUtil.str2DnsName(u3.getHostName()); //DNS名前形式に変換
+							UnCompress u4 = new UnCompress(buffer, p);
+							p = u4.getOffSet();
+							byte[] nameMail = DnsUtil.str2DnsName(u4.getHostName()); //DNS名前形式に変換
+							int serial = BitConverter.ToUInt32(buffer, p);
+							p += 4;
+							int refresh = BitConverter.ToUInt32(buffer, p);
+							p += 4;
+							int retry = BitConverter.ToUInt32(buffer, p);
+							p += 4;
+							int expire = BitConverter.ToUInt32(buffer, p);
+							p += 4;
+							int minimum = BitConverter.ToUInt32(buffer, p);
+							p += 4;
+							byte[] d = Bytes.create(nameNs, nameMail, serial, refresh, retry, expire, minimum);
+							oneRR = new OneRR(name, dnsType, ttl, d);
+							break;
+						default:
+							//A NS MX SOA PTR CNAMEの6種類以外は、処理しない
+							break;
+
+					}
+					if (oneRR != null) {
+						ar[rr].add(oneRR);
+					}
 				}
-				//				if (offSet != off) {
-				//					logger.set(LogKind.SECURE, null, 22, "offSer!=off");
-				//					return false;
-				//				}
-
-				offSet += dlen;
-
+				offset += 2 + 2 + 4 + 2 + dlen;
 				//OneRR形式でPacketDnsのオブジェクト内で保存
-				ar[rr].add(oneRR);
 
 			}
 		}
-		return true;
+
 	}
+
+	//******************************************************
+	//パケットの解釈
+	//******************************************************
+	//	public boolean Read(byte[] buffer) throws IOException {
+	//		//受信バッファ bufferを解釈して、dnsHeader及びrrListを初期化する
+	//
+	//		if (12 > buffer.length) {
+	//			return false;
+	//		}
+	//
+	//		int offSet = 0;
+	//
+	//		//****************************************
+	//		//ヘッダフィールド取得
+	//		//****************************************
+	//		//        unsafe {
+	//		//            fixed (byte* p = buffer) {
+	//		//                _headerDns = (HeaderDns)Marshal.PtrToStructure((IntPtr)(p + offSet), typeof(HeaderDns));
+	//		//            }
+	//		//        }
+	//		//        offSet += Marshal.SizeOf(typeof(HeaderDns));
+	//		dnsHeader = new PacketDnsHeader(buffer, 0);
+	//		offSet += dnsHeader.length();
+	//
+	//		//boolean qr = ((c >> 15) == 0) ? false : true;//要求・応答
+	//
+	//		// オペコード　0:標準 1:逆 2:サーバ状態
+	//		//var c = (short)(Util.htons(_headerDns.Flags) & 0x7800);
+	//		//var opcode = (ushort)(c >> 11);
+	//		short flags = dnsHeader.getFlags();
+	//		int opcode = flags & 0x7800;
+	//
+	//		if (opcode != 0) { // 標準問い合せ以外は対応していない
+	//			throw new IOException(String.format("OPCODE not 0 [CPCODE=%d]", opcode));
+	//		}
+	//		//****************************************
+	//		//質問/回答/権限/追加フィールド取得
+	//		//****************************************
+	//		for (int rr = 0; rr < 4; rr++) {
+	//			//ushort max = Util.htons(_headerDns.Count[rr]);//対象フィールドのデータ数
+	//			short max = dnsHeader.getCount(rr);
+	//
+	//			if (rr == 0 && max != 1) {
+	//				//質問エントリーが１でないパケットは処理できません。
+	//				throw new IOException(String.format("QD Entry !=0  [count=%d]", max));
+	//			}
+	//			for (int n = 0; n < max; n++) {
+	//				//名前の取得
+	//				UnCompress u0 = new UnCompress(buffer, offSet);
+	//				offSet = u0.getOffSet();
+	//				String name = u0.getHostName();
+	//
+	//				//名前以降のリソースレコードを取得
+	//				PacketRR rrPacket = new PacketRR(buffer, offSet);
+	//
+	//				DnsType dnsType = rrPacket.getType();
+	//
+	//				if (rr == 0) { //質問フィールド[QD]の場合は、ここまで
+	//					ar[rr].add(new OneRR(name, dnsType, 0, new byte[0]));
+	//					continue;
+	//				}
+	//
+	//				int ttl = rrPacket.getTtl();
+	//				short dlen = rrPacket.getDLen();
+	//				byte[] data = rrPacket.getData();
+	//
+	//				offSet += 9;
+	//
+	//				//TypeによってはNameが含まれている場合があるが、Nameは圧縮されている可能性があるので、
+	//				//いったん、String 戻してから、改めてリソース用に組み直したDataを作成する
+	//				OneRR oneRR;
+	//
+	//				if (dnsType == DnsType.A) {
+	//					oneRR = new OneRR(name, dnsType, ttl, data);
+	//				} else if (dnsType == DnsType.Aaaa) {
+	//					oneRR = new OneRR(name, dnsType, ttl, data);
+	//				} else if (dnsType == DnsType.Ns || dnsType == DnsType.Ptr || dnsType == DnsType.Cname) {
+	//					//oneRR = new OneRR(name, dnsType, ttl,DnsUtil.Str2DnsName(UnCompress(buffer,ref off)));
+	//					UnCompress u1 = new UnCompress(buffer, offSet);
+	//					oneRR = new OneRR(name, dnsType, ttl, DnsUtil.str2DnsName(u1.getHostName()));
+	//				} else if (dnsType == DnsType.Mx) {
+	//					short preference = BitConverter.ToUInt16(buffer, offSet);
+	//					UnCompress u2 = new UnCompress(buffer, offSet + 2);
+	//					String hostName = u2.getHostName();
+	//					byte[] dataName = DnsUtil.str2DnsName(u2.getHostName()); //DNS名前形式に変換
+	//					byte[] d = Bytes.create(preference, dataName);
+	//					oneRR = new OneRR(name, dnsType, ttl, d);
+	//				} else if (dnsType == DnsType.Soa) {
+	//					UnCompress u3 = new UnCompress(buffer, offSet);
+	//					int p = u3.getOffSet();
+	//					byte[] nameNs = DnsUtil.str2DnsName(u3.getHostName()); //DNS名前形式に変換
+	//					UnCompress u4 = new UnCompress(buffer, p);
+	//					p = u4.getOffSet();
+	//					byte[] nameMail = DnsUtil.str2DnsName(u4.getHostName()); //DNS名前形式に変換
+	//					int serial = BitConverter.ToUInt32(buffer, p);
+	//					p += 4;
+	//					int refresh = BitConverter.ToUInt32(buffer, p);
+	//					p += 4;
+	//					int retry = BitConverter.ToUInt32(buffer, p);
+	//					p += 4;
+	//					int expire = BitConverter.ToUInt32(buffer, p);
+	//					p += 4;
+	//					int minimum = BitConverter.ToUInt32(buffer, p);
+	//					p += 4;
+	//					byte[] d = Bytes.create(nameNs, nameMail, serial, refresh, retry, expire, minimum);
+	//					oneRR = new OneRR(name, dnsType, ttl, d);
+	//
+	//				} else {
+	//					//A NS MX SOA PTR CNAMEの6種類以外は、処理しない
+	//					continue;
+	//				}
+	//				//				if (offSet != off) {
+	//				//					logger.set(LogKind.SECURE, null, 22, "offSer!=off");
+	//				//					return false;
+	//				//				}
+	//
+	//				offSet += dlen;
+	//
+	//				//OneRR形式でPacketDnsのオブジェクト内で保存
+	//				ar[rr].add(oneRR);
+	//
+	//			}
+	//		}
+	//		return true;
+	//	}
 
 	public int getCount(RRKind rrKind) {
 		return ar[rrKind.getIntValue()].size(); //実際に取得したデータ数を返す
