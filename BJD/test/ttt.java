@@ -1,29 +1,23 @@
+import java.util.HashSet;
 
-
-import static org.junit.Assert.*;
-
-import java.io.File;
-
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-import bjd.Kernel;
+public final class ttt {
 
-public class ttt {
-
-	
 	@Test
 	public void test() {
-		Kernel kernel = new Kernel();
-		String s = kernel.getProgDir();
-		String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
-		
-		
-		
-		
-		//TODO Debug Print
-System.out.println(String.format("%s",currentDir));
+
+		System.out.println(String.format("%s", func("12本じてゃ本34567890")));
+	}
+
+	boolean func(String str) {
+		HashSet set = new HashSet();
+		for (int i = 0; i < str.length(); i++) {
+			if (!set.add(str.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
