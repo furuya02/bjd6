@@ -79,9 +79,13 @@ public final class ListOption extends ListBase<OneOption> {
 			if (oneOption.getNameTag().equals("Dns")) {
 				OneOption o = onePlugin.createOption(kernel, "bjd.plugins.dns.OptionDnsDomain", "DnsDomain");
 				if (add(o)) {
-					for (OneDat e : (Dat) o.getValue("domainList")) {
-						if (e.isEnable()) {
-							add(onePlugin.createOption(kernel, "bjd.plugins.dns.OptionDnsResource", String.format("Resource-%s", e.getStrList().get(0))));
+
+					Dat dat = (Dat) o.getValue("domainList");
+					if (dat != null) {
+						for (OneDat e : (Dat) o.getValue("domainList")) {
+							if (e.isEnable()) {
+								add(onePlugin.createOption(kernel, "bjd.plugins.dns.OptionDnsResource", String.format("Resource-%s", e.getStrList().get(0))));
+							}
 						}
 					}
 				}

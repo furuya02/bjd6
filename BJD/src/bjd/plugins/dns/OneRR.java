@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import bjd.net.Ip;
-import bjd.util.Buffer;
 import bjd.util.Util;
 
 /**
@@ -16,11 +15,11 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public final class OneRR {
+public class OneRR {
 
 	private DnsType dnsType;
 	private long createTime; //データが作成された日時
-	private int ttl2; //内部のネットワークバイトオーダのまま取得される
+	private int ttl; //内部のネットワークバイトオーダのまま取得される
 	private String name;
 	private byte[] data;
 
@@ -35,24 +34,24 @@ public final class OneRR {
 		createTime = Calendar.getInstance().getTimeInMillis();
 		this.name = name;
 		this.dnsType = dnsType;
-		this.ttl2 = ttl;
+		this.ttl = ttl;
 		this.data = Arrays.copyOf(data, data.length);
 	}
 
-	public DnsType getDnsType() {
+	public final DnsType getDnsType() {
 		return dnsType;
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public byte[] getData() {
+	public final byte[] getData() {
 		return data;
 	}
 
-	public int getTtl2() {
-		return ttl2;
+	public final int getTtl() {
+		return ttl;
 	}
 
 //	public String getName() {
@@ -67,6 +66,7 @@ public final class OneRR {
 //		return "";
 //	}
 
+	
 	@Override
 	public String toString() {
 		if (dnsType == DnsType.A) {
@@ -103,8 +103,8 @@ public final class OneRR {
 	 * @param now
 	 * @return
 	 */
-	public boolean isEffective(long now) {
-		if (ttl2 == 0) {
+	public final boolean isEffective(long now) {
+		if (ttl == 0) {
 			return true;
 		}
 
@@ -112,8 +112,8 @@ public final class OneRR {
 		//    long ttl = Util.htonl(Ttl2);
 		//    if (_createTime + ttl < now)
 		// nowとcreateTimeはTicksから得ているので100ns単位
-		long ttl = Util.htonl(ttl2) * 10000000;
-		if (createTime + ttl >= now){
+		long t = Util.htonl(ttl) * 10000000;
+		if (createTime + t >= now){
 			return true;
 		}
 		return false;
@@ -130,12 +130,3 @@ public final class OneRR {
 //		return "";
 //	}
 }
-/*
-namespace DnsServer {
-
-    internal class OneRR {
-
-
-   }
-}
-*/

@@ -24,12 +24,18 @@ public final class PacketRR extends Packet {
 		super(new byte[0], 0);
 	}
 
+	private boolean isQD = false;
+
 	/**
 	 * パケットを生成する場合のコンストラクタ
 	 * @param dlen
 	 */
 	public PacketRR(int dlen) {
-		super(new byte[10 + dlen], 0);
+		//dlenが0の時、QDを表す（dLen及びdataが存在しない）
+		super((dlen == 0) ? (new byte[8]) : (new byte[10 + dlen]), 0);
+		if (dlen == 0) {
+			isQD = true;
+		}
 	}
 
 	/**
@@ -47,11 +53,11 @@ public final class PacketRR extends Packet {
 
 	public DnsType getType() throws IOException {
 		short d = getShort(pTYPE);
-		return short2DnsType(d);
+		return DnsUtil.short2DnsType(d);
 	}
 
 	public void setType(DnsType val) throws IOException {
-		short n = dnsType2Short(val);
+		short n = DnsUtil.dnsType2Short(val);
 		setShort(n, pTYPE);
 	}
 
@@ -72,15 +78,29 @@ public final class PacketRR extends Packet {
 	}
 
 	public short getDLen() throws IOException {
+		if (isQD) {
+			return 0;
+		}
 		return getShort(pDLEN);
 	}
 
 	public byte[] getData() throws IOException {
+		if (isQD) {
+			return new byte[0];
+		}
 		return getBytes(pDATA, getDLen());
 	}
+	
+	public void setData(byte [] val) throws IOException{
+		setBytes(val, pDATA);
+	}
 
+	
 	@Override
 	public int length() {
+		if (isQD) {
+			return 8; //dlen及びdataが存在しない
+		}
 		try {
 			int dataLen = getDLen();
 			return 2 + 2 + 4 + dataLen + 1;
@@ -90,82 +110,14 @@ public final class PacketRR extends Packet {
 		return 0;
 	}
 
-	private DnsType short2DnsType(short d) {
-		switch (d) {
-			case 0x0001:
-				return DnsType.A;
-			case 0x0002:
-				return DnsType.Ns;
-			case 0x0005:
-				return DnsType.Cname;
-			case 0x0006:
-				return DnsType.Soa;
-				//case 0x0007:
-				//    return DnsType.Mb;
-				//case 0x0008:
-				//    return DnsType.Mg;
-				//case 0x0009:
-				//    return DnsType.Mr;
-				//case 0x000a:
-				//    return DnsType.Null;
-				//case 0x000b:
-				//    return DnsType.Wks;
-			case 0x000c:
-				return DnsType.Ptr;
-				//case 0x000d:
-				//    return DnsType.Hinfo;
-				//case 0x000e:
-				//    return DnsType.Minfo;
-			case 0x000f:
-				return DnsType.Mx;
-				//case 0x0010:
-				//    return DnsType.Txt;
-			case 0x001c:
-				return DnsType.Aaaa;
-			default:
-				Util.runtimeException("short2DnsType() unknown data");
-				break;
+	@Override
+	public byte[] getBytes() {
+		try {
+			return this.getBytes(0, length());
+		} catch (IOException e) {
+			Util.runtimeException(this, e); //設計上の問題
 		}
-		return DnsType.Unknown;
-	}
-
-	private static short dnsType2Short(DnsType dnsType) {
-		switch (dnsType) {
-			case A:
-				return 0x0001;
-			case Ns:
-				return 0x0002;
-			case Cname:
-				return 0x0005;
-			case Soa:
-				return 0x0006;
-				//case DNS_TYPE.MB:
-				//    return 0x0007;
-				//case DNS_TYPE.MG:
-				//    return 0x0008;
-				//case DNS_TYPE.MR:
-				//    return 0x0009;
-				//case DNS_TYPE.NULL:
-				//    return 0x000a;
-				//case DNS_TYPE.WKS:
-				//    return 0x000b;
-			case Ptr:
-				return 0x000c;
-				//case DNS_TYPE.HINFO:
-				//    return 0x000d;
-				//case DNS_TYPE.MINFO:
-				//    return 0x000e;
-			case Mx:
-				return 0x000f;
-				//case DNS_TYPE.TXT:
-				//    return 0x0010;
-			case Aaaa:
-				return 0x001c;
-			default:
-				Util.runtimeException("dnsType2Short() unknown data");
-				break;
-		}
-		return 0x0000;
+		return null; //これが返されることはない
 	}
 
 }

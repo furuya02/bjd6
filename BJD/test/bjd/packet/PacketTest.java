@@ -3,11 +3,13 @@ package bjd.packet;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 public final class PacketTest {
 
-	int max = 100;
+	private int max = 100;
 
 	class MyPacket extends Packet {
 
@@ -19,10 +21,15 @@ public final class PacketTest {
 		public int length() {
 			return max;
 		}
+
+		@Override
+		public byte[] getBytes() throws IOException {
+			return super.getBytes(0, max);
+		}
 	}
 
 	@Test
-	public void getShortで値を取得する() throws Exception {
+	public void setShortで値を設定してgetShortで取得する() throws Exception {
 		//setUp
 		MyPacket sut = new MyPacket();
 		short expected = (short) 0xff01;
@@ -34,7 +41,7 @@ public final class PacketTest {
 	}
 
 	@Test
-	public void getIntで値を取得する() throws Exception {
+	public void setIntで値を設定してgetIntで取得する() throws Exception {
 		//setUp
 		MyPacket sut = new MyPacket();
 		int expected = (int) 12345678;
@@ -47,7 +54,7 @@ public final class PacketTest {
 	}
 
 	@Test
-	public void getByteで値を取得する() throws Exception {
+	public void setByteで値を設定してgetByteで取得する() throws Exception {
 		//setUp
 		MyPacket sut = new MyPacket();
 		byte expected = (byte) 0xfd;
@@ -59,7 +66,7 @@ public final class PacketTest {
 	}
 
 	@Test
-	public void getLongで値を取得する() throws Exception {
+	public void setLongで値を設定してgetLongで取得する() throws Exception {
 		//setUp
 		MyPacket sut = new MyPacket();
 		long expected = (long) 3333;
@@ -69,4 +76,21 @@ public final class PacketTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
+
+	@Test
+	public void setBytesで値を設定してgetBytesで取得する() throws Exception {
+		//setUp
+		MyPacket sut = new MyPacket();
+
+		byte[] expected = new byte[max - 20];
+		for (int i = 0; i < max - 20; i++) {
+			expected[i] = (byte) i;
+		}
+		sut.setBytes(expected, 20);
+		//exercise
+		byte[] actual = sut.getBytes(20, max - 20);
+		//verify
+		assertThat(actual, is(expected));
+	}
+
 }

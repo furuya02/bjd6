@@ -45,6 +45,7 @@
 		<!-- BJD/bin/pluginの下に各プラグインサーバのjarファイルが生成される -->
 		<ant antfile="${dev}/SampleServer/build.xml" target="default" inheritAll="false" />
 		<ant antfile="${dev}/FtpServer/build.xml" target="default" inheritAll="false" />
+		<ant antfile="${dev}/DnsServer/build.xml" target="default" inheritAll="false" />
 		
 		
 		<!--【プラグインのコピー】-->

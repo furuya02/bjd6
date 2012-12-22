@@ -80,9 +80,8 @@ public abstract class Packet {
 		int len = 2;
 		comformeSize(offset, len);
 
-		byte[] src = { (byte) (val >> 8), (byte) val };
 		packets.position(offset);
-		packets.put(src, 0, len);
+		packets.put(Conv.getBytes(val), 0, len);
 	}
 
 	/**
@@ -110,9 +109,8 @@ public abstract class Packet {
 		int len = 4;
 		comformeSize(offset, len);
 
-		byte[] src = { (byte) (val >> 24), (byte) (val >> 16), (byte) (val >> 8), (byte) val };
 		packets.position(offset);
-		packets.put(src, 0, len);
+		packets.put(Conv.getBytes(val), 0, len);
 	}
 
 	/**
@@ -134,9 +132,8 @@ public abstract class Packet {
 		int len = 8;
 		comformeSize(offset, len);
 
-		byte[] src = { (byte) (val >> 52), (byte) (val >> 48), (byte) (val >> 40), (byte) (val >> 32), (byte) (val >> 24), (byte) (val >> 16), (byte) (val >> 8), (byte) val };
 		packets.position(offset);
-		packets.put(src, 0, len);
+		packets.put(Conv.getBytes(val), 0, len);
 	}
 
 	protected final long getLong(int offset) throws IOException {
@@ -157,6 +154,17 @@ public abstract class Packet {
 		packets.get(dst, 0, len);
 		return dst;
 	}
+
+	protected final void setBytes(byte[] val, int offset) throws IOException {
+		int len = val.length;
+		comformeSize(offset, len);
+
+		packets.position(offset);
+		packets.put(val, 0, len);
+
+	}
+
+	public abstract byte[] getBytes() throws IOException;
 
 	/**
 	 * パケットサイズのオーバーラン確認

@@ -36,6 +36,21 @@ public final class PacketDnsHeader extends Packet {
 	}
 
 	/**
+	 * バイトイメージの取得
+	 * @return
+	 */
+	@Override
+	public byte[] getBytes() {
+		try {
+			return this.getBytes(0, length);
+		} catch (IOException e) {
+			//設計上の問題
+			Util.runtimeException(this, e);
+		}
+		return null; //これが返されることは無い
+	}
+
+	/**
 	 * 識別子の設定
 	 * @param val 識別子
 	 * @throws IOException

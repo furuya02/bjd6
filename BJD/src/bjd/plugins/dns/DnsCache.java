@@ -426,7 +426,7 @@ public class DnsCache {
 					continue;
 				}
 				//TTL=0のデータは普遍であるため、書き換えはしない
-				if (t.getTtl2() == 0) {
+				if (t.getTtl() == 0) {
 					return false;
 				}
 				//まったく同じデータが既に有る場合、書き換えはしない

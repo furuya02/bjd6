@@ -1,7 +1,5 @@
 package bjd.plugins.dns;
 
-import org.junit.internal.matchers.IsCollectionContaining;
-
 import bjd.ctrl.CtrlDat;
 import bjd.ctrl.OneCtrl;
 import bjd.option.ListVal;
