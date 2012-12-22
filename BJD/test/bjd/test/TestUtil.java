@@ -116,6 +116,17 @@ public final class TestUtil {
 	}
 
 	//************************************************
+	//パケットストリームの変換
+	//************************************************
+	public static byte[] hexStream2Bytes(String str) {
+		byte[] buf = new byte[str.length() / 2];
+		for (int i = 0; i < buf.length; i++) {
+			buf[i] = (byte) Integer.parseInt(str.substring(i * 2, (i + 1) * 2), 16);
+		}
+		return buf;
+	}
+
+	//************************************************
 	//コンソール出力用
 	//************************************************
 	public static String toString(byte[] buf) {
@@ -134,5 +145,24 @@ public final class TestUtil {
 		str = str.replaceAll("\r", "/r");
 		str = str.replaceAll("\n", "/n");
 		return str;
+	}
+
+	//************************************************
+	//待ち時間が長い場合に、コンソールの＊を表示する
+	//************************************************
+	public static void waitDisp() {
+		Runnable r = new Runnable() {
+			public void run() {
+				while (true) {
+					System.out.print("*");
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		};
+		Thread thr1 = new Thread(r);
+		thr1.start();
 	}
 }
