@@ -51,15 +51,11 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	private void initialize(ListPlugin listPlugin) {
 		getAr().clear();
 
-
-		
 		for (OneOption op : kernel.getListOption()) {
-
 
 			if (!op.getUseServer()) { //サーバオプション以外は対象外にする
 				continue;
 			}
-
 
 			//プラグイン情報の検索
 			OnePlugin onePlugin = listPlugin.get(op.getNameTag());
@@ -77,12 +73,14 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 				for (OneServer sv : getAr()) {
 					if (sv.getNameTag().indexOf("Web-") == 0) {
 						OneOption o = kernel.getListOption().get(sv.getNameTag());
-						//同一ポートの設定が既にリストされているかどうか
-						if (port == (int) o.getValue("port")) {
-							// バインドアドレスが競合しているかどうか
-							if (bindAddr.checkCompetition((BindAddr) o.getValue("bindAddress2"))) {
-								find = true;
-								break;
+						if (o != null) {
+							//同一ポートの設定が既にリストされているかどうか
+							if (port == (int) o.getValue("port")) {
+								// バインドアドレスが競合しているかどうか
+								if (bindAddr.checkCompetition((BindAddr) o.getValue("bindAddress2"))) {
+									find = true;
+									break;
+								}
 							}
 						}
 					}

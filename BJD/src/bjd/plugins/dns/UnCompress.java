@@ -19,7 +19,8 @@ public final class UnCompress {
 		char[] tmp = new char[buffer.length];
 		int d = 0;
 		while (true) {
-			byte c = buffer[offSet];
+			//byte c = buffer[offSet];
+			int c = buffer[offSet];
 			offSet++;
 			if (c == 0) {
 				//最後の.は残す
@@ -46,8 +47,7 @@ public final class UnCompress {
 				short off = (short) (off1 & 0x3FFF);
 				offSet = off;
 			} else {
-				//if (c >= 255) {
-				if (c >= (byte) 255) {
+				if (c >= 255) {
 					hostname = "";
 					return;
 				}

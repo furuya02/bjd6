@@ -33,8 +33,9 @@ public final class ListOption extends ListBase<OneOption> {
 		if (nameTag.equals("Basic")) {
 			return new OptionBasic(kernel, "");
 		}
-		Util.runtimeException(String.format("nameTag=%s", nameTag));
-		return null; //ランタイム例外が発生するので、このnullが返されることはない
+//		Util.runtimeException(String.format("nameTag=%s", nameTag));
+//		return null; //ランタイム例外が発生するので、このnullが返されることはない
+		return null;
 	}
 
 	/**

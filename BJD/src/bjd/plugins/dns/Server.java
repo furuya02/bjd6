@@ -8,24 +8,23 @@ import java.util.Random;
 import bjd.Kernel;
 import bjd.ValidObjException;
 import bjd.log.LogKind;
-import bjd.log.Logger;
 import bjd.net.Ip;
 import bjd.net.OneBind;
 import bjd.option.Conf;
 import bjd.option.Dat;
+import bjd.option.ListOption;
 import bjd.option.OneDat;
 import bjd.option.OneOption;
 import bjd.server.OneServer;
 import bjd.sock.SockObj;
 import bjd.sock.SockUdp;
-import bjd.util.BitConverter;
 import bjd.util.Util;
 
 public final class Server extends OneServer {
 
 	//キャッシュ
-	private DnsCache _rootCache;
-	private ArrayList<DnsCache> _cacheList = new ArrayList<DnsCache>();
+	private DnsCache rootCache;
+	private ArrayList<DnsCache> cacheList = new ArrayList<DnsCache>();
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel, "Dns", conf, oneBind);
@@ -35,7 +34,7 @@ public final class Server extends OneServer {
 		if ((new File(filename)).exists()) {
 			try {
 				//named.ca読み込み用コンストラクタ
-				_rootCache = new DnsCache(conf, filename);
+				rootCache = new DnsCache(conf, filename);
 				getLogger().set(LogKind.DETAIL, null, 6, filename);
 			} catch (IOException e) {
 				getLogger().set(LogKind.ERROR, null, 2, String.format("filename=%s", filename));
@@ -46,17 +45,21 @@ public final class Server extends OneServer {
 
 		//自己の管理するドメインの一覧を取得する
 		OneOption op = kernel.getListOption().get("DnsDomain");
-		//ArrayList<String> domainList = new ArrayList<String>();
-		for (OneDat o : (Dat) op.getValue("domainList")) {
-			if (o.isEnable()) {
-				//ドメインごとのリソースの読込
-				String domainName = o.getStrList().get(0);
-				OneOption res = kernel.getListOption().get("Resource-" + domainName);
-				//Assembly asm = Assembly.GetExecutingAssembly();
-				//)op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
+		if (op != null) {
+			//ArrayList<String> domainList = new ArrayList<String>();
+			for (OneDat o : (Dat) op.getValue("domainList")) {
+				if (o.isEnable()) {
+					//ドメインごとのリソースの読込
+					String domainName = o.getStrList().get(0);
+					OneOption res = kernel.getListOption().get("Resource-" + domainName);
+					if (res != null) {
+						//Assembly asm = Assembly.GetExecutingAssembly();
+						//)op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
 
-				Dat resource = (Dat) res.getValue("resourceList");
-				_cacheList.add(new DnsCache(getLogger(), conf, resource, domainName + "."));//.zone読み込み用コンストラクタ
+						Dat resource = (Dat) res.getValue("resourceList");
+						cacheList.add(new DnsCache(getLogger(), conf, resource, domainName + ".")); //.zone読み込み用コンストラクタ
+					}
+				}
 			}
 		}
 	}
@@ -115,7 +118,7 @@ public final class Server extends OneServer {
 			// （ドメイン名自身にアドレスが指定されている可能性が有る）
 			// A CNAME の場合、リクエスト名がホスト名を含まないドメイン名である可能性があるため
 			// 対象ドメインのキャッシュからＡレコードが存在するかどうかの確認を行う
-			for (DnsCache cache : _cacheList) {
+			for (DnsCache cache : cacheList) {
 				if (cache.getDomainName().equals(rp.getRequestName())) {
 					if (cache.Find(rp.getRequestName(), DnsType.A)) {
 						domainName = rp.getRequestName();
@@ -128,39 +131,39 @@ public final class Server extends OneServer {
 			domainName = rp.getRequestName();
 		}
 		//ログ出力（リクエスト解釈完了）
-		getLogger().set(LogKind.NORMAL, sockUdp, 8, String.format("%s %s (domain=%s)", rp.getDnsType(), rp.getRequestName(), domainName));//Query
+		getLogger().set(LogKind.NORMAL, sockUdp, 8, String.format("%s %s (domain=%s)", rp.getDnsType(), rp.getRequestName(), domainName)); //Query
 
 		boolean aa = false; // ドメインオーソリティ(管理ドメインかそうでないか)
 		boolean ra = true; //再帰可能
 
-		targetCache = _rootCache;//デフォルトはルートキャッシュ
+		targetCache = rootCache; //デフォルトはルートキャッシュ
 
 		if (rp.getDnsType() == DnsType.Ptr) {
 			if (rp.getRequestName().toUpperCase().equals("1.0.0.127.IN-ADDR.ARPA.")) {
 				//キャッシュはデフォルトであるルートキャッシュが使用される
 				aa = true;
-				getLogger().set(LogKind.DETAIL, sockUdp, 9, "");//"request to a domain under auto (localhost)"
+				getLogger().set(LogKind.DETAIL, sockUdp, 9, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (DnsCache cache : _cacheList) {
+				for (DnsCache cache : cacheList) {
 					if (cache.Find(rp.getRequestName(), DnsType.Ptr)) {
 						targetCache = cache;
 						aa = true;
-						getLogger().set(LogKind.DETAIL, sockUdp, 10, String.format("Resource={0}", targetCache.getDomainName()));//"request to a domain under management"
+						getLogger().set(LogKind.DETAIL, sockUdp, 10, String.format("Resource=%s", targetCache.getDomainName())); //"request to a domain under management"
 						break;
 					}
 				}
 			}
-		} else {//A
+		} else { //A
 			if (rp.getRequestName().toUpperCase().equals("LOCALHOST")) {
 				//キャッシュはデフォルトであるルートキャッシュが使用される
 				aa = true;
-				getLogger().set(LogKind.DETAIL, sockUdp, 11, "");//"request to a domain under auto (localhost)"
+				getLogger().set(LogKind.DETAIL, sockUdp, 11, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (DnsCache cache : _cacheList) {
-					if (cache.getDomainName().toUpperCase().equals(domainName.toUpperCase())) {//大文字で比較される
+				for (DnsCache cache : cacheList) {
+					if (cache.getDomainName().toUpperCase().equals(domainName.toUpperCase())) { //大文字で比較される
 						targetCache = cache;
 						aa = true;
-						getLogger().set(LogKind.DETAIL, sockUdp, 12, String.format("Resource=%s", domainName));//"request to a domain under management"
+						getLogger().set(LogKind.DETAIL, sockUdp, 12, String.format("Resource=%s", domainName)); //"request to a domain under management"
 						break;
 					}
 				}
@@ -169,7 +172,7 @@ public final class Server extends OneServer {
 		}
 
 		if (targetCache != null) {
-			targetCache.TtlClear();// 有効時間を過ぎたデータを削除する
+			targetCache.TtlClear(); // 有効時間を過ぎたデータを削除する
 		}
 
 		//管理するドメインでなく、かつ 再帰要求が無い場合は、処理を終わる
@@ -212,7 +215,7 @@ public final class Server extends OneServer {
 
 		// (B)「回答セクション」作成
 		ArrayList<OneRR> ansList = targetCache.Search(rp.getRequestName(), rp.getDnsType());
-		getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Answer Resurce (%s) Max=%d", rp.getDnsType(), ansList.size()));//"Search LocalCache"
+		getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Answer Resurce (%s) Max=%d", rp.getDnsType(), ansList.size())); //"Search LocalCache"
 		if (0 < ansList.size()) { //検索でヒットした場合
 			for (OneRR oneRR : ansList) {
 				getLogger().set(LogKind.DETAIL, sockUdp, 14, String.format("%s %s", rp.getDnsType(), oneRR)); //"Answer"
@@ -250,9 +253,9 @@ public final class Server extends OneServer {
 				//    }
 				//}
 				while (loop++ <= 15) {
-					getLogger().set(LogKind.DETAIL, sockUdp, 15, String.format("({0}) Max={1} Loop={2}", DnsType.Cname, rrList.size(), loop));//"Search LocalCache"
+					getLogger().set(LogKind.DETAIL, sockUdp, 15, String.format("(%s) Max=%s Loop=%s", DnsType.Cname, rrList.size(), loop)); //"Search LocalCache"
 					for (OneRR oneRR : rrList) {
-						getLogger().set(LogKind.DETAIL, sockUdp, 16, String.format("{0}", oneRR)); //"Answer CNAME"
+						getLogger().set(LogKind.DETAIL, sockUdp, 16, String.format("%s", oneRR)); //"Answer CNAME"
 						sp.addRR(RRKind.AN, oneRR.getName(), DnsType.Cname, oneRR.getTtl(), oneRR.getData());
 						ArrayList<OneRR> rr = targetCache.Search(oneRR.getName(), DnsType.A);
 						if (rr.size() == 0) {
@@ -271,7 +274,7 @@ public final class Server extends OneServer {
 		if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa) {
 			// (C)「権威セクション」「追加情報セクション」作成
 			ArrayList<OneRR> authList = targetCache.Search(domainName, DnsType.Ns);
-			getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Authority Resurce({0}) Max={1}", DnsType.Ns, authList.size()));
+			getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Authority Resurce(%s) Max=%s", DnsType.Ns, authList.size()));
 			for (OneRR oneRR : authList) {
 				sp.addRR(RRKind.NS, oneRR.getName(), DnsType.Ns, oneRR.getTtl(), oneRR.getData());
 				//「追加情報」
@@ -287,13 +290,229 @@ public final class Server extends OneServer {
 			}
 		}
 
-		sockUdp.send(sp.getBytes());//送信
+		sockUdp.send(sp.getBytes()); //送信
 		//sockUdp.Close();UDPソケット(sockUdp)はクローンなのでクローズしても、処理されない※Close()を呼び出しても問題はない
 		sockUdp.close();
 	}
 
+	//	//ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
+	//	boolean SearchLoop(String requestName, DnsType dnsType, int depth, Ip remoteAddr) throws IOException {
+	//
+	//		if (depth > 15) {
+	//			return false;
+	//		}
+	//
+	//		String domainName = requestName;
+	//		int index = requestName.indexOf('.');
+	//		if (index != -1) {
+	//			domainName = requestName.substring(index + 1);
+	//		}
+	//
+	//		// ネームサーバ情報取得
+	//		//ターゲットドメインのネームサーバを検索する
+	//		ArrayList<String> nsList = new ArrayList<String>();
+	//		ArrayList<OneRR> rrList = rootCache.Search(domainName, DnsType.Ns);
+	//		if (0 < rrList.size()) {
+	//			//             nsList.AddRange(rrList.Select(t => t.getName()));
+	//			for (OneRR o : rrList) {
+	//				nsList.add(o.getName());
+	//			}
+	//		} else { //キャッシュに存在しない場合は、ルートサーバをランダムにセットする
+	//			rrList = rootCache.Search(".", DnsType.Ns);
+	//
+	//			//var random = new Random(Environment.TickCount);
+	//			//int center = random.Next(rrList.size());//センタ位置をランダムに決定する
+	//			Random random = new Random();
+	//			int center = random.nextInt(rrList.size()); //センタ位置をランダムに決定する
+	//			for (int i = center; i < rrList.size(); i++) { //センタ以降の一覧を取得
+	//				nsList.add(rrList.get(i).getName());
+	//			}
+	//			for (int i = 0; i < center; i++) { //センタ以前の一覧をコピー
+	//				nsList.add(rrList.get(i).getName());
+	//			}
+	//		}
+	//
+	//		while (true) {
+	//			//rootCacheにターゲットのデータがキャッシュ（蓄積）されているかどうかを確認
+	//			if (rootCache.Find(requestName, dnsType)) {
+	//				return true; //検索完了
+	//			}
+	//			if (dnsType == DnsType.A) {
+	//				//DNS_TYPE.Aの場合、CNAME及びそのAレコードがキャッシュされている場合、蓄積完了となる
+	//				rrList = rootCache.Search(requestName, DnsType.Cname);
+	//
+	//				//boolean find = rrList.Any(t => _rootCache.Find(t.getName(), DnsType.A));
+	//				boolean find = false;
+	//				for (OneRR o : rrList) {
+	//					if (rootCache.Find(o.getName(), DnsType.A)) {
+	//						find = true;
+	//						break;
+	//					}
+	//				}
+	//				if (find) {
+	//					break;
+	//				}
+	//				//Ver5.5.4 CNAMEが発見された場合は、そのIPアドレス取得に移行する
+	//				if (rrList.size() > 0) {
+	//					requestName = rrList.get(0).getName();
+	//				}
+	//			}
+	//
+	//			//ネームサーバ一覧から、そのアドレスの一覧を作成する
+	//			ArrayList<Ip> nsAddrList = new ArrayList<Ip>();
+	//			for (String ns : nsList) {
+	//				rrList = rootCache.Search(ns, DnsType.A);
+	//				if (dnsType == DnsType.Aaaa) {
+	//					//AAAAでの検索の場合、AAAAのアドレス情報も有効にする
+	//					ArrayList<OneRR> tmpList = rootCache.Search(domainName, DnsType.Aaaa);
+	//					//rrList.AddRange(tmpList);
+	//					rrList.addAll(tmpList);
+	//				}
+	//
+	//				if (rrList.size() == 0) {
+	//					if (!SearchLoop(ns, dnsType, depth + 1, remoteAddr))//再帰処理
+	//						return false;
+	//					rrList = rootCache.Search(ns, dnsType);
+	//					if (rrList.size() == 0)
+	//						return false;
+	//				}
+	//
+	//				for (OneRR oneRR : rrList) {
+	//					//uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.getData(), 0));
+	//					int addr = BitConverter.ToUInt32(oneRR.getData(), 0);
+	//					Ip tmpIp = new Ip(addr);
+	//
+	//					if (oneRR.getDnsType() == DnsType.Aaaa) {
+	//						long v6H = BitConverter.ToUInt64(oneRR.getData(), 0);
+	//						long v6L = BitConverter.ToUInt64(oneRR.getData(), 8);
+	//						//tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
+	//						tmpIp = new Ip(v6H, v6L);
+	//					}
+	//					//boolean find = nsAddrList.Any(ip => ip == tmpIp);
+	//					boolean find = false;
+	//					for (Ip ip : nsAddrList) {
+	//						if (ip.equals(tmpIp)) {
+	//							find = true;
+	//							break;
+	//						}
+	//					}
+	//					if (!find) {
+	//						nsAddrList.add(tmpIp);
+	//					}
+	//				}
+	//
+	//			}
+	//			nsList.clear();
+	//
+	//			//ネームサーバのアドレスが取得できない場合、処理の継続はできない（検索不能）
+	//			if (nsAddrList.size() == 0) {
+	//				return false;
+	//			}
+	//
+	//			//0:検索中 1:発見 2:権威サーバ取得 (ドメインオーソリティからの名前エラーの場合は処理停止goto end)
+	//			int state = 0;
+	//			for (Ip ip : nsAddrList) {
+	//
+	//				//PacketDns rp = Lookup(ip.AddrV4, requestName, dnsType);
+	//				PacketDns rp = Lookup(ip, requestName, dnsType, remoteAddr);
+	//				if (rp != null) {
+	//					if (rp.getAA()) {//権威サーバの応答の場合
+	//						//ホストが存在しない　若しくは　回答フィールドが0の場合、処理停止
+	//						if (rp.getRcode() == 3 || rp.getCount(RRKind.AN) == 0) {
+	//							return false;
+	//						}
+	//					}
+	//					if (0 < rp.getCount(RRKind.AN)) { //回答フィールドが存在する場合
+	//						return true;
+	//						//break;
+	//					}
+	//					// 求めている回答は得ていないが、権威サーバを教えられた場合
+	//					// ネームサーバのリストを差し替える
+	//					for (int n = 0; n < rp.getCount(RRKind.NS); n++) {
+	//						OneRR oneRR = rp.getRR(RRKind.NS, n);
+	//						if (oneRR.getDnsType() == DnsType.Ns) {
+	//							nsList.add(oneRR.getName());
+	//							state = 2; //ネームサーバリストを取得した
+	//						}
+	//					}
+	//				}
+	//				//Lookupが成功した場合の処理
+	//				if (state != 0) {
+	//					break;
+	//				}
+	//
+	//			} //nsAddrListのループ処理（state==0の間のみ）
+	//		}
+	//		return false;
+	//	}
+
+	//addrは通常オーダで指定されている
+	//private PacketDns Lookup(Ip ip, String requestName, DNS_TYPE dnsType,RemoteInfo remoteInfo) {
+	private PacketDns Lookup(Ip ip, String requestName, DnsType dnsType, Ip remoteAddr) throws IOException {
+
+		//Ip ip = new Ip(addr);
+		getLogger().set(LogKind.DETAIL, null, 17, String.format("%s Server=%s Type=%s", requestName, ip.toString(), dnsType)); //"Lookup"
+
+		//受信タイムアウト
+		int timeout = 3;
+
+		//		var random = new Random(Environment.TickCount);
+		//		var id = (ushort) random.Next(0xFFFF);//識別子をランダムに決定する
+		Random random = new Random();
+		short id = (short) random.nextInt(0xFFFF);
+		boolean qr = false; //要求
+		boolean aa = false; //権威なし
+		boolean rd = (boolean) getConf().get("useRD"); //再帰要求を使用するかどうか
+		boolean ra = false; //再帰無効
+
+		//リクエストパケットの生成
+		PacketDns sp = new PacketDns(id, qr, aa, rd, ra);
+		sp.addRR(RRKind.QD, requestName, dnsType, 0, new byte[0]); //QR(質問)フィールド追加
+
+		int port = 53;
+		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
+		byte[] sendBuf = null;
+		sendBuf = sp.getBytes();
+		SockUdp sockUdp = new SockUdp(ip, port, timeout, null, sendBuf); //送信
+
+		//この辺のロジックを動作確認する必要がある
+		byte[] recvBuf = sockUdp.recv();
+		if (recvBuf != null) { //受信
+
+			try {
+				PacketDns rp = new PacketDns(recvBuf);
+
+				String str = String.format("requestName=%s count[%d,%d,%d,%d] rcode=%s AA=%s", requestName
+						, rp.getCount(RRKind.QD)
+						, rp.getCount(RRKind.AN)
+						, rp.getCount(RRKind.NS)
+						, rp.getCount(RRKind.AR)
+						, rp.getRcode()
+						, rp.getAA());
+				getLogger().set(LogKind.DETAIL, sockUdp, 18, str); //"Lookup"
+
+				//質問フィールの以外のリソースデータをキャッシュする
+				//for (int rr = 1; rr < 4; rr++) {
+				for (RRKind rr : RRKind.values()) {
+					int m = rp.getCount(rr);
+					for (int n = 0; n < m; n++) {
+						OneRR oneRR = rp.getRR(rr, n);
+						rootCache.Add(oneRR);
+					}
+				}
+				return rp;
+			} catch (IOException e) {
+				//ここでのエラーログも必要？
+				return null;
+			}
+		}
+
+		getLogger().set(LogKind.ERROR, sockUdp, 5, String.format("addr=%s requestName=%s dnsType=%s", remoteAddr, requestName, dnsType));//Lookup() パケット受信でタイムアウトが発生しました。
+		return null;
+	}
+
 	//ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
-	boolean SearchLoop(String requestName, DnsType dnsType, int depth, Ip remoteAddr) throws IOException {
+	boolean searchLoop(String requestName, DnsType dnsType, int depth, Ip remoteAddr) throws IOException {
 
 		if (depth > 15) {
 			return false;
@@ -308,39 +527,42 @@ public final class Server extends OneServer {
 		// ネームサーバ情報取得
 		//ターゲットドメインのネームサーバを検索する
 		ArrayList<String> nsList = new ArrayList<String>();
-		ArrayList<OneRR> rrList = _rootCache.Search(domainName, DnsType.Ns);
+		ArrayList<OneRR> rrList = rootCache.Search(domainName, DnsType.Ns);
 		if (0 < rrList.size()) {
-			//             nsList.AddRange(rrList.Select(t => t.getName()));
+			//nsList.AddRange(rrList.Select(t => t.N1));
 			for (OneRR o : rrList) {
 				nsList.add(o.getName());
 			}
 		} else { //キャッシュに存在しない場合は、ルートサーバをランダムにセットする
-			rrList = _rootCache.Search(".", DnsType.Ns);
+			rrList = rootCache.Search(".", DnsType.Ns);
 
 			//var random = new Random(Environment.TickCount);
-			//int center = random.Next(rrList.size());//センタ位置をランダムに決定する
+			//int center = random.Next(rrList.Count);//センタ位置をランダムに決定する
 			Random random = new Random();
-			int center = random.nextInt(rrList.size());//センタ位置をランダムに決定する
-			for (int i = center; i < rrList.size(); i++) {//センタ以降の一覧を取得
+			int center = random.nextInt(rrList.size()); //センタ位置をランダムに決定する
+
+			for (int i = center; i < rrList.size(); i++) { //センタ以降の一覧を取得
 				nsList.add(rrList.get(i).getName());
 			}
-			for (int i = 0; i < center; i++) {//センタ以前の一覧をコピー
+			for (int i = 0; i < center; i++) { //センタ以前の一覧をコピー
 				nsList.add(rrList.get(i).getName());
 			}
 		}
 
 		while (true) {
 			//rootCacheにターゲットのデータがキャッシュ（蓄積）されているかどうかを確認
-			if (_rootCache.Find(requestName, dnsType))
-				return true;//検索完了
+			if (rootCache.Find(requestName, dnsType)) {
+				return true; //検索完了
+			}
 			if (dnsType == DnsType.A) {
 				//DNS_TYPE.Aの場合、CNAME及びそのAレコードがキャッシュされている場合、蓄積完了となる
-				rrList = _rootCache.Search(requestName, DnsType.Cname);
+				rrList = rootCache.Search(requestName, DnsType.Cname);
 
-				//boolean find = rrList.Any(t => _rootCache.Find(t.getName(), DnsType.A));
+				//【このfindの実装がよく分からない】
+				//var find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
 				boolean find = false;
 				for (OneRR o : rrList) {
-					if (_rootCache.Find(o.getName(), DnsType.A)) {
+					if (rootCache.Find(o.getName(), DnsType.A)) {
 						find = true;
 						break;
 					}
@@ -348,6 +570,7 @@ public final class Server extends OneServer {
 				if (find) {
 					break;
 				}
+
 				//Ver5.5.4 CNAMEが発見された場合は、そのIPアドレス取得に移行する
 				if (rrList.size() > 0) {
 					requestName = rrList.get(0).getName();
@@ -357,34 +580,39 @@ public final class Server extends OneServer {
 			//ネームサーバ一覧から、そのアドレスの一覧を作成する
 			ArrayList<Ip> nsAddrList = new ArrayList<Ip>();
 			for (String ns : nsList) {
-				rrList = _rootCache.Search(ns, DnsType.A);
+				rrList = rootCache.Search(ns, DnsType.A);
 				if (dnsType == DnsType.Aaaa) {
 					//AAAAでの検索の場合、AAAAのアドレス情報も有効にする
-					ArrayList<OneRR> tmpList = _rootCache.Search(domainName, DnsType.Aaaa);
-					//rrList.AddRange(tmpList);
+					ArrayList<OneRR> tmpList = rootCache.Search(domainName, DnsType.Aaaa);
 					rrList.addAll(tmpList);
 				}
 
 				if (rrList.size() == 0) {
-					if (!SearchLoop(ns, dnsType, depth + 1, remoteAddr))//再帰処理
+					if (!searchLoop(ns, dnsType, depth + 1, remoteAddr)) { //再帰処理
 						return false;
-					rrList = _rootCache.Search(ns, dnsType);
-					if (rrList.size() == 0)
+					}
+					rrList = rootCache.Search(ns, dnsType);
+					if (rrList.size() == 0) {
 						return false;
+					}
 				}
 
-				for (OneRR oneRR : rrList) {
-					//uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.getData(), 0));
-					int addr = BitConverter.ToUInt32(oneRR.getData(), 0);
-					Ip tmpIp = new Ip(addr);
-
-					if (oneRR.getDnsType() == DnsType.Aaaa) {
-						long v6H = BitConverter.ToUInt64(oneRR.getData(), 0);
-						long v6L = BitConverter.ToUInt64(oneRR.getData(), 8);
-						//tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
-						tmpIp = new Ip(v6H, v6L);
+				for (OneRR o : rrList) {
+					Ip tmpIp = null;
+					if (o.getDnsType() == DnsType.A) {
+						tmpIp = ((RrA) o).getIp();
+					} else if (o.getDnsType() == DnsType.Aaaa) {
+						tmpIp = ((RrAaaa) o).getIp();
 					}
-					//boolean find = nsAddrList.Any(ip => ip == tmpIp);
+					//                    uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.Data, 0));
+					//                    Ip tmpIp = new Ip(addr);
+					//
+					//                    if (oneRR.getDnsType() == DnsType.Aaaa) {
+					//                        UInt64 v6H = BitConverter.ToUInt64(oneRR.Data,0);
+					//                        UInt64 v6L = BitConverter.ToUInt64(oneRR.Data,8);
+					//                        tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
+					//                    }
+					//var find = nsAddrList.Any(ip => ip == tmpIp);
 					boolean find = false;
 					for (Ip ip : nsAddrList) {
 						if (ip.equals(tmpIp)) {
@@ -412,7 +640,7 @@ public final class Server extends OneServer {
 				//PacketDns rp = Lookup(ip.AddrV4, requestName, dnsType);
 				PacketDns rp = Lookup(ip, requestName, dnsType, remoteAddr);
 				if (rp != null) {
-					if (rp.getAA()) {//権威サーバの応答の場合
+					if (rp.getAA()) { //権威サーバの応答の場合
 						//ホストが存在しない　若しくは　回答フィールドが0の場合、処理停止
 						if (rp.getRcode() == 3 || rp.getCount(RRKind.AN) == 0) {
 							return false;
@@ -431,8 +659,7 @@ public final class Server extends OneServer {
 							state = 2; //ネームサーバリストを取得した
 						}
 					}
-				}
-				//Lookupが成功した場合の処理
+				} //Lookupが成功した場合の処理
 				if (state != 0) {
 					break;
 				}
@@ -441,230 +668,6 @@ public final class Server extends OneServer {
 		}
 		return false;
 	}
-
-	//addrは通常オーダで指定されている
-	//private PacketDns Lookup(Ip ip, String requestName, DNS_TYPE dnsType,RemoteInfo remoteInfo) {
-	private PacketDns Lookup(Ip ip, String requestName, DnsType dnsType, Ip remoteAddr) throws IOException {
-
-		//Ip ip = new Ip(addr);
-		getLogger().set(LogKind.DETAIL, null, 17, String.format("%s Server=%s Type=%s", requestName, ip.toString(), dnsType));//"Lookup"
-
-		//受信タイムアウト
-		int timeout = 3;
-
-		//		var random = new Random(Environment.TickCount);
-		//		var id = (ushort) random.Next(0xFFFF);//識別子をランダムに決定する
-		Random random = new Random();
-		short id = (short) random.nextInt(0xFFFF);
-		boolean qr = false; //要求
-		boolean aa = false; //権威なし
-		boolean rd = (boolean) getConf().get("useRD");//再帰要求を使用するかどうか
-		boolean ra = false; //再帰無効
-
-		//リクエストパケットの生成
-		PacketDns sp = new PacketDns(id, qr, aa, rd, ra);
-		sp.addRR(RRKind.QD, requestName, dnsType, 0, new byte[0]); //QR(質問)フィールド追加
-
-		int port = 53;
-		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
-		byte[] sendBuf = null;
-		sendBuf = sp.getBytes();
-		SockUdp sockUdp = new SockUdp(ip, port, timeout, null, sendBuf); //送信
-
-		//この辺のロジックを動作確認する必要がある
-		byte[] recvBuf = sockUdp.recv();
-		if (recvBuf != null) {//受信
-
-			try {
-				PacketDns rp = new PacketDns(recvBuf);
-
-				String str = String.format("requestName=%s count[%d,%d,%d,%d] rcode=%s AA=%s", requestName
-						, rp.getCount(RRKind.QD)
-						, rp.getCount(RRKind.AN)
-						, rp.getCount(RRKind.NS)
-						, rp.getCount(RRKind.AR)
-						, rp.getRcode()
-						, rp.getAA());
-				getLogger().set(LogKind.DETAIL, sockUdp, 18, str);//"Lookup"
-
-				//質問フィールの以外のリソースデータをキャッシュする
-				//for (int rr = 1; rr < 4; rr++) {
-				for (RRKind rr : RRKind.values()) {
-					int m = rp.getCount(rr);
-					for (int n = 0; n < m; n++) {
-						OneRR oneRR = rp.getRR(rr, n);
-						_rootCache.Add(oneRR);
-					}
-				}
-				return rp;
-			} catch (IOException e) {
-				//ここでのエラーログも必要？
-				return null;
-			}
-		}
-
-		getLogger().set(LogKind.ERROR, sockUdp, 5, String.format("addr=%s requestName=%s dnsType=%s", remoteAddr, requestName, dnsType));//Lookup() パケット受信でタイムアウトが発生しました。
-		return null;
-	}
-
-	//ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する
-	boolean searchLoop(String requestName,DnsType dnsType,int depth,Ip remoteAddr) throws IOException {
-
-        if (depth > 15){
-            return false;
-        }
-
-        String domainName = requestName;
-        int index = requestName.indexOf('.');
-        if (index != -1)
-            domainName = requestName.substring(index + 1);
-
-        // ネームサーバ情報取得
-        //ターゲットドメインのネームサーバを検索する
-        ArrayList<String> nsList = new ArrayList<String>();
-        ArrayList<OneRR> rrList = _rootCache.Search(domainName, DnsType.Ns);
-        if (0 < rrList.size()) {
-            //nsList.AddRange(rrList.Select(t => t.N1));
-        	for(OneRR o : rrList){
-        		nsList.add(o.getName());
-        	}
-        } else {//キャッシュに存在しない場合は、ルートサーバをランダムにセットする
-            rrList = _rootCache.Search(".", DnsType.Ns);
-
-            //var random = new Random(Environment.TickCount);
-            //int center = random.Next(rrList.Count);//センタ位置をランダムに決定する
-            Random random = new Random();
-            int center = random.nextInt(rrList.size());//センタ位置をランダムに決定する
-            
-            for (int i = center; i < rrList.size(); i++){//センタ以降の一覧を取得
-                nsList.add(rrList.get(i).getName());
-            }
-            for (int i = 0; i < center; i++){//センタ以前の一覧をコピー
-                nsList.add(rrList.get(i).getName());
-            }
-        }
-
-        while (true) {
-            //rootCacheにターゲットのデータがキャッシュ（蓄積）されているかどうかを確認
-            if (_rootCache.Find(requestName, dnsType))
-                return true;//検索完了
-            if (dnsType == DnsType.A) {
-                //DNS_TYPE.Aの場合、CNAME及びそのAレコードがキャッシュされている場合、蓄積完了となる
-                rrList = _rootCache.Search(requestName, DnsType.Cname);
-                
-                //【このfindの実装がよく分からない】
-                //var find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
-                boolean find = false;
-                for(OneRR o : rrList){
-                	if(_rootCache.Find(o.getName(), DnsType.A)){
-                		find = true;
-                		break;
-                	}
-                }
-                if (find){
-                    break;
-                }
-                
-                
-                //Ver5.5.4 CNAMEが発見された場合は、そのIPアドレス取得に移行する
-                if (rrList.size() > 0) {
-                    requestName = rrList.get(0).getName();
-                }
-            }
-            
-            //ネームサーバ一覧から、そのアドレスの一覧を作成する
-            ArrayList<Ip> nsAddrList = new ArrayList<Ip>();
-            for (String ns : nsList) {
-                rrList = _rootCache.Search(ns,DnsType.A);
-                if (dnsType == DnsType.Aaaa){
-                //AAAAでの検索の場合、AAAAのアドレス情報も有効にする
-                    ArrayList<OneRR> tmpList = _rootCache.Search(domainName,DnsType.Aaaa);
-                    rrList.addAll(tmpList);
-                }
-
-
-                if (rrList.size() == 0) {
-                    if (!SearchLoop(ns, dnsType, depth + 1, remoteAddr)){//再帰処理
-                        return false;
-                    }
-                    rrList = _rootCache.Search(ns,dnsType);
-                    if (rrList.size() == 0){
-                        return false;
-                    }
-                }
-
-                for (OneRR o : rrList) {
-                	Ip tmpIp = null;
-                	if(o.getDnsType()==DnsType.A){
-                		tmpIp = ((RrA)o).getIp();
-                	}else if(o.getDnsType()==DnsType.Aaaa){
-                		tmpIp = ((RrAaaa)o).getIp();
-                	}
-//                    uint addr = Util.htonl(BitConverter.ToUInt32(oneRR.Data, 0));
-//                    Ip tmpIp = new Ip(addr);
-//
-//                    if (oneRR.getDnsType() == DnsType.Aaaa) {
-//                        UInt64 v6H = BitConverter.ToUInt64(oneRR.Data,0);
-//                        UInt64 v6L = BitConverter.ToUInt64(oneRR.Data,8);
-//                        tmpIp = new Ip(Util.htonl(v6H),Util.htonl(v6L));
-//                    }
-                	//var find = nsAddrList.Any(ip => ip == tmpIp);
-                	boolean find=false;
-                    for(Ip ip : nsAddrList){
-                    	if(ip.equals(tmpIp)){
-                    		find=true;
-                    		break;
-                    	}
-                    }
-                    if (!find) {
-                        nsAddrList.add(tmpIp);
-                    }
-                }
-
-            }
-            nsList.clear();
-
-            //ネームサーバのアドレスが取得できない場合、処理の継続はできない（検索不能）
-            if (nsAddrList.size() == 0){
-                return false;
-            }
-                
-            //0:検索中 1:発見 2:権威サーバ取得 (ドメインオーソリティからの名前エラーの場合は処理停止goto end)
-            int state = 0;
-            for (Ip ip : nsAddrList) {
-
-                //PacketDns rp = Lookup(ip.AddrV4, requestName, dnsType);
-                PacketDns rp = Lookup(ip,requestName,dnsType,remoteAddr);
-                if (rp != null) {
-                    if (rp.getAA()) { //権威サーバの応答の場合
-                        //ホストが存在しない　若しくは　回答フィールドが0の場合、処理停止
-                        if (rp.getRcode() == 3 || rp.getCount(RRKind.AN) == 0) {
-                            return false;
-                        }
-                    }
-                    if (0 < rp.getCount(RRKind.AN)) { //回答フィールドが存在する場合
-                        return true;
-                        //break;
-                    }
-                    // 求めている回答は得ていないが、権威サーバを教えられた場合
-                    // ネームサーバのリストを差し替える
-                    for (int n = 0; n < rp.getCount(RRKind.NS); n++) {
-                        OneRR oneRR = rp.getRR(RRKind.NS, n);
-                        if (oneRR.getDnsType() == DnsType.Ns) {
-                            nsList.add(oneRR.getName());
-                            state = 2; //ネームサーバリストを取得した
-                        }
-                    }
-                } //Lookupが成功した場合の処理
-                if (state != 0){
-                    break;
-                }
-
-            } //nsAddrListのループ処理（state==0の間のみ）
-        }
-end:
-        return false;
-    }
 
 	public String getMsg(int messageNo) {
 		switch (messageNo) {

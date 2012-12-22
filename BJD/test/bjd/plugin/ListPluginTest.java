@@ -32,7 +32,7 @@ public final class ListPluginTest {
 		TestUtil.prompt(String.format("対象フォルダ　plugin = new Plugin(%s)", dir));
 		ListPlugin listPlugin = new ListPlugin(dir);
 		TestUtil.prompt(String.format("列挙数 plugin.length()=%d　件", listPlugin.size()));
-		assertThat(listPlugin.size(), is(0));
+		assertThat(listPlugin.size(), is(3));
 		for (OnePlugin onePlugin : listPlugin) {
 			//Optionインスタンス生成
 			OneOption oneOption = onePlugin.createOption(kernel);
