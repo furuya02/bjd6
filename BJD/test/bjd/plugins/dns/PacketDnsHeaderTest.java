@@ -6,12 +6,23 @@ import static org.junit.Assert.*;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public final class PacketDnsHeaderTest {
 
-	private byte[] data0 = new byte[] { 0x00, 0x03, (byte) 0x81, (byte) 0x80, 0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04 };
+	private byte[] data0;
+	private String str0 = "000381800001000200030004";
 
+	@Before
+	public void before() {
+		//str0 -> data0
+		data0 = new byte[str0.length() / 2];
+		for (int i = 0; i < data0.length; i++) {
+			data0[i] = (byte) Integer.parseInt(str0.substring(i * 2, (i + 1) * 2), 16);
+		}
+	}
+	
 	@Test
 	public void getClsの確認() throws Exception {
 		//setUp

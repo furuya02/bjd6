@@ -3,13 +3,25 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public final class PacketRRTest {
 
 	//type= 0x0002 class=0x0001 ttl=0x00011e86 dlen=0x0006 data=036e7332c00c
-	private byte[] data0 = new byte[] { 0x00, 0x02, 0x00, 0x01, 0x00, 0x01, 0x1e, (byte) 0x86, 0x00, 0x06, 0x03, 0x6e, 0x73, 0x32, (byte) 0xc0, 0x0c };
+	private byte[] data0;
+	private String str0 = "0002000100011e860006036e7332c00c";
 
+	@Before
+	public void before() {
+		//str0 -> data0
+		data0 = new byte[str0.length() / 2];
+		for (int i = 0; i < data0.length; i++) {
+			data0[i] = (byte) Integer.parseInt(str0.substring(i * 2, (i + 1) * 2), 16);
+		}
+	}
+
+	
 	@Test
 	public void getClsの確認() throws Exception {
 		//setUp

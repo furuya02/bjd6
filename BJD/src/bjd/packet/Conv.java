@@ -3,6 +3,11 @@ package bjd.packet;
 import java.nio.ByteBuffer;
 
 public final class Conv {
+	
+	//デフォルトコンストラクタの隠蔽
+	private Conv() {
+		
+	}
 
 	public static byte[] getBytes(short val) {
 		byte[] buf = { (byte) (val >> 8), (byte) val };
@@ -28,7 +33,7 @@ public final class Conv {
 	}
 
 	public static long getLong(byte[] buf) {
-		return getLong(buf,0);
+		return getLong(buf, 0);
 	}
 
 	public static long getLong(byte[] buf, int offset) {

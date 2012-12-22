@@ -3,6 +3,7 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import bjd.net.Ip;
@@ -10,17 +11,18 @@ import bjd.net.Ip;
 public final class PacketDnsTest {
 
 	//www.google.com のAレコードをリクエストした時のレスポンス
-	private byte[] data0 = new byte[] { 0x00, 0x03, (byte) 0x81, (byte) 0x80, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x04,
-			0x03, 0x77, 0x77, 0x77, 0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00, 0x00, 0x1c,
-			0x00, 0x01, (byte) 0xc0, 0x10, 0x00, 0x02, 0x00, 0x01, 0x00, 0x01, 0x45, (byte) 0xc8, 0x00, 0x06, 0x03, 0x6e,
-			0x73, 0x34, (byte) 0xc0, 0x10, (byte) 0xc0, 0x10, 0x00, 0x02, 0x00, 0x01, 0x00, 0x01, 0x45, (byte) 0xc8, 0x00,
-			0x06, 0x03, 0x6e, 0x73, 0x32, (byte) 0xc0, 0x10, (byte) 0xc0, 0x10, 0x00, 0x02, 0x00, 0x01, 0x00, 0x01, 0x45,
-			(byte) 0xc8, 0x00, 0x06, 0x03, 0x6e, 0x73, 0x33, (byte) 0xc0, 0x10, (byte) 0xc0, 0x10, 0x00, 0x02, 0x00, 0x01,
-			0x00, 0x01, 0x45, (byte) 0xc8, 0x00, 0x06, 0x03, 0x6e, 0x73, 0x31, (byte) 0xc0, 0x10, (byte) 0xc0, 0x62, 0x00,
-			0x01, 0x00, 0x01, 0x00, 0x01, 0x46, 0x09, 0x00, 0x04, (byte) 0xd8, (byte) 0xef, 0x20, 0x0a, (byte) 0xc0, 0x3e,
-			0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x46, 0x6b, 0x00, 0x04, (byte) 0xd8, (byte) 0xef, 0x22, 0x0a, (byte) 0xc0,
-			0x50, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x46, 0x09, 0x00, 0x04, (byte) 0xd8, (byte) 0xef, 0x24, 0x0a,
-			(byte) 0xc0, 0x2c, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x46, 0x09, 0x00, 0x04, (byte) 0xd8, (byte) 0xef, 0x26, 0x0a };
+	private byte[] data0;
+	private String str0 = "0003818000010000000400040377777706676f6f676c6503636f6d00001c0001c01000020001000145c80006036e7334c010c01000020001000145c80006036e7332c010c01000020001000145c80006036e7333c010c01000020001000145c80006036e7331c010c06200010001000146090004d8ef200ac03e000100010001466b0004d8ef220ac05000010001000146090004d8ef240ac02c00010001000146090004d8ef260a";
+
+	
+	@Before
+	public void before() {
+		//str0 -> data0
+		data0 = new byte[str0.length() / 2];
+		for (int i = 0; i < data0.length; i++) {
+			data0[i] = (byte) Integer.parseInt(str0.substring(i * 2, (i + 1) * 2), 16);
+		}
+	}
 
 	@Test
 	public void getIdの確認() throws Exception {
@@ -154,7 +156,6 @@ public final class PacketDnsTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
 
 	@Test
 	public void getRR_NS1の確認() throws Exception {
@@ -166,7 +167,7 @@ public final class PacketDnsTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_NS2の確認() throws Exception {
 		//setUp
@@ -177,7 +178,7 @@ public final class PacketDnsTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_NS3の確認() throws Exception {
 		//setUp
@@ -188,51 +189,49 @@ public final class PacketDnsTest {
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_AR0の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(data0);
-		OneRR expected = (new RrA("ns1.google.com.", 0,new Ip("216.239.32.10")));
+		OneRR expected = (new RrA("ns1.google.com.", 0, new Ip("216.239.32.10")));
 		//exercise
-		OneRR actual = sut.getRR(RRKind.AR, 0); 
+		OneRR actual = sut.getRR(RRKind.AR, 0);
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_AR1の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(data0);
-		OneRR expected = (new RrA("ns2.google.com.", 0,new Ip("216.239.34.10")));
+		OneRR expected = (new RrA("ns2.google.com.", 0, new Ip("216.239.34.10")));
 		//exercise
-		OneRR actual = sut.getRR(RRKind.AR, 1); 
+		OneRR actual = sut.getRR(RRKind.AR, 1);
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_AR2の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(data0);
-		OneRR expected = (new RrA("ns3.google.com.", 0,new Ip("216.239.36.10")));
+		OneRR expected = (new RrA("ns3.google.com.", 0, new Ip("216.239.36.10")));
 		//exercise
-		OneRR actual = sut.getRR(RRKind.AR, 2); 
+		OneRR actual = sut.getRR(RRKind.AR, 2);
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
+
 	@Test
 	public void getRR_AR3の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(data0);
-		OneRR expected = (new RrA("ns4.google.com.", 0,new Ip("216.239.38.10")));
+		OneRR expected = (new RrA("ns4.google.com.", 0, new Ip("216.239.38.10")));
 		//exercise
-		OneRR actual = sut.getRR(RRKind.AR, 3); 
+		OneRR actual = sut.getRR(RRKind.AR, 3);
 		//verify
 		assertThat(actual, is(expected));
 	}
-	
-	
 
 }
