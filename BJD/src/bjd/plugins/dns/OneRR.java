@@ -66,6 +66,9 @@ public class OneRR {
 		if (dnsType != r.getDnsType()) {
 			return false;
 		}
+		if (ttl != r.getTtl()) {
+			return false;
+		}
 		byte[] tmp = r.getData();
 		if (data.length != tmp.length) {
 			return false;
@@ -77,7 +80,7 @@ public class OneRR {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public final int hashCode() {
 		assert false : "Use is not assumed.";
@@ -90,6 +93,8 @@ public class OneRR {
 		sb.append(name);
 		sb.append(" ");
 		sb.append(dnsType);
+		sb.append(" ");
+		sb.append(String.format("TTL=0x%x", ttl));
 		sb.append(" ");
 
 		if (data.length != 0) {
