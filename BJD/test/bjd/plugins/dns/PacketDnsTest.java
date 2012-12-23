@@ -141,7 +141,7 @@ public final class PacketDnsTest {
 	public void getRR_NS0の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrNs("google.com.", 0, "ns4.google.com."));
+		OneRr expected = (new RrNs("google.com.", 83400, "ns4.google.com."));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.NS, 0);
 		//verify
@@ -152,7 +152,7 @@ public final class PacketDnsTest {
 	public void getRR_NS1の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrNs("google.com.", 0, "ns2.google.com."));
+		OneRr expected = (new RrNs("google.com.", 83400, "ns2.google.com."));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.NS, 1);
 		//verify
@@ -163,7 +163,7 @@ public final class PacketDnsTest {
 	public void getRR_NS2の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrNs("google.com.", 0, "ns3.google.com."));
+		OneRr expected = (new RrNs("google.com.", 83400, "ns3.google.com."));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.NS, 2);
 		//verify
@@ -174,7 +174,7 @@ public final class PacketDnsTest {
 	public void getRR_NS3の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrNs("google.com.", 0, "ns1.google.com."));
+		OneRr expected = (new RrNs("google.com.", 83400, "ns1.google.com."));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.NS, 3);
 		//verify
@@ -185,7 +185,7 @@ public final class PacketDnsTest {
 	public void getRR_AR0の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrA("ns1.google.com.", 0, new Ip("216.239.32.10")));
+		OneRr expected = (new RrA("ns1.google.com.", 83465, new Ip("216.239.32.10")));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.AR, 0);
 		//verify
@@ -196,7 +196,7 @@ public final class PacketDnsTest {
 	public void getRR_AR1の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrA("ns2.google.com.", 0, new Ip("216.239.34.10")));
+		OneRr expected = (new RrA("ns2.google.com.", 83563, new Ip("216.239.34.10")));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.AR, 1);
 		//verify
@@ -207,7 +207,7 @@ public final class PacketDnsTest {
 	public void getRR_AR2の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrA("ns3.google.com.", 0, new Ip("216.239.36.10")));
+		OneRr expected = (new RrA("ns3.google.com.", 83465, new Ip("216.239.36.10")));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.AR, 2);
 		//verify
@@ -218,7 +218,7 @@ public final class PacketDnsTest {
 	public void getRR_AR3の確認() throws Exception {
 		//setUp
 		PacketDns sut = new PacketDns(TestUtil.hexStream2Bytes(str0));
-		OneRr expected = (new RrA("ns4.google.com.", 0, new Ip("216.239.38.10")));
+		OneRr expected = (new RrA("ns4.google.com.", 83465, new Ip("216.239.38.10")));
 		//exercise
 		OneRr actual = sut.getRR(RrKind.AR, 3);
 		//verify
