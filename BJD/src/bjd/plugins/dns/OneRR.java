@@ -117,45 +117,6 @@ public abstract class OneRr {
 		assert false : "Use is not assumed.";
 		return 101;
 	}
-	
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(name);
-		sb.append(" ");
-		sb.append(dnsType);
-		sb.append(" ");
-		sb.append(String.format("TTL=0x%x", ttl));
-		sb.append(" ");
-
-		if (data.length != 0) {
-			if (dnsType == DnsType.A) {
-				Ip ip = new Ip(ByteBuffer.wrap(data, 0, 4).getInt());
-
-				sb.append(ip.toString());
-				sb.append(" ");
-			}
-			if (dnsType == DnsType.Aaaa) {
-				//var v6H = BitConverter.ToUInt64(Data, 0);
-				long v6H = ByteBuffer.wrap(data, 0, 8).getLong();
-				//var v6L = BitConverter.ToUInt64(Data, 8);
-				long v6L = ByteBuffer.wrap(data, 8, 16).getLong();
-				Ip ip = new Ip(Util.htonl(v6H), Util.htonl(v6L));
-
-				sb.append(ip.toString());
-				sb.append(" ");
-			}
-			if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns) {
-				byte[] dataName = Arrays.copyOfRange(data, 0, data.length);
-				sb.append(DnsUtil.dnsName2Str(dataName));
-				sb.append(" ");
-
-			}
-		}
-		//		return dnsType == DnsType.Soa ? name : "ERROR";
-		return sb.toString();
-	}
-
 	/**
 	 * データの有効・無効判断
 	 * @param now

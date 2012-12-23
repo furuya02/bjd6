@@ -18,7 +18,7 @@ STRING=BasicaclName=
 STRING=BasicaclAddress=
 LIST=LognormalLogKind=2
 LIST=LogsecureLogKind=2
-FOLDER=LogsaveDirectory=
+FOLDER=LogsaveDirectory=C:\dev
 BOOL=LoguseLogFile=true
 BOOL=LoguseLogClear=false
 INT=LogsaveDays=31
@@ -75,7 +75,7 @@ DAT=Ftpuser=	0	C:\dev\bjd6\work\FtpTestDir	user1	***	2	C:\dev\bjd6\work\FtpTes
 RADIO=FtpenableAcl=1
 STRING=FtpaclName=
 STRING=FtpaclAddress=
-BOOL=SampleuseServer=false
+BOOL=SampleuseServer=true
 LIST=SampleprotocolKind=0
 INT=Sampleport=9999
 BINDADDR=SamplebindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT

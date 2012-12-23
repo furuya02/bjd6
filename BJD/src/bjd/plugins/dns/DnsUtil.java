@@ -49,17 +49,18 @@ public final class DnsUtil {
 		String[] tmp = name.split("\\.");
 		//最初の文字カウントと最後の'\0'分を追加（途中の.は文字カウント分として使用される）
 		//www.nifty.com  -> 03www05nifty03com00
-		byte [] data = new byte[name.length() + 2];
+		byte[] data = new byte[name.length() + 2];
 		int d = 0;
 		for (String t : tmp) {
 			data[d++] = (byte) t.length();
-			byte [] dd = t.getBytes(); //Encoding.ASCII.GetBytes(t);
+			byte[] dd = t.getBytes(); //Encoding.ASCII.GetBytes(t);
 			for (int e = 0; e < t.length(); e++) {
 				data[d++] = dd[e];
 			}
 		}
 		return data;
 	}
+
 	public static DnsType short2DnsType(short d) {
 		switch (d) {
 			case 0x0001:
@@ -137,5 +138,27 @@ public final class DnsUtil {
 		}
 		return 0x0000;
 	}
-	
+
+	public static OneRr createRr(String name, DnsType dnsType, int ttl, byte[] data) {
+		switch (dnsType) {
+			case A:
+				return new RrA(name, ttl, data);
+			case Aaaa:
+				return new RrAaaa(name, ttl, data);
+			case Ns:
+				return new RrNs(name, ttl, data);
+			case Mx:
+				return new RrMx(name, ttl, data);
+			case Soa:
+				return new RrSoa(name, ttl, data);
+			case Ptr:
+				return new RrPtr(name, ttl, data);
+			case Cname:
+				return new RrCname(name, ttl, data);
+			default:
+				Util.runtimeException(String.format("DnsUtil.creaetRr() not implement. DnsType=%s", dnsType));
+		}
+		return null; //これが返されることはない
+	}
+
 }

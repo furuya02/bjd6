@@ -167,7 +167,7 @@ public final class PacketDns {
 							break;
 					}
 				} else if (dnsType == DnsType.Mx) {
-					short preference = BitConverter.ToUInt16(buffer, offset + 10);
+					short preference = Conv.getShort(buffer, offset + 10);
 					UnCompress u2 = new UnCompress(buffer, offset + 12);
 					oneRr = new RrMx(name, ttl, preference, u2.getHostName());
 				} else if (dnsType == DnsType.Soa) {
@@ -223,6 +223,7 @@ public final class PacketDns {
 	public OneRr getRR(RrKind rrKind, int no) {
 		return ar[rrKind.getIntValue()].get(no);
 	}
+
 
 	/**
 	 * 質問フィールドのDNSタイプ取得
@@ -291,11 +292,10 @@ public final class PacketDns {
 				if (dnsType == DnsType.Ns || dnsType == DnsType.Cname || dnsType == DnsType.Ptr) {
 					data = (new Compress(buffer, o.getData())).getData(); //圧縮
 				} else if (dnsType == DnsType.Mx) {
-					//ushort preference = BitConverter.ToUInt16(oneRR.Data, 0);
-					short preference = BitConverter.ToUInt16(o.getData(), 0);
+					short preference = Conv.getShort(o.getData(), 0);
 					dataName = new byte[o.getData().length - 2];
-
-					dataName = Buffer.BlockCopy(o.getData(), 2, o.getData().length - 2);
+					//dataName = Buffer.BlockCopy(o.getData(), 2, o.getData().length - 2);
+					System.arraycopy(o.getData(), 2,dataName,0, o.getData().length - 2);
 
 					dataName = (new Compress(buffer, dataName)).getData(); //圧縮
 					data = Bytes.create(preference, dataName);

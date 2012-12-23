@@ -1,5 +1,6 @@
 package bjd.plugins.dns;
 
+import bjd.packet.Conv;
 import bjd.util.BitConverter;
 
 /**
@@ -36,7 +37,7 @@ public final class UnCompress {
 			}
 			if ((c & 0xC0) == 0xC0) { // 圧縮ラベル
 				//ushort off1 = Util.htons(BitConverter.ToUInt16(buffer, offSet - 1));
-				short off1 = BitConverter.ToUInt16(buffer, offSet - 1);
+				short off1 = Conv.getShort(buffer, offSet - 1);
 				// 圧縮ラベルを使用した直後は、s+2を返す
 				// 圧縮ラベルの再帰の場合は、ポインタを保存しない
 				if (!compress) {

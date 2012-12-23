@@ -10,17 +10,46 @@ public final class RrSoa extends OneRr {
 				Conv.getBytes(minimum)));
 	}
 
-//	public short getPreference() {
-//		return Conv.getShort(this.getData(0, 2));
-//	}
-//
-//	public String getMailExchangeHost() {
-//		return DnsUtil.dnsName2Str(this.getData(2));
-//	}
+	public RrSoa(String name, int ttl, byte[] data) {
+		super(name, DnsType.Soa, ttl, data);
+	}
+
+	public String getNameServer() {
+		return DnsUtil.dnsName2Str(getData());
+	}
+
+	public String getPostMaster() {
+		return DnsUtil.dnsName2Str(getData(getNameServer().length() + 1));
+	}
+
+	int getInt(int offset) {
+		int p = getNameServer().length() + getPostMaster().length() + 2;
+		return Conv.getInt(getData(), p + offset);
+	}
+
+	public int getSerial() {
+		return getInt(0);
+	}
+
+	public int getRefresh() {
+		return getInt(4);
+	}
+
+	public int getRetry() {
+		return getInt(8);
+	}
+
+	public int getExpire() {
+		return getInt(12);
+	}
+
+	public int getMinimum() {
+		return getInt(16);
+	}
 
 	@Override
 	public String toString() {
-		return String.format("%s %s TTL=%d", getDnsType(), getName(), getTtl());
+		return String.format("%s %s TTL=%d %d %d %d %d %d", getDnsType(), getName(), getTtl(), getSerial(), getRefresh(), getRetry(), getExpire(), getMinimum());
 	}
 
 }

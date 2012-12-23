@@ -25,7 +25,7 @@ public final class RrAaaaTest {
 	}
 
 	@Test
-	public void OneRRとの比較() throws Exception {
+	public void バイナリ初期化との比較() throws Exception {
 		//setUp
 		RrAaaa sut = new RrAaaa("aaa.com", 64800, new Ip("::1"));
 		OneRr expected = new RrAaaa("aaa.com", 64800, new byte[] { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 });
@@ -36,7 +36,7 @@ public final class RrAaaaTest {
 	}
 
 	@Test
-	public void 実パケット生成したOneRRとの比較() throws Exception {
+	public void 実パケット生成したオブジェクトとの比較() throws Exception {
 		//setUp
 		RrAaaa sut = new RrAaaa("orange.kame.net", 0x00015180, new Ip("2001:200:dff:fff1:216:3eff:feb1:44d7"));
 		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);

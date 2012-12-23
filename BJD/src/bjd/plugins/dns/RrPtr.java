@@ -6,6 +6,10 @@ public final class RrPtr extends OneRr {
 		super(name, DnsType.Ptr, ttl, DnsUtil.str2DnsName(ptr));
 	}
 
+	public RrPtr(String name, int ttl, byte[] data) {
+		super(name, DnsType.Ptr, ttl, data);
+	}
+
 	public String getPtr() {
 		return DnsUtil.dnsName2Str(this.getData());
 	}

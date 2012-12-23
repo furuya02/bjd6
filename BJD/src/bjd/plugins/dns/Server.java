@@ -220,7 +220,7 @@ public final class Server extends OneServer {
 			for (OneRr oneRR : ansList) {
 				getLogger().set(LogKind.DETAIL, sockUdp, 14, String.format("%s %s", rp.getDnsType(), oneRR)); //"Answer"
 
-				sp.addRR(RrKind.AN, rp.getRequestName(), rp.getDnsType(), oneRR.getTtl(), oneRR.getData());
+				sp.addRR(RrKind.AN, DnsUtil.createRr(rp.getRequestName(), rp.getDnsType(), oneRR.getTtl(), oneRR.getData()));
 				if (rp.getDnsType() == DnsType.Mx || rp.getDnsType() == DnsType.Cname || rp.getDnsType() == DnsType.Ns) {
 
 					//追加情報が必要な場合 （Aレコード）をパケットに追加する

@@ -1,5 +1,6 @@
 package bjd.plugins.dns;
 
+import bjd.packet.Conv;
 import bjd.util.BitConverter;
 import bjd.util.Buffer;
 import bjd.util.Bytes;
@@ -29,19 +30,19 @@ public final class Compress {
 				// 圧縮可能な同一パターンを検索する
 				int len = dataName.length - src; //残りの文字列数
 				byte[] target = new byte[len];
-				target = Buffer.BlockCopy(dataName, src, len);
+				//target = Buffer.BlockCopy(dataName, src, len);
+				System.arraycopy(dataName, src, target, 0, len);
 
 				//パケットのヘッダ以降が検索対象になる（bufferは、ヘッダの後ろに位置しているので先頭は0となる）
 				int off = 12; // 検索開始位置(ヘッダ以降)
 				index = Bytes.indexOf(buffer, off, target);
 			}
 			if (0 <= index) { // 圧縮可能な場合
-				//int c = Util.htons((ushort)(0xC000 | (index)));//本当の位置はヘッダ分を追加したindex+12となる
-				int c = 0xC000 | index; //本当の位置はヘッダ分を追加したindex+12となる
-				byte[] cc = BitConverter.GetBytes(c);
-				//Buffer.BlockCopy(cc, 0, buf, dst, 2);
-				buf[dst] = cc[0];
-				buf[dst + 1] = cc[1];
+				int c = 0xC000 | index;
+				byte[] cc = Conv.getBytes(c);
+				buf[dst] = cc[2];
+				buf[dst + 1] = cc[3];
+
 				dst += 2;
 				break;
 			}
@@ -56,7 +57,8 @@ public final class Compress {
 		}
 		//有効文字数分のみコピーする
 		data = new byte[dst];
-		data = Buffer.BlockCopy(buf, 0, dst);
+		//data = Buffer.BlockCopy(buf, 0, dst);
+		System.arraycopy(buf, 0, data, 0, dst);
 	}
 
 	public byte[] getData() {
