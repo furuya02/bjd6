@@ -3,10 +3,10 @@ package bjd.packet;
 import java.nio.ByteBuffer;
 
 public final class Conv {
-	
+
 	//デフォルトコンストラクタの隠蔽
 	private Conv() {
-		
+
 	}
 
 	public static byte[] getBytes(short val) {
@@ -25,19 +25,27 @@ public final class Conv {
 	}
 
 	public static short getShort(byte[] buf) {
-		return ByteBuffer.wrap(buf).getShort();
+		return ByteBuffer.wrap(buf, 0, 2).getShort();
+	}
+
+	public static short getShort(byte[] buf, int offset) {
+		return ByteBuffer.wrap(buf, offset, 2).getShort();
 	}
 
 	public static int getInt(byte[] buf) {
-		return ByteBuffer.wrap(buf).getInt();
+		return ByteBuffer.wrap(buf, 0, 4).getInt();
+	}
+
+	public static int getInt(byte[] buf, int offset) {
+		return ByteBuffer.wrap(buf, offset, 4).getInt();
 	}
 
 	public static long getLong(byte[] buf) {
-		return getLong(buf, 0);
+		return ByteBuffer.wrap(buf, 0, 8).getLong();
 	}
 
 	public static long getLong(byte[] buf, int offset) {
-		return ByteBuffer.wrap(buf).getLong(offset);
+		return ByteBuffer.wrap(buf, offset, 8).getLong();
 	}
 
 }

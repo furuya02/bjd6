@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import bjd.log.LogKind;
 import bjd.log.Logger;
+import bjd.packet.Conv;
 import bjd.util.BitConverter;
 import bjd.util.Buffer;
 import bjd.util.Bytes;
@@ -37,12 +38,12 @@ public final class PacketDns {
 	// 内部バッファ  DNSパケットの内容は、以下の２つのバッファで保持される
 	private PacketDnsHeader dnsHeader = null;
 	//private ArrayList<OneRR>[] _ar = new ArrayList<OneRR>[4];
-	private ArrayList<OneRR>[] ar = new ArrayList[4];
+	private ArrayList<OneRr>[] ar = new ArrayList[4];
 
 	//デフォルトコンストラクタの隠蔽
 	private PacketDns() {
 		for (int i = 0; i < 4; i++) {
-			ar[i] = new ArrayList<OneRR>();
+			ar[i] = new ArrayList<OneRr>();
 		}
 	}
 
@@ -120,7 +121,7 @@ public final class PacketDns {
 				//質問エントリーが１でないパケットは処理できません。
 				throw new IOException(String.format("QD Entry !=0  [count=%d]", max));
 			}
-			next: for (int n = 0; n < max; n++) {
+			for (int n = 0; n < max; n++) {
 				//名前の取得
 				//offsetの移動  名前のサイズが一定ではないので、そのサイズ分だけ進める
 				UnCompress u0 = new UnCompress(buffer, offset);
@@ -128,7 +129,7 @@ public final class PacketDns {
 				String name = u0.getHostName();
 
 				//名前以降のリソースレコードを取得
-				PacketRR packetRr = new PacketRR(buffer, offset);
+				PacketRr packetRr = new PacketRr(buffer, offset);
 
 				DnsType dnsType = packetRr.getType();
 				int ttl = packetRr.getTtl();
@@ -136,60 +137,53 @@ public final class PacketDns {
 				byte[] data = packetRr.getData();
 
 				if (rr == 0) { //質問フィールド[QD]の場合は、TTL, DLEN , DATAは無い
-					ar[rr].add(new OneRR(name, dnsType, 0, new byte[0]));
+					ar[rr].add(new RrQuery(name, dnsType));
 					//offsetの移動  名前以降の分だけ進める
 					offset += 4;
 					continue;
-					
 				}
 
 				//TypeによってはNameが含まれている場合があるが、Nameは圧縮されている可能性があるので、
 				//いったん、String 戻してから、改めてリソース用に組み直したDataを作成する
-				switch (dnsType) {
-					case A:
-					case Aaaa:
-						break;
-					case Ns:
-					case Ptr:
-					case Cname:
-						//oneRR = new OneRR(name, dnsType, ttl,DnsUtil.Str2DnsName(UnCompress(buffer,ref off)));
-						UnCompress u1 = new UnCompress(buffer, offset + 10);
-						data = DnsUtil.str2DnsName(u1.getHostName());
-						break;
-					case Mx:
-						short preference = BitConverter.ToUInt16(buffer, offset + 10);
-						UnCompress u2 = new UnCompress(buffer, offset + 12);
-						String hostName = u2.getHostName();
-						byte[] dataName = DnsUtil.str2DnsName(u2.getHostName()); //DNS名前形式に変換
-						data = Bytes.create(preference, dataName);
-						break;
-					case Soa:
-						UnCompress u3 = new UnCompress(buffer, offset + 10);
-						int p = u3.getOffSet();
-						byte[] nameNs = DnsUtil.str2DnsName(u3.getHostName()); //DNS名前形式に変換
-						UnCompress u4 = new UnCompress(buffer, p);
-						p = u4.getOffSet();
-						byte[] nameMail = DnsUtil.str2DnsName(u4.getHostName()); //DNS名前形式に変換
-						int serial = BitConverter.ToUInt32(buffer, p);
-						p += 4;
-						int refresh = BitConverter.ToUInt32(buffer, p);
-						p += 4;
-						int retry = BitConverter.ToUInt32(buffer, p);
-						p += 4;
-						int expire = BitConverter.ToUInt32(buffer, p);
-						p += 4;
-						int minimum = BitConverter.ToUInt32(buffer, p);
-						p += 4;
-						data = Bytes.create(nameNs, nameMail, serial, refresh, retry, expire, minimum);
-						break;
-					default:
-						//A NS MX SOA PTR CNAMEの6種類以外は、処理しない
-						offset += 10 + dlen;
-						break next;
-
+				OneRr oneRr = null;
+				if (dnsType == DnsType.A) {
+					oneRr = new RrA(name, ttl, data);
+				} else if (dnsType == DnsType.Aaaa) {
+					oneRr = new RrAaaa(name, ttl, data);
+				} else if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns) {
+					UnCompress u1 = new UnCompress(buffer, offset + 10);
+					switch (dnsType) {
+						case Cname:
+							oneRr = new RrCname(name, ttl, u1.getHostName());
+							break;
+						case Ptr:
+							oneRr = new RrPtr(name, ttl, u1.getHostName());
+							break;
+						case Ns:
+							oneRr = new RrNs(name, ttl, u1.getHostName());
+							break;
+						default:
+							Util.runtimeException(String.format("DnsPacket() not implement dnsType=%s", dnsType));
+							break;
+					}
+				} else if (dnsType == DnsType.Mx) {
+					short preference = BitConverter.ToUInt16(buffer, offset + 10);
+					UnCompress u2 = new UnCompress(buffer, offset + 12);
+					oneRr = new RrMx(name, ttl, preference, u2.getHostName());
+				} else if (dnsType == DnsType.Soa) {
+					UnCompress u3 = new UnCompress(buffer, offset + 10);
+					UnCompress u4 = new UnCompress(buffer, u3.getOffSet());
+					int p = u4.getOffSet();
+					int serial = Conv.getInt(buffer, p += 4);
+					int refresh = Conv.getInt(buffer, p += 4);
+					int retry = Conv.getInt(buffer, p += 4);
+					int expire = Conv.getInt(buffer, p += 4);
+					int minimum = Conv.getInt(buffer, p += 4);
+					oneRr = new RrSoa(name, ttl, u3.getHostName(), u4.getHostName(), serial, refresh, retry, expire, minimum);
 				}
-				ar[rr].add(new OneRR(name, dnsType, ttl, data));
-				//offsetの移動  名前以降の分だけ進める
+				if (oneRr != null) { //A NS MX SOA PTR CNAMEの6種類以外は、処理(追加)しない
+					ar[rr].add(oneRr);
+				}
 				offset += 10 + dlen;
 			}
 			//ヘッダ内のRRレコードのエントリー数を設定する
@@ -198,7 +192,7 @@ public final class PacketDns {
 
 	}
 
-	public int getCount(RRKind rrKind) {
+	public int getCount(RrKind rrKind) {
 		try {
 			return dnsHeader.getCount(rrKind.getIntValue());
 		} catch (IOException e) {
@@ -226,7 +220,7 @@ public final class PacketDns {
 
 	//フィールドの読み込み
 	//RR_TYPEフィールドのno番目のデータを取得する
-	public OneRR getRR(RRKind rrKind, int no) {
+	public OneRr getRR(RrKind rrKind, int no) {
 		return ar[rrKind.getIntValue()].get(no);
 	}
 
@@ -275,10 +269,9 @@ public final class PacketDns {
 
 	//回答フィールドへの追加
 	//これを下記のように変更し、OneRRのコンストラクタを使用するようにする
-	public void addRR(RRKind rrKind, String name, DnsType dnsType, int ttl, byte[] data) {
+	public void addRR(RrKind rrKind, OneRr oneRr) {
 		//名前の圧縮と、Headerのカウントは、最後のGet()で処理する
-		OneRR oneRR = new OneRR(name, dnsType, ttl, data);
-		ar[rrKind.getIntValue()].add(oneRR);
+		ar[rrKind.getIntValue()].add(oneRr);
 	}
 
 	/**
@@ -288,8 +281,8 @@ public final class PacketDns {
 	 */
 	public byte[] getBytes() {
 		byte[] buffer = dnsHeader.getBytes();
-		for (ArrayList<OneRR> a : ar) {
-			for (OneRR o : a) {
+		for (ArrayList<OneRr> a : ar) {
+			for (OneRr o : a) {
 
 				byte[] dataName = (new Compress(buffer, DnsUtil.str2DnsName(o.getName()))).getData();
 				byte[] data = o.getData();
@@ -308,7 +301,7 @@ public final class PacketDns {
 					data = Bytes.create(preference, dataName);
 				}
 
-				PacketRR packetRr = new PacketRR(data.length);
+				PacketRr packetRr = new PacketRr(data.length);
 				try {
 					packetRr.setCls((short) 1);
 					packetRr.setType(dnsType);

@@ -1,6 +1,6 @@
 package bjd.plugins.dns;
 
-public enum RRKind {
+public enum RrKind {
 	QD(0),
 	AN(1),
 	NS(2),
@@ -8,7 +8,7 @@ public enum RRKind {
 
 	private int intValue;
 
-	private RRKind(final int intValue) {
+	private RrKind(final int intValue) {
 		this.intValue = intValue;
 	}
 
@@ -25,8 +25,8 @@ public enum RRKind {
 	 * @param intValue 定数
 	 * @return Enum値
 	 */
-	public static RRKind valueOf(final int intValue) {
-		for (RRKind p : values()) {
+	public static RrKind valueOf(final int intValue) {
+		for (RrKind p : values()) {
 			if (p.getIntValue() == intValue) {
 				return p;
 			}

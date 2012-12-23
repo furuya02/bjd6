@@ -17,7 +17,7 @@ public final class PacketRRTest {
 	@Test
 	public void getClsの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
+		PacketRr sut = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		short expected = 0x0001;
 		//exercise
 		short actual = sut.getCls();
@@ -28,7 +28,7 @@ public final class PacketRRTest {
 	@Test
 	public void getTypeの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
+		PacketRr sut = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		DnsType expected = DnsType.Ns;
 		//exercise
 		DnsType actual = sut.getType();
@@ -39,7 +39,7 @@ public final class PacketRRTest {
 	@Test
 	public void getTtlの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
+		PacketRr sut = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		int expected = 0x11E86; //733350
 		//exercise
 		int actual = sut.getTtl();
@@ -50,7 +50,7 @@ public final class PacketRRTest {
 	@Test
 	public void getDLenの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
+		PacketRr sut = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		short expected = 6;
 		//exercise
 		short actual = sut.getDLen();
@@ -61,7 +61,7 @@ public final class PacketRRTest {
 	@Test
 	public void getData確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
+		PacketRr sut = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		byte[] expected = new byte[6];
 		System.arraycopy(TestUtil.hexStream2Bytes(str0), 10, expected, 0, 6);
 		//exercise
@@ -73,7 +73,7 @@ public final class PacketRRTest {
 	@Test
 	public void setClsの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(0);
+		PacketRr sut = new PacketRr(0);
 
 		short expected = 0x0002;
 		sut.setCls(expected);
@@ -87,7 +87,7 @@ public final class PacketRRTest {
 	@Test
 	public void setTypeの確認() throws Exception {
 		//setUp
-		PacketRR sut = new PacketRR(0);
+		PacketRr sut = new PacketRr(0);
 		DnsType expected = DnsType.Mx;
 		sut.setType(expected);
 

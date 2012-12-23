@@ -17,7 +17,7 @@ public final class RrATest {
 	public void getIpの確認() throws Exception {
 		//setUp
 		Ip expected = new Ip("127.0.0.1");
-		RrA sut = new RrA("www.cmo", 0, expected);
+		RrA sut = new RrA("aaa.com", 0, expected);
 		//exercise
 		Ip actual = sut.getIp();
 		//verify
@@ -28,9 +28,9 @@ public final class RrATest {
 	public void OneRRとの比較() throws Exception {
 		//setUp
 		RrA sut = new RrA("aaa.com", 64800, new Ip("1.2.3.4"));
-		OneRR expected = new OneRR("aaa.com", DnsType.A, 64800, new byte[] { 1, 2, 3, 4 });
+		OneRr expected = new RrA("aaa.com", 64800, new byte[] { 1, 2, 3, 4 });
 		//exercise
-		OneRR actual = (OneRR) sut;
+		OneRr actual = (OneRr) sut;
 		//verify
 		assertThat(actual, is(expected));
 	}
@@ -39,12 +39,13 @@ public final class RrATest {
 	public void 実パケット生成したOneRRとの比較() throws Exception {
 		//setUp
 		RrA sut = new RrA("aaa.com", 0x00000e10, new Ip("59.106.27.208"));
-		PacketRR rr = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
-		OneRR expected = new OneRR("aaa.com", rr.getType(), rr.getTtl(), rr.getData());
+		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
+		OneRr expected = new RrA("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
-		OneRR actual = (OneRR) sut;
+		OneRr actual = (OneRr) sut;
 		//verify
 		assertThat(actual, is(expected));
 	}
+
 
 }

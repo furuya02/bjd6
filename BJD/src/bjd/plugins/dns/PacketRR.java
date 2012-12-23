@@ -5,7 +5,7 @@ import java.io.IOException;
 import bjd.packet.Packet;
 import bjd.util.Util;
 
-public final class PacketRR extends Packet {
+public final class PacketRr extends Packet {
 	// Name 不定幅のため、このクラスでは取り扱わない
 	// short type
 	// short class
@@ -20,7 +20,7 @@ public final class PacketRR extends Packet {
 	private final int pDATA = 10;
 
 	// デフォルトコンストラクラの隠蔽
-	private PacketRR() {
+	private PacketRr() {
 		super(new byte[0], 0);
 	}
 
@@ -30,7 +30,7 @@ public final class PacketRR extends Packet {
 	 * パケットを生成する場合のコンストラクタ
 	 * @param dlen
 	 */
-	public PacketRR(int dlen) {
+	public PacketRr(int dlen) {
 		//dlenが0の時、QDを表す（dLen及びdataが存在しない）
 		super((dlen == 0) ? (new byte[8]) : (new byte[10 + dlen]), 0);
 		if (dlen == 0) {
@@ -44,7 +44,7 @@ public final class PacketRR extends Packet {
 	 * @param offset
 	 * @throws IOException 
 	 */
-	public PacketRR(byte[] data, int offset) throws IOException {
+	public PacketRr(byte[] data, int offset) throws IOException {
 		super(data, offset);
 		if (data.length - offset < 10) {
 			throw new IOException("A lack of data");

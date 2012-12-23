@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import org.junit.internal.ArrayComparisonFailure;
+
 import bjd.net.Ip;
 import bjd.util.Util;
 
@@ -15,7 +17,7 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public class OneRR {
+public abstract class OneRr {
 
 	private DnsType dnsType;
 	private long createTime; //データが作成された日時
@@ -30,14 +32,32 @@ public class OneRR {
 	 * @param ttl
 	 * @param data
 	 */
-	public OneRR(String name, DnsType dnsType, int ttl, byte[] data) {
+	public OneRr(String name, DnsType dnsType, int ttl, byte[] data) {
 		createTime = Calendar.getInstance().getTimeInMillis();
 		this.name = name;
 		this.dnsType = dnsType;
 		this.ttl = ttl;
 		this.data = Arrays.copyOf(data, data.length);
 	}
-
+	/**
+	 * TTL値だけを変更したクローンを生成する
+	 * @param t TTL値
+	 * @return OnrRrオブジェクト
+	 */
+	public final OneRr clone(int t) {
+		OneRr oneRr = null;
+		try {
+			oneRr =  (OneRr) super.clone();
+		} catch (CloneNotSupportedException e) {
+			Util.runtimeException(this, e);
+		}
+		oneRr.setTtl(t);
+		return oneRr;
+	}
+	
+	private void setTtl(int t) {
+		this.ttl = t;
+	}
 	public final DnsType getDnsType() {
 		return dnsType;
 	}
@@ -50,6 +70,17 @@ public class OneRR {
 		return data;
 	}
 
+	public final byte[] getData(int offset, int len) {
+		byte[] dst = new byte[len];
+		System.arraycopy(data, offset, dst, 0, len);
+		return dst;
+	}
+
+	public final byte[] getData(int offset) {
+		int len = data.length - offset;
+		return getData(offset, len);
+	}
+
 	public final int getTtl() {
 		return ttl;
 	}
@@ -59,7 +90,7 @@ public class OneRR {
 		if (o == null) {
 			return false;
 		}
-		OneRR r = ((OneRR) o);
+		OneRr r = ((OneRr) o);
 		if (!name.equals(r.getName())) {
 			return false;
 		}
@@ -86,9 +117,9 @@ public class OneRR {
 		assert false : "Use is not assumed.";
 		return 101;
 	}
-
+	
 	@Override
-	public final String toString() {
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" ");
@@ -117,18 +148,6 @@ public class OneRR {
 			if (dnsType == DnsType.Cname || dnsType == DnsType.Ptr || dnsType == DnsType.Ns) {
 				byte[] dataName = Arrays.copyOfRange(data, 0, data.length);
 				sb.append(DnsUtil.dnsName2Str(dataName));
-				sb.append(" ");
-
-			}
-			if (dnsType == DnsType.Mx) {
-				//ushort preference = BitConverter.ToUInt16(Data, 0);
-				short preference = ByteBuffer.wrap(data, 0, 16).getShort();
-
-				//byte[] dataName = new byte[Data.Length - 2];
-				//Buffer.BlockCopy(Data, 2, dataName, 0, Data.Length - 2);
-				byte[] dataName = Arrays.copyOfRange(data, 2, data.length - 1);
-
-				sb.append(String.format("%s %d", DnsUtil.dnsName2Str(dataName), Util.htons(preference)));
 				sb.append(" ");
 
 			}

@@ -8,16 +8,16 @@ import org.junit.Test;
 import bjd.net.Ip;
 import bjd.test.TestUtil;
 
-public class RrAaaaTest {
+public final class RrAaaaTest {
 
 	//type= 0x0001(A) class=0x0001 ttl=0x00000e10 dlen=0x0004 data=3b6a1bd0
-	private String str0 = "0001000100000e1000043b6a1bd0";
+	private String str0 = "001c0001000151800010200102000dfffff102163efffeb144d7";
 
 	@Test
 	public void getIpの確認() throws Exception {
 		//setUp
-		Ip expected = new Ip("127.0.0.1");
-		RrA sut = new RrA("www.cmo", 0, expected);
+		Ip expected = new Ip("2001:200:dff:fff1:216:3eff:feb1:44d7");
+		RrAaaa sut = new RrAaaa("www.com", 0, expected);
 		//exercise
 		Ip actual = sut.getIp();
 		//verify
@@ -27,10 +27,10 @@ public class RrAaaaTest {
 	@Test
 	public void OneRRとの比較() throws Exception {
 		//setUp
-		RrA sut = new RrA("aaa.com", 64800, new Ip("1.2.3.4"));
-		OneRR expected = new OneRR("aaa.com", DnsType.A, 64800, new byte[] { 1, 2, 3, 4 });
+		RrAaaa sut = new RrAaaa("aaa.com", 64800, new Ip("::1"));
+		OneRr expected = new RrAaaa("aaa.com", 64800, new byte[] { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 });
 		//exercise
-		OneRR actual = (OneRR) sut;
+		OneRr actual = (OneRr) sut;
 		//verify
 		assertThat(actual, is(expected));
 	}
@@ -38,11 +38,11 @@ public class RrAaaaTest {
 	@Test
 	public void 実パケット生成したOneRRとの比較() throws Exception {
 		//setUp
-		RrA sut = new RrA("aaa.com", 0x00000e10, new Ip("59.106.27.208"));
-		PacketRR rr = new PacketRR(TestUtil.hexStream2Bytes(str0), 0);
-		OneRR expected = new OneRR("aaa.com", rr.getType(), rr.getTtl(), rr.getData());
+		RrAaaa sut = new RrAaaa("orange.kame.net", 0x00015180, new Ip("2001:200:dff:fff1:216:3eff:feb1:44d7"));
+		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
+		OneRr expected = new RrAaaa("orange.kame.net", rr.getTtl(), rr.getData());
 		//exercise
-		OneRR actual = (OneRR) sut;
+		OneRr actual = (OneRr) sut;
 		//verify
 		assertThat(actual, is(expected));
 	}
