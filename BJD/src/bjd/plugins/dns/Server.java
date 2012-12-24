@@ -23,8 +23,8 @@ import bjd.util.Util;
 public final class Server extends OneServer {
 
 	//キャッシュ
-	private DnsCache rootCache;
-	private ArrayList<DnsCache> cacheList = new ArrayList<DnsCache>();
+	private ListRr rootCache;
+	private ArrayList<ListRr> cacheList = new ArrayList<ListRr>();
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel, "Dns", conf, oneBind);
@@ -34,7 +34,7 @@ public final class Server extends OneServer {
 		if ((new File(filename)).exists()) {
 			try {
 				//named.ca読み込み用コンストラクタ
-				rootCache = new DnsCache(conf, filename);
+				rootCache = new ListRr((int)conf.get("soaExpire"), filename);
 				getLogger().set(LogKind.DETAIL, null, 6, filename);
 			} catch (IOException e) {
 				getLogger().set(LogKind.ERROR, null, 2, String.format("filename=%s", filename));
@@ -57,7 +57,7 @@ public final class Server extends OneServer {
 						//)op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
 
 						Dat resource = (Dat) res.getValue("resourceList");
-						cacheList.add(new DnsCache(getLogger(), conf, resource, domainName + ".")); //.zone読み込み用コンストラクタ
+						cacheList.add(new ListRr(getLogger(), conf, resource, domainName + ".")); //.zone読み込み用コンストラクタ
 					}
 				}
 			}
@@ -91,7 +91,7 @@ public final class Server extends OneServer {
 		//breakを指定した場合は、コネクションの終了を意味する（QUIT ABORT 及びエラーの場合）
 		//}
 
-		DnsCache targetCache;
+		ListRr targetCache;
 
 		//パケットの読込(受信パケットrp)            
 
@@ -118,9 +118,9 @@ public final class Server extends OneServer {
 			// （ドメイン名自身にアドレスが指定されている可能性が有る）
 			// A CNAME の場合、リクエスト名がホスト名を含まないドメイン名である可能性があるため
 			// 対象ドメインのキャッシュからＡレコードが存在するかどうかの確認を行う
-			for (DnsCache cache : cacheList) {
+			for (ListRr cache : cacheList) {
 				if (cache.getDomainName().equals(rp.getRequestName())) {
-					if (cache.Find(rp.getRequestName(), DnsType.A)) {
+					if (cache.find(rp.getRequestName(), DnsType.A)) {
 						domainName = rp.getRequestName();
 					}
 				}
@@ -144,8 +144,8 @@ public final class Server extends OneServer {
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 9, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (DnsCache cache : cacheList) {
-					if (cache.Find(rp.getRequestName(), DnsType.Ptr)) {
+				for (ListRr cache : cacheList) {
+					if (cache.find(rp.getRequestName(), DnsType.Ptr)) {
 						targetCache = cache;
 						aa = true;
 						getLogger().set(LogKind.DETAIL, sockUdp, 10, String.format("Resource=%s", targetCache.getDomainName())); //"request to a domain under management"
@@ -159,7 +159,7 @@ public final class Server extends OneServer {
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 11, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (DnsCache cache : cacheList) {
+				for (ListRr cache : cacheList) {
 					if (cache.getDomainName().toUpperCase().equals(domainName.toUpperCase())) { //大文字で比較される
 						targetCache = cache;
 						aa = true;
@@ -172,7 +172,7 @@ public final class Server extends OneServer {
 		}
 
 		if (targetCache != null) {
-			targetCache.TtlClear(); // 有効時間を過ぎたデータを削除する
+			targetCache.ttlClear(); // 有効時間を過ぎたデータを削除する
 		}
 
 		//管理するドメインでなく、かつ 再帰要求が無い場合は、処理を終わる
@@ -497,7 +497,7 @@ public final class Server extends OneServer {
 					int m = rp.getCount(rr);
 					for (int n = 0; n < m; n++) {
 						OneRr oneRR = rp.getRR(rr, n);
-						rootCache.Add(oneRR);
+						rootCache.add(oneRR);
 					}
 				}
 				return rp;
@@ -551,7 +551,7 @@ public final class Server extends OneServer {
 
 		while (true) {
 			//rootCacheにターゲットのデータがキャッシュ（蓄積）されているかどうかを確認
-			if (rootCache.Find(requestName, dnsType)) {
+			if (rootCache.find(requestName, dnsType)) {
 				return true; //検索完了
 			}
 			if (dnsType == DnsType.A) {
@@ -562,7 +562,7 @@ public final class Server extends OneServer {
 				//var find = rrList.Any(t => _rootCache.Find(t.N1, DnsType.A));
 				boolean find = false;
 				for (OneRr o : rrList) {
-					if (rootCache.Find(o.getName(), DnsType.A)) {
+					if (rootCache.find(o.getName(), DnsType.A)) {
 						find = true;
 						break;
 					}

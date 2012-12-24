@@ -19,47 +19,40 @@ import bjd.util.Bytes;
 import bjd.util.Util;
 
 /**
- * 後でListRRに変更予定<br>
- * ＲＲレコードのデータベース<br>
+ * RRレコードのデータベース<br>
  * @author SIN
  *
  */
-public final class DnsCache {
+public final class ListRr {
 
-	private Object lock = new Object();
+	private Object lock = new Object(); //排他制御
 
 	//コンストラクタでファイルを読み込んで初期化する
 	//コンストラクタは、named.ca用と.zone用の２種類がある
-	private ArrayList<OneRr> _db = new ArrayList<>();
+	private ArrayList<OneRr> db = new ArrayList<>();
 
-	//プロパティ
+	private int soaExpire; //終了時間（オプションで指定された有効時間）
 	private String domainName;
 
 	public String getDomainName() {
 		return domainName;
 	}
 
-	int _soaExpire; //終了時間（オプションで指定された有効時間）
-
 	/**
 	 * named.caで初期化する場合のコンストラクタ
-	 * @param oneOption
+	 * @param soaExpire
 	 * @param fileName
 	 * @throws IOException IllegalArgumentException
 	 */
-	public DnsCache(Conf conf, String fileName) throws IOException {
-		int ttl = 0;//rootCacheは有効期限なし
-
-		//オプションを読み込んで、ローカルデータを初期化する
-		//this.oneOption = oneOption;
-		_soaExpire = (int) conf.get("soaExpire");
-
+	public ListRr(int soaExpire, String fileName) throws IOException {
+		this.soaExpire = soaExpire;
+		int ttl = 0; //rootCacheは有効期限なし
 		domainName = ".";
+
 		//this.defaultExpire = defaultExpire;
 		File file = new File(fileName);
 
 		if (file.exists()) {
-			//using (var sr = new StreamReader(fileName, Encoding.GetEncoding("Shift_JIS"))) {
 			ArrayList<String> lines = Util.textFileRead(file);
 			String tmpName = ""; //全行のNAMEを保持する　NAMEは前行と同じ場合省略が可能
 			for (String str : lines) {
@@ -189,14 +182,14 @@ public final class DnsCache {
 				//*********************************************
 				//nameの補完
 				//*********************************************
-				if (name == "@") { //@の場合
+				if (name.equals("@")) { //@の場合
 					name = domainName;
 				} else if (name.lastIndexOf(".") != name.length() - 1) { //最後に.がついていない場合、ドメイン名を追加する
 					name = name + "." + domainName + ".";
 				} else if (name.equals("")) {
-					name = tmpName;//前行と同じ
+					name = tmpName; //前行と同じ
 				}
-				tmpName = name;//前行分として記憶する
+				tmpName = name; //前行分として記憶する
 
 				//*********************************************
 				//String sataStr を変換してデータベースに追加
@@ -204,16 +197,16 @@ public final class DnsCache {
 				if (dnsType == DnsType.A) {
 					try {
 						Ip ipV4 = new Ip(dataStr);
-						Add(new RrA(name, ttl, ipV4));
+						add(new RrA(name, ttl, ipV4));
 					} catch (ValidObjException e) {
 						throw new IllegalArgumentException(String.format("Ipアドレスに矛盾があります [ip=%s file=%s str=%s]", dataStr, fileName, str));
 					}
 				} else if (dnsType == DnsType.Ns) {
-					Add(new RrNs(name, ttl, dataStr));
+					add(new RrNs(name, ttl, dataStr));
 				} else if (dnsType == DnsType.Aaaa) {
 					try {
 						Ip ipV6 = new Ip(dataStr);
-						Add(new RrAaaa(name, ttl, ipV6));
+						add(new RrAaaa(name, ttl, ipV6));
 					} catch (ValidObjException e) {
 						throw new IllegalArgumentException(String.format("Ipアドレスに矛盾があります [ip=%s file=%s str=%s]", dataStr, fileName, str));
 					}
@@ -224,22 +217,22 @@ public final class DnsCache {
 		}
 		//locaohostレコードの追加
 		Ip ip = new Ip(IpKind.V4_LOCALHOST);
-		Add(new RrA("localhost.", ttl, ip));
-		Add(new RrPtr("1.0.0.127.in-addr.arpa.", ttl, "localhost"));
+		add(new RrA("localhost.", ttl, ip));
+		add(new RrPtr("1.0.0.127.in-addr.arpa.", ttl, "localhost"));
 
 		ip = new Ip(IpKind.V6_LOCALHOST);
-		Add(new RrAaaa("localhost.", ttl, ip));
-		Add(new RrPtr("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.", ttl, "localhost"));
+		add(new RrAaaa("localhost.", ttl, ip));
+		add(new RrPtr("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.", ttl, "localhost"));
 	}
 
 	//リソース定義（Dat)で初期化する場合
-	public DnsCache(Logger logger, Conf conf, Dat dat, String dName) {
+	public ListRr(Logger logger, Conf conf, Dat dat, String dName) {
 		int ttl = 0; //有効期限なし
-		String ns = "";//SOA追加時に使用するため、NSレコードを見つけたときにサーバ名を保存しておく
+		String ns = ""; //SOA追加時に使用するため、NSレコードを見つけたときにサーバ名を保存しておく
 
 		//オプションを読み込んで、ローカルデータを初期化する
 		//this.oneOption = oneOption;
-		_soaExpire = (int) conf.get("soaExpire");
+		soaExpire = (int) conf.get("soaExpire");
 
 		domainName = dName;
 
@@ -284,7 +277,7 @@ public final class DnsCache {
 					//PTR名を作成 [例] 192.168.0.1 -> 1.0.168.192.in-addr.arpa;
 					if (ip.getInetKind() == InetKind.V4) { //IPv4
 						String ptrName = String.format("%d.%d.%d.%d.in-addr.arpa.", ip.getIpV4()[3], ip.getIpV4()[2], ip.getIpV4()[1], ip.getIpV4()[0]);
-						Add(new RrPtr(ptrName, ttl, name));
+						add(new RrPtr(ptrName, ttl, name));
 					} else { //IPv6
 						StringBuilder sb = new StringBuilder();
 						for (byte a : ip.getIpV6()) {
@@ -297,7 +290,7 @@ public final class DnsCache {
 								sb.append(ipStr.charAt(e));
 								sb.append('.');
 							}
-							Add(new RrPtr(sb + "ip6.arpa.", ttl, name));
+							add(new RrPtr(sb + "ip6.arpa.", ttl, name));
 						}
 					}
 				}
@@ -305,13 +298,13 @@ public final class DnsCache {
 				//データベースへの追加
 				if (dnsType == DnsType.A) {
 					if (ip.getInetKind() == InetKind.V4) {
-						Add(new RrA(name, ttl, ip));
+						add(new RrA(name, ttl, ip));
 					} else {
 						logger.set(LogKind.ERROR, null, 19, String.format("address %s", ip.toString()));
 					}
 				} else if (dnsType == DnsType.Aaaa) {
 					if (ip.getInetKind() == InetKind.V6) {
-						Add(new RrAaaa(name, ttl, ip));
+						add(new RrAaaa(name, ttl, ip));
 					} else {
 						logger.set(LogKind.ERROR, null, 20, String.format("address %s", ip.toString()));
 					}
@@ -320,22 +313,22 @@ public final class DnsCache {
 
 					// A or AAAAレコードも追加
 					if (ip.getInetKind() == InetKind.V4) {
-						Add(new RrA(name, ttl, ip));
+						add(new RrA(name, ttl, ip));
 					} else { //IPv6
-						Add(new RrAaaa(name, ttl, ip));
+						add(new RrAaaa(name, ttl, ip));
 					}
 
-					Add(new RrNs(domainName, ttl, name));
+					add(new RrNs(domainName, ttl, name));
 				} else if (dnsType == DnsType.Mx) {
 					// A or AAAAレコードも追加
-					Add(new RrA(name, ttl, ip));
+					add(new RrA(name, ttl, ip));
 
 					//プライオリィ
 					//					byte[] dataName = DnsUtil.str2DnsName(name); //DNS名前形式に変換
 					//					byte[] data = Bytes.create(Util.htons(priority), dataName);
-					Add(new RrMx(domainName, ttl, priority, name));
+					add(new RrMx(domainName, ttl, priority, name));
 				} else if (dnsType == DnsType.Cname) {
-					Add(new RrCname(alias, ttl, name));
+					add(new RrCname(alias, ttl, name));
 				}
 			}
 
@@ -353,7 +346,7 @@ public final class DnsCache {
 				//				byte[] data = Bytes.create(DnsUtil.str2DnsName(ns), DnsUtil.str2DnsName(soaMail), Util.htonl(soaSerial), Util.htonl(soaRefresh), Util.htonl(soaRetry), Util.htonl(soaExpire),
 				//						Util.htonl(soaMinimum));
 
-				Add(new RrSoa(domainName, ttl, ns, soaMail, soaSerial, soaRefresh, soaRetry, soaExpire, soaMinimum));
+				add(new RrSoa(domainName, ttl, ns, soaMail, soaSerial, soaRefresh, soaRetry, soaExpire, soaMinimum));
 			}
 		}
 	}
@@ -365,7 +358,7 @@ public final class DnsCache {
 
 		// 排他制御
 		synchronized (lock) {
-			for (OneRr oneRr : _db) {
+			for (OneRr oneRr : db) {
 				if (oneRr.getDnsType() != dnsType) {
 					continue;
 				}
@@ -388,8 +381,8 @@ public final class DnsCache {
 				if (find) {
 					continue;
 				}
-				int ttl = Util.htonl(_soaExpire);
-				
+				int ttl = Util.htonl(soaExpire);
+
 				rrList.add(oneRr.clone(ttl));
 			}
 		} // 排他制御
@@ -397,31 +390,33 @@ public final class DnsCache {
 	}
 
 	//データが存在するかどうかだけの確認
-	public boolean Find(String name, DnsType dnsType) {
+	public boolean find(String name, DnsType dnsType) {
 		long now = Calendar.getInstance().getTimeInMillis();
 		boolean ret = false;
 		// 排他制御
 		synchronized (lock) {
-			for (OneRr oneRR : _db) {
-				if (oneRR.getDnsType() != dnsType)
+			for (OneRr oneRR : db) {
+				if (oneRR.getDnsType() != dnsType) {
 					continue;
-				if (!oneRR.isEffective(now))
-					continue;//生存時間超過データは使用しない
+				}
+				if (!oneRR.isEffective(now)) {
+					continue; //生存時間超過データは使用しない
+				}
 				if (!oneRR.getName().toUpperCase().equals(name.toUpperCase())) {
 					continue; //大文字で比較される
 				}
-				ret = true;//存在する
+				ret = true; //存在する
 				break;
 			}
-		}// 排他制御
+		} // 排他制御
 		return ret;
 	}
 
 	//リソースの追加
-	public boolean Add(OneRr oneRR) {
+	public boolean add(OneRr oneRR) {
 		// 排他制御
 		synchronized (lock) {
-			for (OneRr t : _db) {
+			for (OneRr t : db) {
 				if (t.getDnsType() != oneRR.getDnsType()) {
 					continue;
 				}
@@ -452,20 +447,20 @@ public final class DnsCache {
 				}
 				return false;
 			}
-			_db.add(oneRR);
+			db.add(oneRR);
 		}
 		return true;
 	}
 
-	public void TtlClear() {
+	public void ttlClear() {
 		long now = Calendar.getInstance().getTimeInMillis();
 		// 排他制御
 		synchronized (lock) {
-			for (int i = _db.size() - 1; i > 0; i--) {
-				if (!_db.get(i).isEffective(now)) {
-					_db.remove(i);
+			for (int i = db.size() - 1; i > 0; i--) {
+				if (!db.get(i).isEffective(now)) {
+					db.remove(i);
 				}
 			}
-		}// 排他制御
+		} // 排他制御
 	}
 }
