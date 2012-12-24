@@ -709,10 +709,10 @@ public final class Server extends OneServer {
 				return "Lookup";
 			case 18:
 				return "Lookup";
-			case 19:
-				return isJp() ? "A(PTR)レコードにIPv6アドレスを指定できません" : "IPv6 cannot address it in an A(PTR) record";
-			case 20:
-				return isJp() ? "AAAAレコードにIPv4アドレスを指定できません" : "IPv4 cannot address it in an AAAA record";
+			//case 19:
+			//	return isJp() ? "A(PTR)レコードにIPv6アドレスを指定できません" : "IPv6 cannot address it in an A(PTR) record";
+			//case 20:
+			//	return isJp() ? "AAAAレコードにIPv4アドレスを指定できません" : "IPv4 cannot address it in an AAAA record";
 				//case 22:
 				//	return isJp() ? "バイト計算に矛盾が生じています" : "Contradiction produces it in a byte calculation";
 			default:
