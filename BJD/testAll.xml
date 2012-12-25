@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 指定したテストを実行する -->
-<project name="test" default="default" basedir="./">
-	<!-- ここだけプロジェクトごとに名前を変えればよい -->
-   	<property name="name" value="Dns"/>
+<project name="build" default="xxx" basedir="./">
+	<property name="name" value="Dns" />
 
 	<!-- ソースの配置が換わる場合、ここを修正する -->
-	<property name="dev" value="C:/dev/bjd6"/>
+	<property name="dev" value="C:/dev/bjd6" />
 
-   	<property name="target" value="${name}Server"/>
-   	<property name="project" value="${dev}/${target}"/>
-	<property name="out" value="${dev}/BJD/bin/plugins"/>
+	<property name="target" value="BJD" />
+	<property name="project" value="${dev}/${target}" />
+	<property name="out" value="${dev}/BJD/bin/plugins" />
 
-	<target name="test" depends="compile" description="test the source " >
-	        <!-- JUnitによるテストを実行 -->
-	        <junit fork="yes" haltonfailure="yes">
-	            <test name="${test.class.name}" />
-	            <formatter type="plain" usefile="false" />
-	            <classpath refid="test.classpath" />
-	        </junit>
-	</target>
+
 	
+	<target name="xxx">
+		<junit printsummary="yes" haltonfailure="yes">
+	      <classpath>
+	      	<pathelement path="C:\eclipse_juno_java\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar" />
+	      	<pathelement path="C:\eclipse_juno_java\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar" />
+	      	<pathelement path="C:\eclipse_juno_java\eclipse\plugins\org.apache.commons.codec_1.3.0.v201101211617.jar" />
+	         <pathelement location="${dev}\BJD\bin"/>
+
+	         
+	      </classpath>
+	      <formatter type="plain"/>
+	      <batchtest fork="yes" todir="c:\tmp">
+	         <!-- テストCLASSのみを実行させる -->
+	         <fileset dir="${dev}\BJD\test">
+	            <include name="**/*Test*.java"/>
+	         </fileset>
+	      </batchtest>
+	   </junit>
+	</target>
+			
 </project>
