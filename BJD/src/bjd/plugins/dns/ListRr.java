@@ -44,8 +44,10 @@ public final class ListRr {
 	 * @param fileName
 	 * @throws IOException IllegalArgumentException
 	 */
-	public ListRr(int soaExpire, String fileName) throws IOException {
-		this.soaExpire = soaExpire;
+//	public ListRr(int soaExpire, String fileName) throws IOException {
+//		this.soaExpire = soaExpire;
+	public ListRr(String fileName) throws IOException {
+		//this.soaExpire = soaExpire;
 		int ttl = 0; //rootCacheは有効期限なし
 		domainName = ".";
 
@@ -352,7 +354,7 @@ public final class ListRr {
 	}
 
 	//指定したname及びDNS_TYPEにヒットするデータを取得する
-	public ArrayList<OneRr> search(String name, DnsType dnsType) {
+	public ArrayList<OneRr> getList(String name, DnsType dnsType) {
 		ArrayList<OneRr> rrList = new ArrayList<OneRr>();
 		long now = Calendar.getInstance().getTimeInMillis();
 
@@ -391,26 +393,35 @@ public final class ListRr {
 
 	//データが存在するかどうかだけの確認
 	public boolean find(String name, DnsType dnsType) {
-		long now = Calendar.getInstance().getTimeInMillis();
-		boolean ret = false;
-		// 排他制御
-		synchronized (lock) {
-			for (OneRr oneRR : db) {
-				if (oneRR.getDnsType() != dnsType) {
-					continue;
-				}
-				if (!oneRR.isEffective(now)) {
-					continue; //生存時間超過データは使用しない
-				}
-				if (!oneRR.getName().toUpperCase().equals(name.toUpperCase())) {
-					continue; //大文字で比較される
-				}
-				ret = true; //存在する
-				break;
-			}
-		} // 排他制御
-		return ret;
+		ArrayList<OneRr> list = getList(name, dnsType);
+		if (list.size() != 0) {
+			return true;
+		}
+		return false;
 	}
+
+	//データが存在するかどうかだけの確認
+//	public boolean find2(String name, DnsType dnsType) {
+//		long now = Calendar.getInstance().getTimeInMillis();
+//		boolean ret = false;
+//		// 排他制御
+//		synchronized (lock) {
+//			for (OneRr oneRR : db) {
+//				if (oneRR.getDnsType() != dnsType) {
+//					continue;
+//				}
+//				if (!oneRR.isEffective(now)) {
+//					continue; //生存時間超過データは使用しない
+//				}
+//				if (!oneRR.getName().toUpperCase().equals(name.toUpperCase())) {
+//					continue; //大文字で比較される
+//				}
+//				ret = true; //存在する
+//				break;
+//			}
+//		} // 排他制御
+//		return ret;
+//	}
 
 	//リソースの追加
 	public boolean add(OneRr oneRR) {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 指定したテストを実行する -->
+<project name="test" default="default" basedir="./">
+	<!-- ここだけプロジェクトごとに名前を変えればよい -->
+   	<property name="name" value="Dns"/>
+
+	<!-- ソースの配置が換わる場合、ここを修正する -->
+	<property name="dev" value="C:/dev/bjd6"/>
+
+   	<property name="target" value="${name}Server"/>
+   	<property name="project" value="${dev}/${target}"/>
+	<property name="out" value="${dev}/BJD/bin/plugins"/>
+
+	<target name="test" depends="compile" description="test the source " >
+	        <!-- JUnitによるテストを実行 -->
+	        <junit fork="yes" haltonfailure="yes">
+	            <test name="${test.class.name}" />
+	            <formatter type="plain" usefile="false" />
+	            <classpath refid="test.classpath" />
+	        </junit>
+	</target>
+	
+</project>

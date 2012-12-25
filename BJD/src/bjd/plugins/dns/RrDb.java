@@ -1,6 +1,7 @@
 package bjd.plugins.dns;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import bjd.ValidObjException;
 import bjd.log.LogKind;
@@ -10,10 +11,18 @@ import bjd.net.Ip;
 import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.OneDat;
+import bjd.util.Util;
 
 public final class RrDb {
+
+	private Object lock = new Object(); //排他制御
 	private ArrayList<OneRr> ar = new ArrayList<>();
 
+	/**
+	 * プロダクトでは使用しないが、テストのためにあえて公開している
+	 * @param index
+	 * @return
+	 */
 	public RrDb() {
 
 	}
@@ -45,17 +54,116 @@ public final class RrDb {
 		}
 	}
 
-	public int size() {
-		return ar.size();
+	/**
+	 * リソースの検索<br>
+	 * 指定したname及びDNS_TYPEにヒットするデータを取得する<br>
+	 * クライアントへの送信に使用する場合は、TTLをexpireで書き換える必要がある<br>
+	 * @param name
+	 * @param dnsType
+	 * @return 検索で見つからなかった場合は、空の配列を返す
+	 */
+	public ArrayList<OneRr> getList(String name, DnsType dnsType) {
+
+		ArrayList<OneRr> list = new ArrayList<OneRr>();
+		//検索中に期限の過ぎたリソースがあった場合は、このリストに追加しておいて最後に削除する
+		ArrayList<OneRr> removeList = new ArrayList<OneRr>();
+
+		long now = Calendar.getInstance().getTimeInMillis();
+
+		// 排他制御
+		synchronized (lock) {
+			for (OneRr o : ar) {
+				if (o.getDnsType() != dnsType) {
+					continue;
+				}
+				if (!o.isEffective(now)) {
+					removeList.add(o);
+					continue; //生存時間超過データは使用しない
+				}
+				if (!o.getName().toUpperCase().equals(name.toUpperCase())) {
+					continue; //大文字で比較される
+				}
+
+				//boolean find = rrList.Any(o => o.Data == oneRR.Data);//データが重複していない場合だけ、リストに追加する
+				//データが重複していない場合だけ、リストに追加する
+				//boolean find = false;
+				//for (OneRr o : rrList) {
+				//	if (o.getData() == o.getData()) {
+				//		find = true;
+				//		break;
+				//	}
+				//}
+				//if (find) {
+				//	continue;
+				//}
+				//int ttl = Util.htonl(soaExpire);
+				//	
+				list.add(o);
+			}
+			//期限の過ぎたリソースの削除
+			for (OneRr o : removeList) {
+				ar.remove(o);
+			}
+		} // 排他制御
+		return list;
 	}
 
 	/**
-	 * 本来は必要ないが、テストのためにあえてメソッドにしている
+	 * リソースの追加<br>
+	 * 同一のリソース（TTL以外）は上書きされる<br>
+	 * ただしTTL=0のデータは上書きされない<br>
+	 * @param oneRR
+	 * @return
+	 */
+	public boolean add(OneRr oneRR) {
+		// 排他制御
+		synchronized (lock) {
+			OneRr target = null; //書き換え対象のリソース
+			//TTL以外が全て同じのソースを検索する
+			for (OneRr o : ar) {
+				if (o.getDnsType() == oneRR.getDnsType() && o.getName().equals(oneRR.getName())) {
+					//データ内容の確認	
+					boolean isSame = true;
+					for (int n = 0; n < o.getData().length; n++) {
+						if (o.getData()[n] != oneRR.getData()[n]) {
+							isSame = false;
+							break;
+						}
+					}
+					if (isSame) {
+						if (o.getTtl() == 0) {
+							//TTL=0のデータは普遍であるため、書き換えはしない
+							return false;
+						}
+						target = o;
+						break;
+					}
+				}
+			}
+			//書き換えの対象が見つかっている場合は、削除する
+			if (target != null) {
+				ar.remove(target);
+			}
+			ar.add(oneRR);
+		}
+		return true;
+	}
+
+	/**
+	 * プロダクトでは使用しないが、テストのためにあえてメソッドにしている
 	 * @param index
 	 * @return
 	 */
 	private OneRr get(int index) {
 		return ar.get(index);
+	}
+
+	/**
+	 * プロダクトでは使用しないが、テストのためにあえてメソッドにしている
+	 * @return
+	 */
+	private int size() {
+		return ar.size();
 	}
 
 	/**
@@ -162,7 +270,7 @@ public final class RrDb {
 	 * @param minimum
 	 * @return 追加した場合 true
 	 */
-	public boolean initSoa(String domainName, String mail, int serial, int refresh, int retry, int expire, int minimum) {
+	private boolean initSoa(String domainName, String mail, int serial, int refresh, int retry, int expire, int minimum) {
 
 		//NSサーバ
 		String nsName = null;
@@ -202,4 +310,6 @@ public final class RrDb {
 		ar.add(new RrSoa(domainName, ttl, nsName, soaMail, serial, refresh, retry, expire, minimum));
 		return true;
 	}
+	
+	
 }
