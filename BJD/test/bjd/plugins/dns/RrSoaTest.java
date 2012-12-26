@@ -92,8 +92,8 @@ public final class RrSoaTest {
 	@Test
 	public void バイナリ初期化との比較() throws Exception {
 		//setUp
-		RrMx sut = new RrMx("aaa.com", 64800, (short) 20, "1.");
-		OneRr expected = new RrMx("aaa.com", 64800, new byte[] { 0, 20, 01, 49, 0 });
+		RrSoa sut = new RrSoa("aaa.com", 10, "1", "2", 1, 2, 3, 4, 5);
+		OneRr expected = new RrSoa("aaa.com", 10, new byte[] { 1, 49, 0, 1, 50, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5 });
 		//exercise
 		OneRr actual = (OneRr) sut;
 		//verify
@@ -108,6 +108,17 @@ public final class RrSoaTest {
 		OneRr expected = new RrMx("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Soa aaa.com. TTL=0 1 2 3 4 5";
+		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", "postmaster.", 1, 2, 3, 4, 5);
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

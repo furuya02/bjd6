@@ -2,6 +2,7 @@ package bjd.util;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 /**
@@ -9,7 +10,7 @@ import org.junit.Test;
  * @author SIN
  *
  */
-public class ListBaseTest {
+public final class ListBaseTest {
 
 	//テストのためにListBaseを継承するクラスを定義する
 	class OneClass implements IDispose {

@@ -2,11 +2,8 @@ package bjd.plugins.ftp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.annotation.processing.FilerException;
 
 import bjd.Kernel;
 import bjd.ValidObjException;
@@ -631,8 +628,8 @@ public final class Server extends OneServer {
 			if (len < 0) {
 				break;
 			}
-			if(len==0){
-				if(sockTcp.getSockState() != SockState.CONNECT){
+			if (len == 0) {
+				if (sockTcp.getSockState() != SockState.CONNECT) {
 					break;
 				}
 				Util.sleep(10);

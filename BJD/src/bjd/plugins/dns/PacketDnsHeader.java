@@ -1,6 +1,7 @@
 package bjd.plugins.dns;
 
 import java.io.IOException;
+
 import bjd.packet.Packet;
 import bjd.util.Util;
 

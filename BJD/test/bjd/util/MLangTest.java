@@ -1,10 +1,12 @@
 package bjd.util;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+
 import org.junit.Test;
 
 public final class MLangTest {

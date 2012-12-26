@@ -1,7 +1,7 @@
 package bjd.plugin;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
@@ -16,7 +16,6 @@ import bjd.net.OneBind;
 import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.option.OneOption;
-
 import bjd.server.OneServer;
 import bjd.test.TestUtil;
 

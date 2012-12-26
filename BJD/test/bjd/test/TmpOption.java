@@ -2,7 +2,6 @@ package bjd.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import bjd.Kernel;
 import bjd.util.IDispose;

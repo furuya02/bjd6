@@ -91,7 +91,7 @@ public final class PacketRr extends Packet {
 		return getBytes(pDATA, getDLen());
 	}
 	
-	public void setData(byte [] val) throws IOException{
+	public void setData(byte[] val) throws IOException {
 		setBytes(val, pDATA);
 	}
 

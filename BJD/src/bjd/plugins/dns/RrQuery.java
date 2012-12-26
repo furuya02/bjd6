@@ -1,7 +1,5 @@
 package bjd.plugins.dns;
 
-import bjd.net.Ip;
-
 public final class RrQuery extends OneRr {
 
 	public RrQuery(String name, DnsType dnsType) {

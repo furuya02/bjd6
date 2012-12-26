@@ -1,8 +1,7 @@
 package bjd.net;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

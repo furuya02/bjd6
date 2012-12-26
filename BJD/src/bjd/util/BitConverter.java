@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  */
 public final class BitConverter {
 	//コンストラクタの隠蔽
-	private BitConverter(){
+	private BitConverter() {
 		;
 	}
 	public static short ToUInt16(byte[] data, int offSet) {

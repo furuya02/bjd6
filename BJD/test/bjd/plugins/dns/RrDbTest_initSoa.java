@@ -5,12 +5,9 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import bjd.net.Ip;
-import bjd.option.OneDat;
 
 public final class RrDbTest_initSoa {
 	//private boolean[] isSecret = new boolean[] { false, false, false, false, false };

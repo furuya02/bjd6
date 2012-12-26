@@ -61,7 +61,7 @@ public class Logger {
 
 	/**
 	 * ログ出力<br>
-	 * 【オーバーライド可能（テストで使用）】
+	 * Override可能（テストで使用）<br>
 	 * @param logKind
 	 * @param sockBase
 	 * @param messageNo

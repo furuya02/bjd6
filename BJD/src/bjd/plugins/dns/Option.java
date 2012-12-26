@@ -3,13 +3,8 @@ package bjd.plugins.dns;
 import java.util.ArrayList;
 
 import bjd.Kernel;
-import bjd.RunMode;
 import bjd.ctrl.CtrlCheckBox;
-import bjd.ctrl.CtrlComboBox;
-import bjd.ctrl.CtrlDat;
-import bjd.ctrl.CtrlFolder;
 import bjd.ctrl.CtrlGroup;
-import bjd.ctrl.CtrlHidden;
 import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.CtrlTextBox;
@@ -58,7 +53,7 @@ public final class Option extends OneOption {
 		OnePage onePage = new OnePage(name, title);
 		onePage.add(createServerOption(ProtocolKind.Udp, 53, 10, 10)); //サーバ基本設定
 		
-		onePage.add(new OneVal("rootCache", "named.ca", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "ルートキャッシュ" : "Root Cache",45)));
+		onePage.add(new OneVal("rootCache", "named.ca", Crlf.NEXTLINE, new CtrlTextBox(isJp() ? "ルートキャッシュ" : "Root Cache", 45)));
 		onePage.add(new OneVal("useRD", true, Crlf.NEXTLINE, new CtrlCheckBox(isJp() ? "再帰要求を使用する" : "Use Recurrence")));
 		
 		ListVal list = new ListVal();
@@ -69,7 +64,7 @@ public final class Option extends OneOption {
 		list.add(new OneVal("soaExpire", 360000, Crlf.CONTINUE, new CtrlInt(isJp() ? "終了時間(秒)" : "Expire(sec)", 5)));
 		list.add(new OneVal("soaMinimum", 3600, Crlf.NEXTLINE, new CtrlInt(isJp() ? "最小時間(秒)" : "Minimum(sec)", 5)));
 
-		onePage.add(new OneVal("GroupSoa", null,Crlf.NEXTLINE,new CtrlGroup(isJp() ? "ゾーン管理情報(この設定はすべてのドメインのSOAレコードとして使用されます)": "Group SOA",list)));
+		onePage.add(new OneVal("GroupSoa", null, Crlf.NEXTLINE, new CtrlGroup(isJp() ? "ゾーン管理情報(この設定はすべてのドメインのSOAレコードとして使用されます)" : "Group SOA", list)));
 		
 		
         

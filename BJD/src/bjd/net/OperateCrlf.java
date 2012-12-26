@@ -5,7 +5,7 @@ package bjd.net;
  * @author user1
  *
  */
-public enum OperateCrlf {
-	No,
-	Yes,
-}
+//public enum OperateCrlf {
+//	No,
+//	Yes,
+//}

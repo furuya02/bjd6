@@ -2,11 +2,9 @@ package bjd.plugins.dns;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import junit.framework.Assert;
 
 import org.junit.Test;
 
-import bjd.net.Ip;
 import bjd.test.TestUtil;
 
 public final class RrMxTest {
@@ -55,6 +53,17 @@ public final class RrMxTest {
 		OneRr expected = new RrMx("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Mx aaa.com TTL=10 10 smtp.aaa.com.";
+		RrMx sut = new RrMx("aaa.com", 10, (short) 10, "smtp.aaa.com.");
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

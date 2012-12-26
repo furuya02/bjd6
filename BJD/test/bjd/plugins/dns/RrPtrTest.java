@@ -37,11 +37,22 @@ public final class RrPtrTest {
 	@Test
 	public void 実パケット生成したオブジェクトとの比較() throws Exception {
 		//setUp
-		RrPtr sut = new RrPtr("aaa.com", 0x00000e10,"localhost");
+		RrPtr sut = new RrPtr("aaa.com", 0x00000e10, "localhost");
 		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		OneRr expected = new RrPtr("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Ptr aaa.com TTL=0 ns.google.com.";
+		RrPtr sut = new RrPtr("aaa.com", 0, "ns.google.com.");
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

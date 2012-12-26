@@ -37,11 +37,22 @@ public final class RrNsTest {
 	@Test
 	public void 実パケット生成したオブジェクトとの比較() throws Exception {
 		//setUp
-		RrNs sut = new RrNs("aaa.com", 0x00002b25,"ns2.google.com");
+		RrNs sut = new RrNs("aaa.com", 0x00002b25, "ns2.google.com");
 		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		OneRr expected = new RrNs("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Ns aaa.com TTL=0 ns.google.com.";
+		RrNs sut = new RrNs("aaa.com", 0, "ns.google.com.");
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

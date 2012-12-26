@@ -1,9 +1,10 @@
 package bjd.net;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.net.InetAddress;
+
 import org.junit.Test;
 
 import bjd.log.Logger;

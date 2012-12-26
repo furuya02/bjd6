@@ -1,8 +1,6 @@
 package bjd.plugins.dns;
 
 import bjd.packet.Conv;
-import bjd.util.BitConverter;
-import bjd.util.Buffer;
 import bjd.util.Bytes;
 
 /**

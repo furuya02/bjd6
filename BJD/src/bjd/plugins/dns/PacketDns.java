@@ -1,14 +1,9 @@
 package bjd.plugins.dns;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import bjd.log.LogKind;
-import bjd.log.Logger;
 import bjd.packet.Conv;
-import bjd.util.BitConverter;
-import bjd.util.Buffer;
 import bjd.util.Bytes;
 import bjd.util.Util;
 
@@ -224,7 +219,6 @@ public final class PacketDns {
 		return ar[rrKind.getIntValue()].get(no);
 	}
 
-
 	/**
 	 * 質問フィールドのDNSタイプ取得
 	 * @return
@@ -295,7 +289,7 @@ public final class PacketDns {
 					short preference = Conv.getShort(o.getData(), 0);
 					dataName = new byte[o.getData().length - 2];
 					//dataName = Buffer.BlockCopy(o.getData(), 2, o.getData().length - 2);
-					System.arraycopy(o.getData(), 2,dataName,0, o.getData().length - 2);
+					System.arraycopy(o.getData(), 2, dataName, 0, o.getData().length - 2);
 
 					dataName = (new Compress(buffer, dataName)).getData(); //圧縮
 					data = Bytes.create(preference, dataName);

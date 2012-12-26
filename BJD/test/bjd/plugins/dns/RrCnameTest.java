@@ -37,11 +37,22 @@ public final class RrCnameTest {
 	@Test
 	public void 実パケット生成したオブジェクトとの比較() throws Exception {
 		//setUp
-		RrCname sut = new RrCname("aaa.com", 0x00000067,"ytimg.l.google.com");
+		RrCname sut = new RrCname("aaa.com", 0x00000067, "ytimg.l.google.com");
 		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
 		OneRr expected = new RrCname("aaa.com", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Cname ns.aaa.com. TTL=222 www.aaa.com.";
+		RrCname sut = new RrCname("ns.aaa.com.", 222, "www.aaa.com.");
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

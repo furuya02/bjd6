@@ -183,6 +183,9 @@ public final class Kernel implements IDispose {
 				//                RemoteClient = new RemoteClient(this);
 				//                RemoteClient.Start();
 				break;
+			default:
+				Util.runtimeException("Kernel.defaultInitialize() not implement (RunMode)");
+				break;
 		}
 
 		//        switch (RunMode){

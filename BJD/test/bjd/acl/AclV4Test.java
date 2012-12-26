@@ -1,7 +1,7 @@
 package bjd.acl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.junit.experimental.runners.Enclosed;

@@ -3,15 +3,11 @@ package bjd.plugins.dns;
 import java.util.ArrayList;
 
 import bjd.Kernel;
-import bjd.ctrl.CtrlCheckBox;
 import bjd.ctrl.CtrlDat;
-import bjd.ctrl.CtrlGroup;
-import bjd.ctrl.CtrlInt;
 import bjd.ctrl.CtrlTabPage;
 import bjd.ctrl.CtrlTextBox;
 import bjd.ctrl.OneCtrl;
 import bjd.ctrl.OnePage;
-import bjd.net.ProtocolKind;
 import bjd.option.Crlf;
 import bjd.option.ListVal;
 import bjd.option.OneOption;

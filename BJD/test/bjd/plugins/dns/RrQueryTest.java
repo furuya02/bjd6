@@ -5,9 +5,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import bjd.net.Ip;
-import bjd.test.TestUtil;
-
 public final class RrQueryTest {
 
 	@Test
@@ -17,6 +14,17 @@ public final class RrQueryTest {
 		RrQuery sut = new RrQuery("aaa.com", expected);
 		//exercise
 		DnsType actual = sut.getDnsType();
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Query A aaa.com";
+		RrQuery sut = new RrQuery("aaa.com", DnsType.A);
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

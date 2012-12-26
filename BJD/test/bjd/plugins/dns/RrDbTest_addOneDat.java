@@ -3,8 +3,9 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -169,4 +170,67 @@ public final class RrDbTest_addOneDat {
 		assertThat(c.getCName(), is("cname.aaa.com."));
 
 	}
+	
+	@Test(expected = Exception.class)
+	public void enable_falseのデータを追加すると例外が発生する() throws Exception {
+		//実際に発生するのはValidObjExceptionだが、privateメソッドの制約のためExceptionの発生をテストする
+		
+		//setUp
+		RrDb sut = new RrDb();
+		OneDat oneDat = new OneDat(false, new String[] { "0", "www", "alias", "192.168.0.1", "10" }, isSecret);
+		//exercise
+		addOneDat(sut, domainName, oneDat);
+
+		//verify
+		Assert.fail("ここが実行されたらテスト失敗");
+	}
+	
+	@Test(expected = Exception.class)
+	public void 無効なAレコードを読み込むと例外が発生する() throws Exception {
+		//実際に発生するのはValidObjExceptionだが、privateメソッドの制約のためExceptionの発生をテストする
+
+		//setUp
+		RrDb sut = new RrDb();
+		//IPv6のAレコード
+		OneDat oneDat = new OneDat(true, new String[] { "0", "www", "alias", "::1", "0" }, isSecret);
+		//exercise
+		addOneDat(sut, domainName, oneDat);
+	
+		//verify
+		Assert.fail("ここが実行されたらテスト失敗");
+
+	}
+
+	@Test(expected = Exception.class)
+	public void 無効なAAAAレコードを読み込むと例外が発生する() throws Exception {
+		//実際に発生するのはValidObjExceptionだが、privateメソッドの制約のためExceptionの発生をテストする
+
+		//setUp
+		RrDb sut = new RrDb();
+		//IPv4のAAAAレコード
+		OneDat oneDat = new OneDat(true, new String[] { "4", "www", "alias", "127.0.0.1", "0" }, isSecret);
+		//exercise
+		addOneDat(sut, domainName, oneDat);
+	
+		//verify
+		Assert.fail("ここが実行されたらテスト失敗");
+
+	}
+	
+	@Test(expected = Exception.class)
+	public void 無効なタイプのレコードを読み込むと例外が発生する() throws Exception {
+		//実際に発生するのはValidObjExceptionだが、privateメソッドの制約のためExceptionの発生をテストする
+
+		//setUp
+		RrDb sut = new RrDb();
+		//タイプは0~4まで
+		OneDat oneDat = new OneDat(true, new String[] { "5", "www", "alias", "127.0.0.1", "0" }, isSecret);
+		//exercise
+		addOneDat(sut, domainName, oneDat);
+	
+		//verify
+		Assert.fail("ここが実行されたらテスト失敗");
+
+	}
+
 }

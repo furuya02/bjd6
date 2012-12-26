@@ -3,10 +3,6 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.nio.ByteBuffer;
-import java.util.BitSet;
-
-import org.junit.Before;
 import org.junit.Test;
 
 import bjd.test.TestUtil;

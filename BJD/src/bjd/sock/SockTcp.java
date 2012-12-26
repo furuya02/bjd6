@@ -151,7 +151,7 @@ public final class SockTcp extends SockObj {
 	private void doRead(SocketChannel channel) {
 		//キューのスペース確認
 		int space = sockQueue.getSpace();
-		if (space <20000) {
+		if (space < 20000) {
 			Util.sleep(10);
 			return;
 		}
@@ -170,7 +170,7 @@ public final class SockTcp extends SockObj {
 			recvBuf.get(buf);
 
 			int q = sockQueue.enqueue(buf, buf.length);
-			if(q!=buf.length){
+			if (q != buf.length) {
 				Util.runtimeException("SockTcp.doRead() sockQueue.enqueue()!=buf.length");
 			}
 

@@ -46,6 +46,18 @@ public final class RrATest {
 		//verify
 		assertThat(actual, is(expected));
 	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "A aaa.com TTL=0 127.0.0.1";
+		RrA sut = new RrA("aaa.com", 0, new Ip("127.0.0.1"));
+		//exercise
+		String actual = sut.toString();
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
 
 
 }

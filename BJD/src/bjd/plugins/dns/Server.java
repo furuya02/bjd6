@@ -1,6 +1,5 @@
 package bjd.plugins.dns;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,10 +10,6 @@ import bjd.log.LogKind;
 import bjd.net.Ip;
 import bjd.net.OneBind;
 import bjd.option.Conf;
-import bjd.option.Dat;
-import bjd.option.ListOption;
-import bjd.option.OneDat;
-import bjd.option.OneOption;
 import bjd.server.OneServer;
 import bjd.sock.SockObj;
 import bjd.sock.SockUdp;
@@ -23,18 +18,18 @@ import bjd.util.Util;
 public final class Server extends OneServer {
 
 	//キャッシュ
-	private ListRr rootCache;
-	private ArrayList<ListRr> cacheList = new ArrayList<ListRr>();
+	private RrDb rootCache;
+	private ArrayList<RrDb> cacheList = new ArrayList<RrDb>();
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel, "Dns", conf, oneBind);
-
+		/*
 		//ルートキャッシュ
 		String filename = String.format("%s\\%s", kernel.getProgDir(), getConf().get("rootCache"));
 		if ((new File(filename)).exists()) {
 			try {
 				//named.ca読み込み用コンストラクタ
-				rootCache = new ListRr(filename);
+				rootCache = new RrDb(filename);
 				getLogger().set(LogKind.DETAIL, null, 6, filename);
 			} catch (IOException e) {
 				getLogger().set(LogKind.ERROR, null, 2, String.format("filename=%s", filename));
@@ -57,11 +52,12 @@ public final class Server extends OneServer {
 						//)op = (OneOption)asm.CreateInstance("DnsServer.OptionDnsResource", true, BindingFlags.Default, null, new Object[] { kernel, "Resource-" + domainName }, null, null);
 
 						Dat resource = (Dat) res.getValue("resourceList");
-						cacheList.add(new ListRr(getLogger(), conf, resource, domainName + ".")); //.zone読み込み用コンストラクタ
+						cacheList.add(new RrDb(getLogger(), conf, resource, domainName + ".")); //.zone読み込み用コンストラクタ
 					}
 				}
 			}
 		}
+		*/
 	}
 
 	@Override
@@ -91,7 +87,7 @@ public final class Server extends OneServer {
 		//breakを指定した場合は、コネクションの終了を意味する（QUIT ABORT 及びエラーの場合）
 		//}
 
-		ListRr targetCache;
+		RrDb targetCache;
 
 		//パケットの読込(受信パケットrp)            
 
@@ -118,7 +114,7 @@ public final class Server extends OneServer {
 			// （ドメイン名自身にアドレスが指定されている可能性が有る）
 			// A CNAME の場合、リクエスト名がホスト名を含まないドメイン名である可能性があるため
 			// 対象ドメインのキャッシュからＡレコードが存在するかどうかの確認を行う
-			for (ListRr cache : cacheList) {
+			for (RrDb cache : cacheList) {
 				if (cache.getDomainName().equals(rp.getRequestName())) {
 					if (cache.find(rp.getRequestName(), DnsType.A)) {
 						domainName = rp.getRequestName();
@@ -144,7 +140,7 @@ public final class Server extends OneServer {
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 9, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (ListRr cache : cacheList) {
+				for (RrDb cache : cacheList) {
 					if (cache.find(rp.getRequestName(), DnsType.Ptr)) {
 						targetCache = cache;
 						aa = true;
@@ -159,7 +155,7 @@ public final class Server extends OneServer {
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 11, ""); //"request to a domain under auto (localhost)"
 			} else {
-				for (ListRr cache : cacheList) {
+				for (RrDb cache : cacheList) {
 					if (cache.getDomainName().toUpperCase().equals(domainName.toUpperCase())) { //大文字で比較される
 						targetCache = cache;
 						aa = true;
@@ -507,7 +503,7 @@ public final class Server extends OneServer {
 			}
 		}
 
-		getLogger().set(LogKind.ERROR, sockUdp, 5, String.format("addr=%s requestName=%s dnsType=%s", remoteAddr, requestName, dnsType));//Lookup() パケット受信でタイムアウトが発生しました。
+		getLogger().set(LogKind.ERROR, sockUdp, 5, String.format("addr=%s requestName=%s dnsType=%s", remoteAddr, requestName, dnsType)); //Lookup() パケット受信でタイムアウトが発生しました。
 		return null;
 	}
 

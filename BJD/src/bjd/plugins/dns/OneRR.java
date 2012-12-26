@@ -1,10 +1,8 @@
 package bjd.plugins.dns;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import bjd.net.Ip;
 import bjd.util.Util;
 
 /**

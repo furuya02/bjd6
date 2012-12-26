@@ -28,7 +28,7 @@ public final class RrAaaaTest {
 	public void バイナリ初期化との比較() throws Exception {
 		//setUp
 		RrAaaa sut = new RrAaaa("aaa.com", 64800, new Ip("::1"));
-		OneRr expected = new RrAaaa("aaa.com", 64800, new byte[] { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 });
+		OneRr expected = new RrAaaa("aaa.com", 64800, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 });
 		//exercise
 		OneRr actual = (OneRr) sut;
 		//verify
@@ -43,6 +43,17 @@ public final class RrAaaaTest {
 		OneRr expected = new RrAaaa("orange.kame.net", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
+		//verify
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void toStringの確認() throws Exception {
+		//setUp
+		String expected = "Aaaa www.com TTL=100 ::1";
+		RrAaaa sut = new RrAaaa("www.com", 100, new Ip("::1"));
+		//exercise
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}

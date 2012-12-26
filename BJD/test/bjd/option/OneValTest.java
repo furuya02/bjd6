@@ -3,9 +3,8 @@
  */
 package bjd.option;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.awt.Font;
 import java.util.ArrayList;

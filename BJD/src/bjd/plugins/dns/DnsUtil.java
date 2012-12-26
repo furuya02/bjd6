@@ -1,13 +1,7 @@
 package bjd.plugins.dns;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import bjd.ValidObjException;
-import bjd.log.LogKind;
-import bjd.net.InetKind;
-import bjd.net.Ip;
-import bjd.option.OneDat;
 import bjd.util.Util;
 
 public final class DnsUtil {

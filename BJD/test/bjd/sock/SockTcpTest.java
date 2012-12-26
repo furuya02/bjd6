@@ -2,7 +2,6 @@ package bjd.sock;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-
 import junit.framework.Assert;
 
 import org.junit.Test;

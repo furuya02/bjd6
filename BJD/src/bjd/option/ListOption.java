@@ -6,7 +6,6 @@ import bjd.menu.OneMenu;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
 import bjd.util.ListBase;
-import bjd.util.Util;
 
 /**
  * オプションのリストを表現するクラス<br>

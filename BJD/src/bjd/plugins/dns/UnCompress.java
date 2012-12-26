@@ -1,7 +1,6 @@
 package bjd.plugins.dns;
 
 import bjd.packet.Conv;
-import bjd.util.BitConverter;
 
 /**
  * 開始位置 buffer[offSet]から、ホスト名(String)を取り出す<br>
@@ -49,6 +48,7 @@ public final class UnCompress {
 				offSet = off;
 			} else {
 				if (c >= 255) {
+				//if (c >= (byte) 255) {
 					hostname = "";
 					return;
 				}
