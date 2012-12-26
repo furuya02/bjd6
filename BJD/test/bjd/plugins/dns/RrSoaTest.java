@@ -15,7 +15,7 @@ public final class RrSoaTest {
 	@Test
 	public void getNameServerの確認() throws Exception {
 		//setUp
-		String expected = "name.server.";
+		String expected = "ns.aaa.com.";
 		RrSoa sut = new RrSoa("aaa.com", 0, expected, "post.master.", 1, 2, 3, 4, 5);
 		//exercise
 		String actual = sut.getNameServer();
@@ -26,8 +26,8 @@ public final class RrSoaTest {
 	@Test
 	public void getPostMasterの確認() throws Exception {
 		//setUp
-		String expected = "post.master.";
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", expected, 1, 2, 3, 4, 5);
+		String expected = "root.aaa.com.";
+		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", expected, 1, 2, 3, 4, 5);
 		//exercise
 		String actual = sut.getPostMaster();
 		//verify
@@ -37,8 +37,8 @@ public final class RrSoaTest {
 	@Test
 	public void getSerialの確認() throws Exception {
 		//setUp
-		int expected = 1;
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", "post.master.", expected, 2, 3, 4, 5);
+		int expected = 100;
+		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", "postmaster.", expected, 2, 3, 4, 5);
 		//exercise
 		int actual = sut.getSerial();
 		//verify
@@ -49,7 +49,7 @@ public final class RrSoaTest {
 	public void getRefreshの確認() throws Exception {
 		//setUp
 		int expected = 300;
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", "post.master.", 1, expected, 3, 4, 5);
+		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", "postmaster.", 1, expected, 3, 4, 5);
 		//exercise
 		int actual = sut.getRefresh();
 		//verify
@@ -59,8 +59,8 @@ public final class RrSoaTest {
 	@Test
 	public void getRetryの確認() throws Exception {
 		//setUp
-		int expected = 300;
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", "post.master.", 1, 2, expected, 4, 5);
+		int expected = 400;
+		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", "postmaster.", 1, 2, expected, 4, 5);
 		//exercise
 		int actual = sut.getRetry();
 		//verify
@@ -70,8 +70,8 @@ public final class RrSoaTest {
 	@Test
 	public void getExpireの確認() throws Exception {
 		//setUp
-		int expected = 300;
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", "post.master.", 1, 2, 3, expected, 5);
+		int expected = 500;
+		RrSoa sut = new RrSoa("aaa.com", 0, "ns.aaa.com.", "postmaster.", 1, 2, 3, expected, 5);
 		//exercise
 		int actual = sut.getExpire();
 		//verify
@@ -82,7 +82,7 @@ public final class RrSoaTest {
 	public void getMinimumの確認() throws Exception {
 		//setUp
 		int expected = 300;
-		RrSoa sut = new RrSoa("aaa.com", 0, "name.server.", "post.master.", 1, 2, 3, 4, expected);
+		RrSoa sut = new RrSoa("aaa.com", 0, "ns.aaa.com.", "postmaster.", 1, 2, 3, 4, expected);
 		//exercise
 		int actual = sut.getMinimum();
 		//verify
