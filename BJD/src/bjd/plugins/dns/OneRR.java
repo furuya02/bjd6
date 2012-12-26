@@ -35,25 +35,33 @@ public abstract class OneRr {
 		this.ttl = ttl;
 		this.data = Arrays.copyOf(data, data.length);
 	}
+
 	/**
 	 * TTL値だけを変更したクローンを生成する
 	 * @param t TTL値
 	 * @return OnrRrオブジェクト
 	 */
 	public final OneRr clone(int t) {
-		OneRr oneRr = null;
-		try {
-			oneRr =  (OneRr) super.clone();
-		} catch (CloneNotSupportedException e) {
-			Util.runtimeException(this, e);
+		switch (dnsType) {
+			case A:
+				return new RrA(name, t, data);
+			case Aaaa:
+				return new RrAaaa(name, t, data);
+			case Ns:
+				return new RrNs(name, t, data);
+			case Mx:
+				return new RrMx(name, t, data);
+			case Cname:
+				return new RrCname(name, t, data);
+			case Soa:
+				return new RrSoa(name, t, data);
+			default:
+				Util.runtimeException(String.format("OneRr.close() not implement DnsType=%s", dnsType));
+				break;
 		}
-		oneRr.setTtl(t);
-		return oneRr;
+		return null; //これは実行されない
 	}
-	
-	private void setTtl(int t) {
-		this.ttl = t;
-	}
+
 	public final DnsType getDnsType() {
 		return dnsType;
 	}
@@ -113,6 +121,7 @@ public abstract class OneRr {
 		assert false : "Use is not assumed.";
 		return 101;
 	}
+
 	/**
 	 * データの有効・無効判断
 	 * @param now
@@ -126,8 +135,8 @@ public abstract class OneRr {
 		//    long ttl = Util.htonl(Ttl2);
 		//    if (_createTime + ttl < now)
 		// nowとcreateTimeはTicksから得ているので100ns単位
-		long t = Util.htonl(ttl);
-		t *= 10000000;
+		long t = ttl * 1000;
+		//t *= 1000;
 		if (createTime + t >= now) {
 			return true;
 		}
