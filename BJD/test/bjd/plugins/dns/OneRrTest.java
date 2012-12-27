@@ -18,6 +18,7 @@ public final class OneRrTest {
 		public RrTest(String name, DnsType dnsType, int ttl, String data) {
 			super(name, dnsType, ttl, data.getBytes());
 		}
+
 	}
 
 	@Test
@@ -60,7 +61,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでAレコードの複製を作成() throws Exception {
+	public void cloneでAレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.A;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -74,7 +75,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでAAAAレコードの複製を作成() throws Exception {
+	public void cloneでAAAAレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.Aaaa;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -88,7 +89,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでNSレコードの複製を作成() throws Exception {
+	public void cloneでNSレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.Ns;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -102,7 +103,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでMxレコードの複製を作成() throws Exception {
+	public void cloneでMxレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.Mx;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -116,7 +117,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでCnameレコードの複製を作成() throws Exception {
+	public void cloneでCnameレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.Cname;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -130,7 +131,7 @@ public final class OneRrTest {
 	}
 
 	@Test
-	public void closeでSoaレコードの複製を作成() throws Exception {
+	public void cloneでSoaレコードの複製を作成() throws Exception {
 		//setUp
 		DnsType expected = DnsType.Soa;
 		RrTest sut = new RrTest("name", expected, 10, "123");
@@ -205,6 +206,17 @@ public final class OneRrTest {
 		boolean expected = false;
 		//exercise
 		boolean actual = sut.equals(new RrA("name", 20, new Ip("0.0.0.1")));
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void equalsでDataが異なるオブジェクトを比較するとfalseが返る() throws Exception {
+		//setUp
+		RrTest sut = new RrTest("name", DnsType.A, 10, "123");
+		boolean expected = false;
+		//exercise
+		boolean actual = sut.equals(new RrTest("name", DnsType.A, 10, "12"));
 		//verify
 		assertThat(actual, is(expected));
 	}

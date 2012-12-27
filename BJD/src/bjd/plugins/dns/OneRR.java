@@ -89,6 +89,11 @@ public abstract class OneRr {
 		return ttl;
 	}
 
+	/**
+	 * equalsの実装は、テストで使用される<br>
+	 * 内部変数の値が、全て等しいときにtrueとなる<br>
+	 * TTLの値も検証するので、プロダクトコードには使用する場所が無い<br>
+	 */
 	@Override
 	public final boolean equals(Object o) {
 		if (o == null) {

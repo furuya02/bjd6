@@ -30,4 +30,25 @@ public final class CompressTest {
 		//verify
 		assertThat(s.getHostName(), is("google.com."));
 	}
+	
+	@Test
+	public void ホスト名を圧縮しないで格納する() {
+		//setUp
+		byte[] buf = TestUtil.hexStream2Bytes(str0);
+		byte[] hostName = new byte[] { 0x03, 0x67, 0x6f, 0x6f, 0x03, 0x63, 0x6f, 0x6d, 0x00 }; //goo.com
+		Compress sut = new Compress(buf, hostName);
+		byte[] expected = new byte[] { (byte) 0x03, 0x67,0x6f,0x6f,(byte)0xC0,0x1b };
+
+		//exercise
+		byte[] actual = sut.getData();
+		//verify
+		assertThat(actual, is(expected));
+
+		//以下の、UnCompressでもう一度元に戻してみる
+		//exercise
+		UnCompress s = new UnCompress(Bytes.create(buf, actual), buf.length);
+		//verify
+		assertThat(s.getHostName(), is("goo.com."));
+	}
+
 }

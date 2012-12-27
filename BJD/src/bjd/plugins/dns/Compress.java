@@ -48,7 +48,7 @@ public final class Compress {
 			int n = dataName[src] + 1;
 			//Buffer.BlockCopy(dataName, src, buf, dst, n);
 			for (int i = 0; i < n; i++) {
-				dataName[src + i] = buf[dst + i];
+				buf[dst + i] = dataName[src + i];
 			}
 			dst += n;
 			src += n;
