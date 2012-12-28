@@ -169,11 +169,15 @@ public final class PacketDns {
 					UnCompress u3 = new UnCompress(buffer, offset + 10);
 					UnCompress u4 = new UnCompress(buffer, u3.getOffSet());
 					int p = u4.getOffSet();
-					int serial = Conv.getInt(buffer, p += 4);
-					int refresh = Conv.getInt(buffer, p += 4);
-					int retry = Conv.getInt(buffer, p += 4);
-					int expire = Conv.getInt(buffer, p += 4);
-					int minimum = Conv.getInt(buffer, p += 4);
+					int serial = Conv.getInt(buffer, p);
+					p+=4;
+					int refresh = Conv.getInt(buffer, p);
+					p+=4;
+					int retry = Conv.getInt(buffer, p);
+					p+=4;
+					int expire = Conv.getInt(buffer, p);
+					p+=4;
+					int minimum = Conv.getInt(buffer, p);
 					oneRr = new RrSoa(name, ttl, u3.getHostName(), u4.getHostName(), serial, refresh, retry, expire, minimum);
 				}
 				if (oneRr != null) { //A NS MX SOA PTR CNAMEの6種類以外は、処理(追加)しない

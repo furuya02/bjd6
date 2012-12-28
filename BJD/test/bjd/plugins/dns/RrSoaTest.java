@@ -115,7 +115,7 @@ public final class RrSoaTest {
 	@Test
 	public void toStringの確認() throws Exception {
 		//setUp
-		String expected = "Soa aaa.com. TTL=0 1 2 3 4 5";
+		String expected = "Soa aaa.com. TTL=0 ns.aaa.com. postmaster. 00000001 00000002 00000003 00000004 00000005";
 		RrSoa sut = new RrSoa("aaa.com.", 0, "ns.aaa.com.", "postmaster.", 1, 2, 3, 4, 5);
 		//exercise
 		String actual = sut.toString();
