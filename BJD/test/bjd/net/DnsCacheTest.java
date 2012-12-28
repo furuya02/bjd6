@@ -109,15 +109,14 @@ public final class DnsCacheTest {
 		int expected = 0;
 
 		//exercise
-		TestUtil.waitDisp();
-		System.out.print("無効ホスト名の検索　タイムアウトまで待機");
+		TestUtil.waitDisp("無効ホスト名の検索　タイムアウトまで待機");
 		Ip[] ipList = sut.getAddress("xxx");
 		int actual = ipList.length;
 
 		//verify
 		assertThat(actual, is(expected));
 		//TearDown
-		System.out.println(""); //waitDisp()の最終改行
+		TestUtil.waitDisp(null);
 		
 	}
 
@@ -131,13 +130,12 @@ public final class DnsCacheTest {
 		String expected = "1.1.1.1";
 
 		//exercise
-		TestUtil.waitDisp();
-		System.out.print("無効アドレスの検索　タイムアウトまで待機");
+		TestUtil.waitDisp("無効アドレスの検索　タイムアウトまで待機");
 		String actual = sut.getHostName(inetAddress, new Logger());
 
 		//verify
 		assertThat(actual, is(expected));
 		//TearDown
-		System.out.println(""); //waitDisp()の最終改行
+		TestUtil.waitDisp(null);
 	}
 }

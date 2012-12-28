@@ -150,19 +150,28 @@ public final class TestUtil {
 	//************************************************
 	//待ち時間が長い場合に、コンソールの＊を表示する
 	//************************************************
-	public static void waitDisp() {
-		Runnable r = new Runnable() {
-			public void run() {
-				while (true) {
-					System.out.print("*");
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
+	/**
+	 * 待ち時間が長い場合に、コンソールの＊を表示する
+	 * @param msg msg==nullの時、改行のみ表示（TearDown用）
+	 */
+	public static void waitDisp(String msg) {
+		if (msg == null) {
+			System.out.println("");
+		} else {
+			System.out.print(msg);
+			Runnable r = new Runnable() {
+				public void run() {
+					while (true) {
+						System.out.print("*");
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+						}
 					}
 				}
-			}
-		};
-		Thread thr1 = new Thread(r);
-		thr1.start();
+			};
+			Thread thr1 = new Thread(r);
+			thr1.start();
+		}
 	}
 }
