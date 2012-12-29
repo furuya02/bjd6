@@ -59,19 +59,18 @@ public final class PacketDns {
 
 		// 各種フラグ
 		short flags = 0;
+		if (qr) { //要求(false)・応答(true)
+			flags = (short) (flags | 0x8000);
+		}
 		if (aa) { //権威応答 権威有り(true)
 			flags = (short) (flags | 0x0400);
-		}
-		if (ra) { //再帰有効 有効(true)
-			flags = (short) (flags | 0x0080);
 		}
 		if (rd) { //再帰要求 有り(true)
 			flags = (short) (flags | 0x0100);
 		}
-		if (qr) { //要求(false)・応答(true)
-			flags = (short) (flags | 0x8000);
+		if (ra) { //再帰有効 有効(true)
+			flags = (short) (flags | 0x0080);
 		}
-		//_headerDns.Flags = Util.htons(flags);
 		try {
 			dnsHeader.setFlags(flags);
 		} catch (IOException e) {
@@ -127,16 +126,15 @@ public final class PacketDns {
 				PacketRr packetRr = new PacketRr(buffer, offset);
 
 				DnsType dnsType = packetRr.getType();
-				int ttl = packetRr.getTtl();
-				short dlen = packetRr.getDLen();
-				byte[] data = packetRr.getData();
-
 				if (rr == 0) { //質問フィールド[QD]の場合は、TTL, DLEN , DATAは無い
 					ar[rr].add(new RrQuery(name, dnsType));
 					//offsetの移動  名前以降の分だけ進める
 					offset += 4;
 					continue;
 				}
+				int ttl = packetRr.getTtl();
+				short dlen = packetRr.getDLen();
+				byte[] data = packetRr.getData();
 
 				//TypeによってはNameが含まれている場合があるが、Nameは圧縮されている可能性があるので、
 				//いったん、String 戻してから、改めてリソース用に組み直したDataを作成する
@@ -170,13 +168,13 @@ public final class PacketDns {
 					UnCompress u4 = new UnCompress(buffer, u3.getOffSet());
 					int p = u4.getOffSet();
 					int serial = Conv.getInt(buffer, p);
-					p+=4;
+					p += 4;
 					int refresh = Conv.getInt(buffer, p);
-					p+=4;
+					p += 4;
 					int retry = Conv.getInt(buffer, p);
-					p+=4;
+					p += 4;
 					int expire = Conv.getInt(buffer, p);
-					p+=4;
+					p += 4;
 					int minimum = Conv.getInt(buffer, p);
 					oneRr = new RrSoa(name, ttl, u3.getHostName(), u4.getHostName(), serial, refresh, retry, expire, minimum);
 				}
@@ -208,10 +206,7 @@ public final class PacketDns {
 	}
 
 	public boolean getAA() throws IOException {
-		//        if ((_headerDns.Flags & 0004) != 0)
-		//            return true;
-		//        return false;
-		if ((dnsHeader.getFlags() & 0x0004) != 0) {
+		if ((dnsHeader.getFlags() & 0x0400) != 0) {
 			return true;
 		}
 		return false;
@@ -269,8 +264,15 @@ public final class PacketDns {
 	//回答フィールドへの追加
 	//これを下記のように変更し、OneRRのコンストラクタを使用するようにする
 	public void addRR(RrKind rrKind, OneRr oneRr) {
-		//名前の圧縮と、Headerのカウントは、最後のGet()で処理する
-		ar[rrKind.getIntValue()].add(oneRr);
+		//名前の圧縮は、最後のgetBytes()で処理する
+		int i = rrKind.getIntValue();
+		ar[i].add(oneRr);
+		try {
+			short count = dnsHeader.getCount(i);
+			dnsHeader.setCount(i, ++count);
+		} catch (IOException e) {
+			Util.runtimeException("PacketDns.addRR()");
+		}
 	}
 
 	/**
@@ -280,36 +282,39 @@ public final class PacketDns {
 	 */
 	public byte[] getBytes() {
 		byte[] buffer = dnsHeader.getBytes();
-		for (ArrayList<OneRr> a : ar) {
+		for (int i = 0; i < 4; i++) {
+			ArrayList<OneRr> a = ar[i];
 			for (OneRr o : a) {
 
 				byte[] dataName = (new Compress(buffer, DnsUtil.str2DnsName(o.getName()))).getData();
 				byte[] data = o.getData();
 				DnsType dnsType = o.getDnsType();
 
-				if (dnsType == DnsType.Ns || dnsType == DnsType.Cname || dnsType == DnsType.Ptr) {
-					data = (new Compress(buffer, o.getData())).getData(); //圧縮
-				} else if (dnsType == DnsType.Mx) {
-					short preference = Conv.getShort(o.getData(), 0);
-					dataName = new byte[o.getData().length - 2];
-					//dataName = Buffer.BlockCopy(o.getData(), 2, o.getData().length - 2);
-					System.arraycopy(o.getData(), 2, dataName, 0, o.getData().length - 2);
+				if (i != 0) { //QDでは、data部分は存在しない
+					if (dnsType == DnsType.Ns || dnsType == DnsType.Cname || dnsType == DnsType.Ptr) {
+						data = (new Compress(buffer, o.getData())).getData(); //圧縮
+					} else if (dnsType == DnsType.Mx) {
+						short preference = Conv.getShort(o.getData(), 0);
+						byte [] mlServer = new byte[o.getData().length - 2];
+						System.arraycopy(o.getData(), 2, mlServer, 0, o.getData().length - 2);
 
-					dataName = (new Compress(buffer, dataName)).getData(); //圧縮
-					data = Bytes.create(preference, dataName);
+						mlServer = (new Compress(buffer, mlServer)).getData(); //圧縮
+						data = Bytes.create(Conv.getBytes(preference), mlServer);
+					}
 				}
-
+				//PacketRrは、QD(i==0)の時、data.length=0となり、内部でisQueryがセットされる
 				PacketRr packetRr = new PacketRr(data.length);
 				try {
 					packetRr.setCls((short) 1);
 					packetRr.setType(dnsType);
-					packetRr.setTtl(o.getTtl());
-					packetRr.setData(data);
+					packetRr.setTtl(o.getTtl()); //PacketRr.isQueryがセットされているとき、処理なし
+					packetRr.setData(data);      //PacketRr.isQueryがセットされているとき、処理なし
+
 				} catch (IOException e) {
 					//設計上の問題
 					Util.runtimeException(this, e);
 				}
-
+				//PacketRr.isQueryがセットされているとき、getBytes()は4バイト(TTL,DLEN,DATAなし)になっている
 				buffer = Bytes.create(buffer, dataName, packetRr.getBytes());
 			}
 		}

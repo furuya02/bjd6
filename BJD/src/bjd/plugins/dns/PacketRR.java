@@ -31,8 +31,10 @@ public final class PacketRr extends Packet {
 	 * @param dlen
 	 */
 	public PacketRr(int dlen) {
-		//dlenが0の時、QDを表す（dLen及びdataが存在しない）
-		super((dlen == 0) ? (new byte[8]) : (new byte[10 + dlen]), 0);
+
+		//dlenが0の時、QDを表す（TTL,dLen,dataが存在しない）
+		super((dlen == 0) ? (new byte[4]) : (new byte[10 + dlen]), 0);
+
 		if (dlen == 0) {
 			isQD = true;
 		}
@@ -46,7 +48,7 @@ public final class PacketRr extends Packet {
 	 */
 	public PacketRr(byte[] data, int offset) throws IOException {
 		super(data, offset);
-		if (data.length - offset < 10) {
+		if (data.length - offset < 4) {
 			throw new IOException("A lack of data");
 		}
 	}
@@ -74,6 +76,9 @@ public final class PacketRr extends Packet {
 	}
 
 	public void setTtl(int val) throws IOException {
+		if (isQD) { //QueryにはData領域は無い
+			return;
+		}
 		setInt(val, pTTL);
 	}
 
@@ -90,20 +95,23 @@ public final class PacketRr extends Packet {
 		}
 		return getBytes(pDATA, getDLen());
 	}
-	
+
 	public void setData(byte[] val) throws IOException {
+		if (isQD) { //QueryにはData領域は無い
+			return;
+		}
+		setShort((short) (val.length), pDLEN);
 		setBytes(val, pDATA);
 	}
 
-	
 	@Override
 	public int length() {
 		if (isQD) {
-			return 8; //dlen及びdataが存在しない
+			return 4; //TTL,dlen及びdataが存在しない
 		}
 		try {
 			int dataLen = getDLen();
-			return 2 + 2 + 4 + dataLen + 1;
+			return 2 + 2 + 4 + dataLen + 2;
 		} catch (IOException e) {
 			Util.runtimeException(this, e);
 		}

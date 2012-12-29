@@ -17,6 +17,9 @@ public final class PacketDnsTest {
 	//set type=soa で nifty.comをリクエストした時のレスポンス
 	private String str2 = "000481800001000100020002056e6966747903636f6d0000060001c00c00060001000006160033046f6e7330056e69667479026164026a70000a686f73746d6173746572c02c0bfe412800000e10000003840036ee8000000384c00c00020001000006d20002c027c00c00020001000006d20007046f6e7331c02cc02700010001000007120004caf8254dc07400010001000006da0004caf8149c";
 
+	//set type=a で www.google.com をリクエストした時のレスポンス
+	private String str3 = "0005818000010000000400040377777706676f6f676c6503636f6d00001c0001c0100002000100000a7d0006036e7333c010c0100002000100000a7d0006036e7331c010c0100002000100000a7d0006036e7334c010c0100002000100000a7d0006036e7332c010c03e0001000100000b5e0004d8ef200ac0620001000100000bde0004d8ef220ac02c0001000100000af50004d8ef240ac0500001000100000ab30004d8ef260a";
+
 	@Test
 	public void パケット解釈_str0() throws Exception {
 		//exercise
@@ -101,28 +104,94 @@ public final class PacketDnsTest {
 	}
 
 	@Test
-	public void パケット生成() throws Exception {
+	public void パケット生成_A_NS() throws Exception {
 		//setUp
-		byte[] expected = TestUtil.hexStream2Bytes(str0);
+
 		//exercise
-		short id = 0x0003;
-		boolean qr = false;
-		boolean aa = false;
-		boolean rd = true;
-		boolean ra = false;
+		//パケットの生成
+		short id = 0x0005;
+		boolean qr = true; //応答
+		boolean rd = true; //再帰要求(有効)
+		boolean aa = false; //権限(なし)
+		boolean ra = true;
 		PacketDns sut = new PacketDns(id, qr, aa, rd, ra);
 		sut.addRR(RrKind.QD, new RrQuery("www.google.com.", DnsType.Aaaa));
-		sut.addRR(RrKind.NS, new RrNs("google.com.", 83400, "ns4.google.com."));
-		sut.addRR(RrKind.NS, new RrNs("google.com.", 83400, "ns2.google.com."));
-		sut.addRR(RrKind.NS, new RrNs("google.com.", 83400, "ns3.google.com."));
-		sut.addRR(RrKind.NS, new RrNs("google.com.", 83400, "ns1.google.com."));
-		sut.addRR(RrKind.AR, new RrA("ns1.google.com.", 83465, new Ip("216.239.32.10")));
-		sut.addRR(RrKind.AR, new RrA("ns2.google.com.", 83563, new Ip("216.239.34.10")));
-		sut.addRR(RrKind.AR, new RrA("ns3.google.com.", 83465, new Ip("216.239.36.10")));
-		sut.addRR(RrKind.AR, new RrA("ns4.google.com.", 83465, new Ip("216.239.38.10")));
-		byte[] actual = sut.getBytes();
+		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns3.google.com."));
+		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns1.google.com."));
+		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns4.google.com."));
+		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns2.google.com."));
+		sut.addRR(RrKind.AR, new RrA("ns1.google.com.", 0xb5e, new Ip("216.239.32.10")));
+		sut.addRR(RrKind.AR, new RrA("ns2.google.com.", 0xbde, new Ip("216.239.34.10")));
+		sut.addRR(RrKind.AR, new RrA("ns3.google.com.", 0xaf5, new Ip("216.239.36.10")));
+		sut.addRR(RrKind.AR, new RrA("ns4.google.com.", 0xab3, new Ip("216.239.38.10")));
+		//生成したパケットのバイト配列で、再度パケットクラスを生成する
+		PacketDns p = new PacketDns(sut.getBytes());
+
 		//verify
-		assertThat(actual, is(expected));
+		assertThat(p.getAA(), is(false));
+		assertThat(p.getId(), is((short) 0x0005));
+		assertThat(p.getDnsType(), is(DnsType.Aaaa));
+		assertThat(p.getCount(RrKind.QD), is(1));
+		assertThat(p.getCount(RrKind.AN), is(0));
+		assertThat(p.getCount(RrKind.NS), is(4));
+		assertThat(p.getCount(RrKind.AR), is(4));
+		assertThat(p.getRcode(), is((short)0));
+		assertThat(p.getRR(RrKind.NS, 0).toString(), is(new RrNs("google.com.", 0xa7d, "ns3.google.com.").toString()));
+		assertThat(p.getRR(RrKind.NS, 1).toString(), is(new RrNs("google.com.", 0xa7d, "ns1.google.com.").toString()));
+		assertThat(p.getRR(RrKind.NS, 2).toString(), is(new RrNs("google.com.", 0xa7d, "ns4.google.com.").toString()));
+		assertThat(p.getRR(RrKind.NS, 3).toString(), is(new RrNs("google.com.", 0xa7d, "ns2.google.com.").toString()));
+
+		assertThat(p.getRR(RrKind.AR, 0).toString(), is(new RrA("ns1.google.com.", 0xb5e, new Ip("216.239.32.10")).toString()));
+		assertThat(p.getRR(RrKind.AR, 1).toString(), is(new RrA("ns2.google.com.", 0xbde, new Ip("216.239.34.10")).toString()));
+		assertThat(p.getRR(RrKind.AR, 2).toString(), is(new RrA("ns3.google.com.", 0xaf5, new Ip("216.239.36.10")).toString()));
+		assertThat(p.getRR(RrKind.AR, 3).toString(), is(new RrA("ns4.google.com.", 0xab3, new Ip("216.239.38.10")).toString()));
+	}
+	
+	@Test
+	public void パケット生成_MX() throws Exception {
+		//setUp
+
+		//exercise
+		//パケットの生成
+		short id = (short)0xf00f;
+		boolean qr = true; //応答
+		boolean rd = false; //再帰要求(有効)
+		boolean aa = true; //権限(あり)
+		boolean ra = true;
+		PacketDns sut = new PacketDns(id, qr, aa, rd, ra);
+		sut.addRR(RrKind.QD, new RrQuery("google.com.", DnsType.Mx));
+		sut.addRR(RrKind.AN, new RrMx("google.com.", 0xa7d,(short)10,"smtp.google.com."));
+		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns3.google.com."));
+//		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns1.google.com."));
+//		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns4.google.com."));
+//		sut.addRR(RrKind.NS, new RrNs("google.com.", 0xa7d, "ns2.google.com."));
+//		sut.addRR(RrKind.AR, new RrA("ns1.google.com.", 0xb5e, new Ip("216.239.32.10")));
+//		sut.addRR(RrKind.AR, new RrA("ns2.google.com.", 0xbde, new Ip("216.239.34.10")));
+//		sut.addRR(RrKind.AR, new RrA("ns3.google.com.", 0xaf5, new Ip("216.239.36.10")));
+//		sut.addRR(RrKind.AR, new RrA("ns4.google.com.", 0xab3, new Ip("216.239.38.10")));
+		//生成したパケットのバイト配列で、再度パケットクラスを生成する
+		byte [] b = sut.getBytes();
+		PacketDns p = new PacketDns(b);
+
+		//verify
+		assertThat(p.getAA(), is(true));
+		assertThat(p.getId(), is((short) 0xf00f));
+		assertThat(p.getDnsType(), is(DnsType.Mx));
+		assertThat(p.getCount(RrKind.QD), is(1));
+		assertThat(p.getCount(RrKind.AN), is(1));
+		assertThat(p.getCount(RrKind.NS), is(1));
+		assertThat(p.getCount(RrKind.AR), is(0));
+		assertThat(p.getRcode(), is((short)0));
+		assertThat(p.getRR(RrKind.AN, 0).toString(), is(new RrMx("google.com.", 0xa7d,(short)10, "smtp.google.com.").toString()));
+		assertThat(p.getRR(RrKind.NS, 0).toString(), is(new RrNs("google.com.", 0xa7d, "ns3.google.com.").toString()));
+//		assertThat(p.getRR(RrKind.NS, 1).toString(), is(new RrNs("google.com.", 0xa7d, "ns1.google.com.").toString()));
+//		assertThat(p.getRR(RrKind.NS, 2).toString(), is(new RrNs("google.com.", 0xa7d, "ns4.google.com.").toString()));
+//		assertThat(p.getRR(RrKind.NS, 3).toString(), is(new RrNs("google.com.", 0xa7d, "ns2.google.com.").toString()));
+//
+//		assertThat(p.getRR(RrKind.AR, 0).toString(), is(new RrA("ns1.google.com.", 0xb5e, new Ip("216.239.32.10")).toString()));
+//		assertThat(p.getRR(RrKind.AR, 1).toString(), is(new RrA("ns2.google.com.", 0xbde, new Ip("216.239.34.10")).toString()));
+//		assertThat(p.getRR(RrKind.AR, 2).toString(), is(new RrA("ns3.google.com.", 0xaf5, new Ip("216.239.36.10")).toString()));
+//		assertThat(p.getRR(RrKind.AR, 3).toString(), is(new RrA("ns4.google.com.", 0xab3, new Ip("216.239.38.10")).toString()));
 	}
 
 }
