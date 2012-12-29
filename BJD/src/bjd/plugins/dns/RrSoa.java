@@ -23,7 +23,7 @@ public final class RrSoa extends OneRr {
 	}
 
 	int getInt(int offset) {
-		int p = getNameServer().length() + getPostMaster().length()+2;
+		int p = getNameServer().length() + getPostMaster().length() + 2;
 		return Conv.getInt(getData(), p + offset);
 	}
 
@@ -50,7 +50,8 @@ public final class RrSoa extends OneRr {
 	@Override
 	public String toString() {
 		return String
-				.format("%s %s TTL=%d %s %s %08x %08x %08x %08x %08x", getDnsType(), getName(), getTtl(), getNameServer(), getPostMaster(), getSerial(), getRefresh(), getRetry(), getExpire(), getMinimum());
+				.format("%s %s TTL=%d %s %s %08x %08x %08x %08x %08x", getDnsType(), getName(), getTtl(), getNameServer(), getPostMaster(), getSerial(), getRefresh(), getRetry(), getExpire(),
+						getMinimum());
 	}
 
 }

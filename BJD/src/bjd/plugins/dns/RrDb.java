@@ -33,16 +33,16 @@ public final class RrDb {
 	 */
 	public RrDb() {
 		//ドメイン名の初期化
-		setDomainName("example.com.");//テスト用ドメイン名
+		setDomainName("example.com."); //テスト用ドメイン名
 	}
 
 	/**
 	 * コンストラクタ<br>
 	 * リソース定義（Dat)で初期化する場合
 	 */
-	public RrDb(Logger logger, Conf conf, Dat dat, String domainName) {
+	public RrDb(Logger logger, Conf conf, Dat dat, String dname) {
 		//ドメイン名の初期化
-		setDomainName(domainName);
+		setDomainName(dname);
 
 		//Datの読み込み
 		if (dat != null) {
@@ -276,13 +276,13 @@ public final class RrDb {
 		add(new RrAaaa("localhost.", ttl, ip));
 		add(new RrPtr("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.", ttl, "localhost"));
 	}
-	
+
 	/**
 	 * ドメイン名の設定<br>
 	 * 必ず、最後がドットになるように補完される<br>
 	 * @param str
 	 */
-	private void setDomainName(String str){
+	private void setDomainName(String str) {
 		//最後に.がついていない場合、追加する
 		if (str.lastIndexOf('.') != str.length() - 1) {
 			str = str + ".";
@@ -290,17 +290,17 @@ public final class RrDb {
 		this.domainName = str;
 	}
 
-//	public void ttlClear() {
-//		long now = Calendar.getInstance().getTimeInMillis();
-//		// 排他制御
-//		synchronized (lock) {
-//			for (int i = ar.size() - 1; i > 0; i--) {
-//				if (!ar.get(i).isEffective(now)) {
-//					ar.remove(i);
-//				}
-//			}
-//		} // 排他制御
-//	}
+	//	public void ttlClear() {
+	//		long now = Calendar.getInstance().getTimeInMillis();
+	//		// 排他制御
+	//		synchronized (lock) {
+	//			for (int i = ar.size() - 1; i > 0; i--) {
+	//				if (!ar.get(i).isEffective(now)) {
+	//					ar.remove(i);
+	//				}
+	//			}
+	//		} // 排他制御
+	//	}
 
 	//データが存在するかどうかだけの確認
 	public boolean find(String name, DnsType dnsType) {
@@ -458,26 +458,26 @@ public final class RrDb {
 				if (ip.getInetKind() != InetKind.V4) {
 					throw new ValidObjException("IPv6 cannot address it in an A(PTR) record");
 				}
-				ar.add(new RrA(name, ttl, ip));
+				add(new RrA(name, ttl, ip));
 				break;
 			case 1:
 				dnsType = DnsType.Ns;
-				ar.add(new RrNs(domainName, ttl, name));
+				add(new RrNs(domainName, ttl, name));
 				break;
 			case 2:
 				dnsType = DnsType.Mx;
-				ar.add(new RrMx(domainName, ttl, (short) priority, name));
+				add(new RrMx(domainName, ttl, (short) priority, name));
 				break;
 			case 3:
 				dnsType = DnsType.Cname;
-				ar.add(new RrCname(alias, ttl, name));
+				add(new RrCname(alias, ttl, name));
 				break;
 			case 4:
 				dnsType = DnsType.Aaaa;
 				if (ip.getInetKind() != InetKind.V6) {
 					throw new ValidObjException("IPv4 cannot address it in an AAAA record");
 				}
-				ar.add(new RrAaaa(name, ttl, ip));
+				add(new RrAaaa(name, ttl, ip));
 				break;
 			default:
 				throw new ValidObjException(String.format("unknown type (%d)", type));
@@ -486,9 +486,9 @@ public final class RrDb {
 		//MX及びNSの場合は、A or AAAAも追加する
 		if (dnsType == DnsType.Mx || dnsType == DnsType.Ns) {
 			if (ip.getInetKind() == InetKind.V4) {
-				ar.add(new RrA(name, ttl, ip));
+				add(new RrA(name, ttl, ip));
 			} else {
-				ar.add(new RrAaaa(name, ttl, ip));
+				add(new RrAaaa(name, ttl, ip));
 			}
 		}
 		//CNAME以外は、PTRレコードを自動的に生成する
@@ -496,7 +496,7 @@ public final class RrDb {
 			//PTR名を作成 [例] 192.168.0.1 -> 1.0.168.192.in-addr.arpa;
 			if (ip.getInetKind() == InetKind.V4) { //IPv4
 				String ptrName = String.format("%d.%d.%d.%d.in-addr.arpa.", (ip.getIpV4()[3] & 0xff), (ip.getIpV4()[2] & 0xff), (ip.getIpV4()[1] & 0xff), (ip.getIpV4()[0] & 0xff));
-				ar.add(new RrPtr(name, ttl, ptrName));
+				add(new RrPtr(name, ttl, ptrName));
 			} else { //IPv6
 				StringBuilder sb = new StringBuilder();
 				for (byte a : ip.getIpV6()) {
@@ -509,7 +509,7 @@ public final class RrDb {
 						sb.append(ipStr.charAt(e));
 						sb.append('.');
 					}
-					ar.add(new RrPtr(name, ttl, sb + "ip6.arpa."));
+					add(new RrPtr(name, ttl, sb + "ip6.arpa."));
 				}
 			}
 		}

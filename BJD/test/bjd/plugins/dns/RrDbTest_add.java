@@ -3,29 +3,11 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Method;
-
 import org.junit.Test;
 
 import bjd.net.Ip;
 
 public final class RrDbTest_add {
-
-	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.get(int)
-	OneRr get(RrDb sut, int index) throws Exception {
-		Class<RrDb> c = RrDb.class;
-		Method m = c.getDeclaredMethod("get", new Class[] { int.class });
-		m.setAccessible(true);
-		return (OneRr) m.invoke(sut, index);
-	}
-
-	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.size()
-	int size(RrDb sut) throws Exception {
-		Class<RrDb> c = RrDb.class;
-		Method m = c.getDeclaredMethod("size");
-		m.setAccessible(true);
-		return (int) m.invoke(sut);
-	}
 
 	@Test
 	public void 新規のリソース追加は成功する() throws Exception {
@@ -60,8 +42,8 @@ public final class RrDbTest_add {
 		sut.add(new RrA("domain", ttl, new Ip("1.2.3.4")));
 		sut.add(new RrA("domain", 20, new Ip("1.2.3.4")));
 		//verify
-		assertThat(size(sut), is(1)); //件数は１件になる
-		assertThat(get(sut, 0).getTtl(), is(20)); //TTLは後から追加した20になる
+		assertThat(RrDbTest.size(sut), is(1)); //件数は１件になる
+		assertThat(RrDbTest.get(sut, 0).getTtl(), is(20)); //TTLは後から追加した20になる
 	}
 
 	@Test
@@ -73,7 +55,7 @@ public final class RrDbTest_add {
 		sut.add(new RrA("domain", 10, new Ip("1.2.3.4")));
 		sut.add(new RrA("domain", 10, new Ip("3.4.5.6")));
 		sut.add(new RrNs("domain", 10, "ns"));
-		int actual = size(sut);
+		int actual = RrDbTest.size(sut);
 		//verify
 		assertThat(actual, is(expected));
 	}

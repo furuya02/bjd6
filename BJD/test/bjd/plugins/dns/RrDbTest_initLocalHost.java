@@ -3,45 +3,18 @@ package bjd.plugins.dns;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Method;
-
 import org.junit.Test;
 
-import bjd.net.Ip;
-
 public class RrDbTest_initLocalHost {
-	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.initLocalHost()
-	void initLocalHost(RrDb sut) throws Exception {
-		Class<RrDb> c = RrDb.class;
-		Method m = c.getDeclaredMethod("initLocalHost");
-		m.setAccessible(true);
-		m.invoke(sut);
-	}
-
-	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.get(int)
-	OneRr get(RrDb sut, int index) throws Exception {
-		Class<RrDb> c = RrDb.class;
-		Method m = c.getDeclaredMethod("get", new Class[] { int.class });
-		m.setAccessible(true);
-		return (OneRr) m.invoke(sut, index);
-	}
-
-	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.size()
-	int size(RrDb sut) throws Exception {
-		Class<RrDb> c = RrDb.class;
-		Method m = c.getDeclaredMethod("size");
-		m.setAccessible(true);
-		return (int) m.invoke(sut);
-	}
-
+	
 	@Test
 	public void 件数は４件になる() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
 		int expected = 4;
 		//exercise
-		initLocalHost(sut);
-		int actual = size(sut);
+		RrDbTest.initLocalHost(sut);
+		int actual = RrDbTest.size(sut);
 		//verify
 		assertThat(actual, is(expected));
 	}
@@ -51,8 +24,8 @@ public class RrDbTest_initLocalHost {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-		initLocalHost(sut);
-		RrA o = (RrA) get(sut, 0);
+		RrDbTest.initLocalHost(sut);
+		RrA o = (RrA) RrDbTest.get(sut, 0);
 		//verify
 		assertThat(o.getDnsType(), is(DnsType.A));
 		assertThat(o.getName(), is("localhost."));
@@ -64,8 +37,8 @@ public class RrDbTest_initLocalHost {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-		initLocalHost(sut);
-		RrPtr o = (RrPtr) get(sut, 1);
+		RrDbTest.initLocalHost(sut);
+		RrPtr o = (RrPtr) RrDbTest.get(sut, 1);
 		//verify
 		assertThat(o.getDnsType(), is(DnsType.Ptr));
 		assertThat(o.getName(), is("1.0.0.127.in-addr.arpa."));
@@ -77,8 +50,8 @@ public class RrDbTest_initLocalHost {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-		initLocalHost(sut);
-		RrAaaa o = (RrAaaa) get(sut, 2);
+		RrDbTest.initLocalHost(sut);
+		RrAaaa o = (RrAaaa) RrDbTest.get(sut, 2);
 		//verify
 		//assertThat(o.getDnsType(), is(DnsType.Aaaa));
 		//assertThat(o.getName(), is("localhost."));
@@ -90,8 +63,8 @@ public class RrDbTest_initLocalHost {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-		initLocalHost(sut);
-		RrPtr o = (RrPtr) get(sut, 3);
+		RrDbTest.initLocalHost(sut);
+		RrPtr o = (RrPtr) RrDbTest.get(sut, 3);
 		//verify
 		assertThat(o.getDnsType(), is(DnsType.Ptr));
 		assertThat(o.getName(), is("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA."));

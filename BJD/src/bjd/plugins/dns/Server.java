@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import bjd.Kernel;
-import bjd.ValidObjException;
 import bjd.log.LogKind;
 import bjd.net.Ip;
 import bjd.net.OneBind;
@@ -17,7 +16,6 @@ import bjd.option.OneOption;
 import bjd.server.OneServer;
 import bjd.sock.SockObj;
 import bjd.sock.SockUdp;
-import bjd.util.Util;
 
 public final class Server extends OneServer {
 
@@ -75,6 +73,7 @@ public final class Server extends OneServer {
 							Dat resource = (Dat) res.getValue("resourceList");
 							RrDb rrDb = new RrDb(getLogger(), getConf(), resource, domainName);
 							cacheList.add(rrDb);
+							getLogger().set(LogKind.DETAIL, null, 21, "Resource-" + domainName);
 						}
 					}
 				}
@@ -115,7 +114,6 @@ public final class Server extends OneServer {
 
 	}
 
-	
 	@Override
 	protected void onSubThread(SockObj sockObj) {
 		SockUdp sockUdp = (SockUdp) sockObj;
@@ -289,7 +287,6 @@ public final class Server extends OneServer {
 		sockUdp.close();
 	}
 
-
 	//addrは通常オーダで指定されている
 	//private PacketDns Lookup(Ip ip, String requestName, DNS_TYPE dnsType,RemoteInfo remoteInfo) {
 	private PacketDns Lookup(Ip ip, String requestName, DnsType dnsType, Ip remoteAddr) throws IOException {
@@ -382,8 +379,11 @@ public final class Server extends OneServer {
 
 			//var random = new Random(Environment.TickCount);
 			//int center = random.Next(rrList.Count);//センタ位置をランダムに決定する
-			Random random = new Random();
-			int center = random.nextInt(rrList.size()); //センタ位置をランダムに決定する
+			int center = 0;
+			if (rrList.size() > 0) {
+				Random random = new Random();
+				center = random.nextInt(rrList.size()); //センタ位置をランダムに決定する
+			}
 
 			for (int i = center; i < rrList.size(); i++) { //センタ以降の一覧を取得
 				nsList.add(rrList.get(i).getName());
@@ -557,8 +557,8 @@ public final class Server extends OneServer {
 				return isJp() ? "リソースデータの読み込みに失敗しました" : "Failed in reading of resource data";
 			case 20:
 				return isJp() ? "リソース(SOA)は追加されませんでした" : "Resource (SOA) was not added";
-				//case 22:
-				//	return isJp() ? "バイト計算に矛盾が生じています" : "Contradiction produces it in a byte calculation";
+			case 21:
+				return isJp() ? "ドメインのリソース定義を読み込みました" : "Read a resource definition of a domain";
 			default:
 				return "unknown";
 

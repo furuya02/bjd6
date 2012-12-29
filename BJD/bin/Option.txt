@@ -41,7 +41,7 @@ STRING=DnssoaMail=postmaster
 INT=DnssoaSerial=1
 INT=DnssoaRefresh=3600
 INT=DnssoaRetry=300
-INT=DnssoaExpire=0
+INT=DnssoaExpire=4800
 INT=DnssoaMinimum=3600
 RADIO=DnsenableAcl=1
 STRING=DnsaclName=
@@ -53,7 +53,7 @@ STRING=Resource-aaa.comname=
 STRING=Resource-aaa.comalias=
 STRING=Resource-aaa.comaddress=
 INT=Resource-aaa.compriority=10
-DAT=Resource-aaa.comresourceList=	0	www		192.168.0.1	0	1	ns		192.168.0.1	0
+DAT=Resource-aaa.comresourceList=	0	www		192.168.0.1	0	2	mail		192.168.0.100	10	1	ns		192.168.0.1	0
 BOOL=FtpuseServer=false
 LIST=FtpprotocolKind=0
 INT=Ftpport=21

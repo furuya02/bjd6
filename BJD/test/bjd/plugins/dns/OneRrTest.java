@@ -37,7 +37,7 @@ public final class OneRrTest {
 	@Test
 	public void isEffective_ttlが10秒の場合_10秒後で確認するとtrueが返る() throws Exception {
 		//setUp
-		long now = Calendar.getInstance().getTimeInMillis();//現在時間
+		long now = Calendar.getInstance().getTimeInMillis(); //現在時間
 		int ttl = 10; //生存時間は10秒
 		RrTest sut = new RrTest("name", DnsType.A, ttl, "123");
 		boolean expected = true;
