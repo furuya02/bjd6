@@ -290,17 +290,17 @@ public final class RrDb {
 		this.domainName = str;
 	}
 
-	public void ttlClear() {
-		long now = Calendar.getInstance().getTimeInMillis();
-		// 排他制御
-		synchronized (lock) {
-			for (int i = ar.size() - 1; i > 0; i--) {
-				if (!ar.get(i).isEffective(now)) {
-					ar.remove(i);
-				}
-			}
-		} // 排他制御
-	}
+//	public void ttlClear() {
+//		long now = Calendar.getInstance().getTimeInMillis();
+//		// 排他制御
+//		synchronized (lock) {
+//			for (int i = ar.size() - 1; i > 0; i--) {
+//				if (!ar.get(i).isEffective(now)) {
+//					ar.remove(i);
+//				}
+//			}
+//		} // 排他制御
+//	}
 
 	//データが存在するかどうかだけの確認
 	public boolean find(String name, DnsType dnsType) {
