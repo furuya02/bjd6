@@ -93,9 +93,9 @@ public final class SockUdp extends SockObj {
 		} catch (UnknownHostException ex) {
 			setException(ex);
 		}
-		
-//		InetSocketAddress remoteAddress = new InetSocketAddress(inetAddress, port);
-//		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), remoteAddress);
+
+		//		InetSocketAddress remoteAddress = new InetSocketAddress(inetAddress, port);
+		//		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), remoteAddress);
 		//set(SockState.CONNECT, getLocalAddress(), remoteAddress);
 
 		send(buf);
@@ -156,6 +156,21 @@ public final class SockUdp extends SockObj {
 		recvBuf.flip();
 		recvBuf.get(buf);
 		return buf;
+	}
+
+	/**
+	 * ミリ秒まで受信を待機する
+	 * @param timeout ミリ秒
+	 * @return
+	 */
+	public byte[] recv(int timeout) {
+		for (int i = 0; i < timeout / 10; i++) {
+			Util.sleep(10);
+			if (recvBuf.position() != 0) {
+				break;
+			}
+		}
+		return recv();
 	}
 
 	//ACCEPTのみで使用する　CLIENTは、コンストラクタで送信する

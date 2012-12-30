@@ -175,9 +175,7 @@ public final class RrDb {
 				//０番目はNAME若しくはTTLとなる
 				if (str.substring(0, 1).equals(" ") || str.substring(0, 1).equals("\t")) {
 					//名前は省略されているので
-					//ttl = Convert.ToUInt32(tmp2[0]);
-					ttl = Integer.valueOf(tmp2.get(0));
-					//ttl = Util.htonl(ttl);
+					//TTLは0で固定 ttl = Integer.valueOf(tmp2.get(0));
 				} else {
 					name = tmp2.get(0);
 				}
@@ -191,9 +189,7 @@ public final class RrDb {
 			if (classCol == -1) { //INが無い場合
 				//０番目はNAME、1番目はTTLとなる
 				name = tmp2.get(0);
-				//ttl = Convert.ToUInt32(tmp2[1]);
-				ttl = Integer.valueOf(tmp2.get(1));
-				//ttl = Util.htonl(ttl);
+				//TTLは0で固定 ttl = Integer.valueOf(tmp2.get(1));
 			} else { //INが有る場合
 				if (classCol != 1) {
 					throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました  (INの位置に矛盾がありま [str=%s])", str));
@@ -201,9 +197,7 @@ public final class RrDb {
 				//０番目はNAME若しくはTTLとなる
 				if (str.substring(0, 1).equals(" ") || str.substring(0, 1).equals("\t")) {
 					//名前は省略されているので
-					//ttl = Convert.ToUInt32(tmp2[0]);
-					ttl = Integer.valueOf(tmp2.get(0));
-					//ttl = Util.htonl(ttl);
+					//TTLは0で固定  ttl = Integer.valueOf(tmp2.get(0));
 				} else {
 					name = tmp2.get(0);
 				}
@@ -218,9 +212,7 @@ public final class RrDb {
 			}
 			//０番目はNAME、1番目はTTLとなる
 			name = tmp2.get(0);
-			//ttl = Convert.ToUInt32(tmp2[1]);
-			ttl = Integer.valueOf(tmp2.get(1));
-			//ttl = Util.htonl(ttl);
+			//TTLは0で固定 ttl = Integer.valueOf(tmp2.get(1));
 		}
 
 		//*********************************************

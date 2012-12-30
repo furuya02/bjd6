@@ -16,5 +16,7 @@ public enum DnsType {
 	Mx,
 	//TXT,
 	Aaaa,
-	Unknown
+	Unknown;
+
+	
 }

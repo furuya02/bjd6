@@ -30,6 +30,7 @@ public final class RrDbTest_addNamedCaLine {
 		assertThat(RrDbTest.size(sut), is(0));
 	}
 
+	
 	@Test
 	public void Aレコードの処理() throws Exception {
 		//setUp
@@ -44,7 +45,7 @@ public final class RrDbTest_addNamedCaLine {
 		assertThat(RrDbTest.size(sut), is(1));
 		assertThat(o.getDnsType(), is(DnsType.A));
 		assertThat(o.getIp().toString(), is("198.41.0.4"));
-		assertThat(o.getTtl(), is(3600000));
+		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
 		assertThat(o.getName(), is("A.ROOT-SERVERS.NET."));
 	}
 
@@ -62,7 +63,7 @@ public final class RrDbTest_addNamedCaLine {
 		assertThat(RrDbTest.size(sut), is(1));
 		assertThat(o.getDnsType(), is(DnsType.Aaaa));
 		assertThat(o.getIp().toString(), is("2001:503:ba3e::2:30"));
-		assertThat(o.getTtl(), is(3600000));
+		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
 		assertThat(o.getName(), is("A.ROOT-SERVERS.NET."));
 	}
 
@@ -80,7 +81,7 @@ public final class RrDbTest_addNamedCaLine {
 		assertThat(RrDbTest.size(sut), is(1));
 		assertThat(o.getDnsType(), is(DnsType.Ns));
 		assertThat(o.getNsName(), is("A.ROOT-SERVERS.NET."));
-		assertThat(o.getTtl(), is(3600000));
+		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
 		assertThat(o.getName(), is("."));
 	}
 

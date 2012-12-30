@@ -90,7 +90,7 @@ public final class Server extends OneServer {
 
 		//.が存在する場合、.以降をデフォルト値として仮置きする
 		int index = requestName.indexOf('.');
-		if (index != -1) {
+		if (index != -1 && index < requestName.length()-1) {
 			name = requestName.substring(index + 1);
 		}
 
