@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public final class RrDbTest_addNamedCaLine {
 
+	int expire = 2400;
 
 	@Test
 	public void コメント行は処理されない() throws Exception {

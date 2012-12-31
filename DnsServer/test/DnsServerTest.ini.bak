@@ -53,7 +53,7 @@ STRING=Resource-aaa.comname=
 STRING=Resource-aaa.comalias=
 STRING=Resource-aaa.comaddress=
 INT=Resource-aaa.compriority=10
-DAT=Resource-aaa.comresourceList=	0	www		192.168.0.10	0	2	mail		192.168.0.100	10	1	ns		192.168.0.1	0	4	www2		2408:1c6:9fff:37:ed36:ff7:d113:60f6	0	3	www	www3		0
+DAT=Resource-aaa.comresourceList=	0	www		192.168.0.10	0
 BOOL=FtpuseServer=false
 LIST=FtpprotocolKind=0
 INT=Ftpport=21

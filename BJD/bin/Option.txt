@@ -42,7 +42,7 @@ INT=DnssoaSerial=1
 INT=DnssoaRefresh=3600
 INT=DnssoaRetry=300
 INT=DnssoaExpire=4800
-INT=DnssoaMinimum=3600
+INT=DnssoaMinimum=2400
 RADIO=DnsenableAcl=1
 STRING=DnsaclName=
 STRING=DnsaclAddress=

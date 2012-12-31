@@ -53,6 +53,8 @@ public abstract class OneRr {
 				return new RrMx(name, t, data);
 			case Cname:
 				return new RrCname(name, t, data);
+			case Ptr:
+				return new RrPtr(name, t, data);
 			case Soa:
 				return new RrSoa(name, t, data);
 			default:

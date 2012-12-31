@@ -45,7 +45,8 @@ public final class Server extends OneServer {
 		if ((new File(namedCaPath)).exists()) {
 			try {
 				//named.ca読み込み用コンストラクタ
-				rootCache = new RrDb(namedCaPath);
+				int expire = (int)getConf().get("soaExpire");
+				rootCache = new RrDb(namedCaPath,expire);
 				getLogger().set(LogKind.DETAIL, null, 6, namedCaPath);
 
 			} catch (IOException e) {
@@ -90,7 +91,7 @@ public final class Server extends OneServer {
 
 		//.が存在する場合、.以降をデフォルト値として仮置きする
 		int index = requestName.indexOf('.');
-		if (index != -1 && index < requestName.length()-1) {
+		if (index != -1 && index < requestName.length() - 1) {
 			name = requestName.substring(index + 1);
 		}
 
@@ -109,6 +110,10 @@ public final class Server extends OneServer {
 		} else if (dnsType == DnsType.Mx || dnsType == DnsType.Ns || dnsType == DnsType.Soa) {
 			//MX NS SOA リクエストの場合亜h、requestName自体がドメイン名となる
 			name = requestName;
+		}
+
+		if (requestName.toUpperCase().equals("LOCALHOST.")) {
+			name = "localhost.";
 		}
 		return name;
 
@@ -141,7 +146,8 @@ public final class Server extends OneServer {
 		RrDb targetCache = rootCache; //デフォルトはルートキャッシュ
 
 		if (rp.getDnsType() == DnsType.Ptr) {
-			if (rp.getRequestName().toUpperCase().equals("1.0.0.127.IN-ADDR.ARPA.")) {
+			if (rp.getRequestName().toUpperCase().equals("1.0.0.127.IN-ADDR.ARPA.")
+					|| rp.getRequestName().toUpperCase().equals("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.")) {
 				//キャッシュはデフォルトであるルートキャッシュが使用される
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 9, ""); //"request to a domain under auto (localhost)"
@@ -269,16 +275,18 @@ public final class Server extends OneServer {
 			getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Authority Resurce(%s) Max=%s", DnsType.Ns, authList.size()));
 			for (OneRr oneRR : authList) {
 				sp.addRR(RrKind.NS, new RrNs(oneRR.getName(), oneRR.getTtl(), oneRR.getData()));
-				//「追加情報」
-				ArrayList<OneRr> addList = targetCache.getList(oneRR.getName(), DnsType.A);
-				for (OneRr rr : addList) {
-					sp.addRR(RrKind.AR, new RrA(oneRR.getName(), rr.getTtl(), rr.getData()));
-				}
-				addList = targetCache.getList(oneRR.getName(), DnsType.Aaaa);
-				for (OneRr rr : addList) {
-					sp.addRR(RrKind.AR, new RrAaaa(oneRR.getName(), rr.getTtl(), rr.getData()));
-				}
 
+				if (!domainName.toUpperCase().equals("LOCALHOST.")) { //localhost検索の場合は、追加情報はない
+					//「追加情報」
+					ArrayList<OneRr> addList = targetCache.getList(oneRR.getName(), DnsType.A);
+					for (OneRr rr : addList) {
+						sp.addRR(RrKind.AR, new RrA(oneRR.getName(), rr.getTtl(), rr.getData()));
+					}
+					addList = targetCache.getList(oneRR.getName(), DnsType.Aaaa);
+					for (OneRr rr : addList) {
+						sp.addRR(RrKind.AR, new RrAaaa(oneRR.getName(), rr.getTtl(), rr.getData()));
+					}
+				}
 			}
 		}
 

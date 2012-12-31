@@ -43,6 +43,10 @@ public final class DnsUtil {
 	 * @return
 	 */
 	public static byte[] str2DnsName(String name) {
+		if (name.equals("")) {
+			return new byte[] { 0 };
+		}
+
 		if (name.charAt(name.length() - 1) == '.') {
 			name = name.substring(0, name.length() - 1);
 		}
@@ -160,6 +164,5 @@ public final class DnsUtil {
 		}
 		return null; //これが返されることはない
 	}
-
 
 }

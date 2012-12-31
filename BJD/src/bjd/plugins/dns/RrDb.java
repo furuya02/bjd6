@@ -21,6 +21,7 @@ public final class RrDb {
 	private Object lock = new Object(); //排他制御
 	private ArrayList<OneRr> ar = new ArrayList<>();
 	private String domainName = "ERROR";
+	private int expire = 0;
 
 	public String getDomainName() {
 		return domainName;
@@ -34,6 +35,7 @@ public final class RrDb {
 	public RrDb() {
 		//ドメイン名の初期化
 		setDomainName("example.com."); //テスト用ドメイン名
+		this.expire = 2400; //テスト用は2400で固定
 	}
 
 	/**
@@ -62,7 +64,7 @@ public final class RrDb {
 			int serial = (int) conf.get("soaSerial");
 			int refresh = (int) conf.get("soaRefresh");
 			int retry = (int) conf.get("soaRetry");
-			int expire = (int) conf.get("soaExpire");
+			expire = (int) conf.get("soaExpire"); //expireは、TTL=0のリソースが検索されたとき、TTLに使用するため、クラス変数に保存する
 			int minimum = (int) conf.get("soaMinimum");
 			if (!initSoa(domainName, mail, serial, refresh, retry, expire, minimum)) {
 				logger.set(LogKind.ERROR, null, 20, String.format("domain=%s", domainName));
@@ -75,9 +77,10 @@ public final class RrDb {
 	 * named.caで初期化する場合
 	 * @throws IOException 
 	 */
-	public RrDb(String namedCaPath) throws IOException {
+	public RrDb(String namedCaPath, int expire) throws IOException {
 		//ドメイン名の初期化
 		setDomainName(".");
+		this.expire = expire;
 
 		//named.caの読み込み
 		if (namedCaPath != null) {
@@ -267,6 +270,9 @@ public final class RrDb {
 		ip = new Ip(IpKind.V6_LOCALHOST);
 		add(new RrAaaa("localhost.", ttl, ip));
 		add(new RrPtr("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.", ttl, "localhost"));
+
+		//ドメイン名が""空の時にNSレコードを返すため
+		add(new RrNs("localhost.", ttl, "localhost"));
 	}
 
 	/**
@@ -347,7 +353,14 @@ public final class RrDb {
 				//}
 				//int ttl = Util.htonl(soaExpire);
 				//	
-				list.add(o);
+
+				//TTLだけを修正したクローンを作成してresultリストに追加する
+				int ttl = o.getTtl();
+				//TTLが0の場合、「基本設定」の「最少時間」を使用する
+				if (ttl == 0) {
+					ttl = expire;
+				}
+				list.add(o.clone(ttl));
 			}
 			//期限の過ぎたリソースの削除
 			for (OneRr o : removeList) {

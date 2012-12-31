@@ -238,7 +238,9 @@ public final class Kernel implements IDispose {
 		//************************************************************
 		//ListPlugin は。ListOptionとListServerを初期化する間だけ生存する
 		//isTest=trueの場合、パスを""にして、プラグイン0個で初期化さあせる
-		ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
+		
+		//ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
+		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
 		for (OnePlugin o : listPlugin) {
 			tmpLogger.set(LogKind.NORMAL, null, 9000008, String.format("%sServer", o.getName()));
 		}

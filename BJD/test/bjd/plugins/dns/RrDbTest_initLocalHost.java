@@ -11,7 +11,7 @@ public class RrDbTest_initLocalHost {
 	public void 件数は４件になる() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		int expected = 4;
+		int expected = 5;
 		//exercise
 		RrDbTest.initLocalHost(sut);
 		int actual = RrDbTest.size(sut);
@@ -71,6 +71,18 @@ public class RrDbTest_initLocalHost {
 		assertThat(o.getPtr(), is("localhost."));
 	}
 
+	@Test
+	public void リソース確認_5番目はNSレコードとなる() throws Exception {
+		//setUp
+		RrDb sut = new RrDb();
+		//exercise
+		RrDbTest.initLocalHost(sut);
+		RrNs o = (RrNs) RrDbTest.get(sut, 4);
+		//verify
+		assertThat(o.getDnsType(), is(DnsType.Ns));
+		assertThat(o.getName(), is("localhost."));
+		assertThat(o.getNsName(), is("localhost."));
+	}
 
 
 }

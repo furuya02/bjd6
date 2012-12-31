@@ -57,7 +57,7 @@ public final class RrDbTest {
 		m.setAccessible(true);
 		m.invoke(sut);
 	}
-	
+
 	//リフレクションを使用してプライベートメソッドにアクセスする RrDb.addOneDat(String,OneDat)
 	public static boolean initSoa(RrDb sut, String domainName, String mail, int serial, int refresh, int retry, int expire, int minimum) throws Exception {
 		Class<RrDb> c = RrDb.class;
@@ -65,21 +65,20 @@ public final class RrDbTest {
 		m.setAccessible(true);
 		return (boolean) m.invoke(sut, domainName, mail, serial, refresh, retry, expire, minimum);
 	}
-	
 
 	@Test(expected = IOException.class)
 	//例外テスト
 	public void コンストラクタの例外処理_指定したファイルが存在しない() throws Exception {
 		//exercise
 		String namedCaPath = "dmy";
-		new RrDb(namedCaPath);
+		new RrDb(namedCaPath, 2400);
 	}
 
 	@Test
 	public void getDomainNameの確認_namedcaで初期化された場合ルートになる() throws Exception {
 		//setUp
 		String namedCaPath = File.createTempFile("xxx", ".ca").getPath();
-		RrDb sut = new RrDb(namedCaPath);
+		RrDb sut = new RrDb(namedCaPath, 2400);
 		String expected = ".";
 		//exercise
 		String actual = sut.getDomainName();
