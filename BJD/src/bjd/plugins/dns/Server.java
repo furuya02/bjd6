@@ -16,6 +16,7 @@ import bjd.option.OneOption;
 import bjd.server.OneServer;
 import bjd.sock.SockObj;
 import bjd.sock.SockUdp;
+import bjd.util.Util;
 
 public final class Server extends OneServer {
 
@@ -45,8 +46,8 @@ public final class Server extends OneServer {
 		if ((new File(namedCaPath)).exists()) {
 			try {
 				//named.ca読み込み用コンストラクタ
-				int expire = (int)getConf().get("soaExpire");
-				rootCache = new RrDb(namedCaPath,expire);
+				int expire = (int) getConf().get("soaExpire");
+				rootCache = new RrDb(namedCaPath, expire);
 				getLogger().set(LogKind.DETAIL, null, 6, namedCaPath);
 
 			} catch (IOException e) {
@@ -147,7 +148,8 @@ public final class Server extends OneServer {
 
 		if (rp.getDnsType() == DnsType.Ptr) {
 			if (rp.getRequestName().toUpperCase().equals("1.0.0.127.IN-ADDR.ARPA.")
-					|| rp.getRequestName().toUpperCase().equals("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.")) {
+					|| rp.getRequestName().toUpperCase().equals("1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.IP6.ARPA.")
+					|| rp.getRequestName().toUpperCase().equals("LOCALHOST.")) {
 				//キャッシュはデフォルトであるルートキャッシュが使用される
 				aa = true;
 				getLogger().set(LogKind.DETAIL, sockUdp, 9, ""); //"request to a domain under auto (localhost)"
@@ -221,16 +223,27 @@ public final class Server extends OneServer {
 				sp.addRR(RrKind.AN, DnsUtil.createRr(rp.getRequestName(), rp.getDnsType(), oneRR.getTtl(), oneRR.getData()));
 				if (rp.getDnsType() == DnsType.Mx || rp.getDnsType() == DnsType.Cname || rp.getDnsType() == DnsType.Ns) {
 
+					String targetName = "";
+					if (rp.getDnsType() == DnsType.Mx) {
+						targetName = ((RrMx) oneRR).getMailExchangeHost();
+					} else if (rp.getDnsType() == DnsType.Ns) {
+						targetName = ((RrNs) oneRR).getNsName();
+					} else if (rp.getDnsType() == DnsType.Cname) {
+						targetName = ((RrCname) oneRR).getCName();
+					} else {
+						Util.runtimeException("not implement [Server.onSubThread()]");
+					}
+
 					//追加情報が必要な場合 （Aレコード）をパケットに追加する
-					ArrayList<OneRr> rr = targetCache.getList(oneRR.getName(), DnsType.A);
+					ArrayList<OneRr> rr = targetCache.getList(targetName, DnsType.A);
 					for (OneRr r : rr) {
-						sp.addRR(RrKind.AR, new RrA(oneRR.getName(), r.getTtl(), r.getData()));
+						sp.addRR(RrKind.AR, new RrA(targetName, r.getTtl(), r.getData()));
 					}
 
 					//追加情報が必要な場合 （AAAAレコード）をパケットに追加する
-					rr = targetCache.getList(oneRR.getName(), DnsType.Aaaa);
+					rr = targetCache.getList(targetName, DnsType.Aaaa);
 					for (OneRr r : rr) {
-						sp.addRR(RrKind.AR, new RrAaaa(oneRR.getName(), r.getTtl(), r.getData()));
+						sp.addRR(RrKind.AR, new RrAaaa(targetName, r.getTtl(), r.getData()));
 					}
 				}
 			}
@@ -269,22 +282,23 @@ public final class Server extends OneServer {
 			}
 		}
 
-		if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa) {
+		if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa || rp.getDnsType() == DnsType.Cname) {
 			// (C)「権威セクション」「追加情報セクション」作成
-			ArrayList<OneRr> authList = targetCache.getList(domainName, DnsType.Ns);
-			getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Authority Resurce(%s) Max=%s", DnsType.Ns, authList.size()));
-			for (OneRr oneRR : authList) {
-				sp.addRR(RrKind.NS, new RrNs(oneRR.getName(), oneRR.getTtl(), oneRR.getData()));
+			ArrayList<OneRr> nsList = targetCache.getList(domainName, DnsType.Ns);
+			getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("Authority Resurce(%s) Max=%s", DnsType.Ns, nsList.size()));
+			for (OneRr o : nsList) {
+				RrNs ns = (RrNs) o;
+				sp.addRR(RrKind.NS, new RrNs(ns.getName(), ns.getTtl(), ns.getData()));
 
 				if (!domainName.toUpperCase().equals("LOCALHOST.")) { //localhost検索の場合は、追加情報はない
 					//「追加情報」
-					ArrayList<OneRr> addList = targetCache.getList(oneRR.getName(), DnsType.A);
+					ArrayList<OneRr> addList = targetCache.getList(ns.getNsName(), DnsType.A);
 					for (OneRr rr : addList) {
-						sp.addRR(RrKind.AR, new RrA(oneRR.getName(), rr.getTtl(), rr.getData()));
+						sp.addRR(RrKind.AR, new RrA(ns.getNsName(), rr.getTtl(), rr.getData()));
 					}
-					addList = targetCache.getList(oneRR.getName(), DnsType.Aaaa);
+					addList = targetCache.getList(ns.getNsName(), DnsType.Aaaa);
 					for (OneRr rr : addList) {
-						sp.addRR(RrKind.AR, new RrAaaa(oneRR.getName(), rr.getTtl(), rr.getData()));
+						sp.addRR(RrKind.AR, new RrAaaa(ns.getNsName(), rr.getTtl(), rr.getData()));
 					}
 				}
 			}

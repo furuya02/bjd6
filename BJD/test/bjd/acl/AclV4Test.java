@@ -2,6 +2,7 @@ package bjd.acl;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+
 import junit.framework.Assert;
 
 import org.junit.experimental.runners.Enclosed;
@@ -14,15 +15,13 @@ import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.test.TestUtil;
 
-
 @RunWith(Enclosed.class)
 public class AclV4Test {
 	@RunWith(Theories.class)
-	public static final class startとendの確認 {
+	public static final class getStart及びgetEndの確認 {
 
 		@DataPoints
 		public static Fixture[] datas = {
-				//コントロールの種類,デフォルト値,toRegの出力
 				new Fixture("192.168.0.1-192.168.10.254", "192.168.0.1", "192.168.10.254"),
 				new Fixture("192.168.0.1-200", "192.168.0.1", "192.168.0.200"),
 				new Fixture("*", "0.0.0.0", "255.255.255.255"),
@@ -32,6 +31,7 @@ public class AclV4Test {
 				new Fixture("192.168.10.254-192.168.0.1", "192.168.0.1", "192.168.10.254"),
 				new Fixture("192.168.0.1", "192.168.0.1", "192.168.0.1"),
 		};
+
 		static class Fixture {
 			private String aclStr;
 			private String startStr;
@@ -42,67 +42,63 @@ public class AclV4Test {
 				this.startStr = startStr;
 				this.endStr = endStr;
 			}
-
-			public String toString() {
-				return String.format("new AclV4(%s) => getStartr()=%s getEnd()=%s", aclStr, startStr, endStr);
-			}
-
 		}
 
 		@Theory
-		public void test(Fixture fx) {
+		public void getStartの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV4 sut = new AclV4("TAG", fx.aclStr);
+			String expected = fx.startStr;
+			//exercise
+			String actual = sut.getStart().toString();
+			//verify
+			assertThat(actual, is(expected));
+		}
 
-			TestUtil.prompt(fx.toString()); 
-
-			try {
-				AclV4 sut = new AclV4("test", fx.aclStr);
-				assertThat(sut.getStart().toString(), is(fx.startStr));
-				assertThat(sut.getEnd().toString(), is(fx.endStr));
-			} catch (ValidObjException e) {
-				Assert.fail(e.getMessage());
-			}
-			
+		@Theory
+		public void getEndの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV4 sut = new AclV4("TAG", fx.aclStr);
+			String expected = fx.endStr;
+			//exercise
+			String actual = sut.getEnd().toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
-	
+
 	@RunWith(Theories.class)
 	public static final class isHitを使用して範囲に入っているかを確認する {
 
 		@DataPoints
 		public static Fixture[] datas = {
-				//コントロールの種類,デフォルト値,toRegの出力
 				new Fixture("192.168.1.0/24", "192.168.1.0", true),
 				new Fixture("192.168.1.0/24", "192.168.1.255", true),
 				new Fixture("192.168.1.0/24", "192.168.0.255", false),
 				new Fixture("192.168.1.0/24", "192.168.2.0", false),
 		};
+
 		static class Fixture {
 			private String aclStr;
-			private String ipStr;
+			private Ip ip;
 			private boolean expected;
 
 			public Fixture(String aclStr, String ipStr, boolean expected) {
 				this.aclStr = aclStr;
-				this.ipStr = ipStr;
 				this.expected = expected;
+				this.ip = TestUtil.createIp(ipStr);
 			}
-
-			public String toString() {
-				return String.format("new AclV4(%s) => isHit(%s)=%s", aclStr, ipStr, expected);
-			}
-
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-			TestUtil.prompt(fx.toString()); 
-
-			try {
-				AclV4 aclV4 = new AclV4("test", fx.aclStr);
-				assertThat(aclV4.isHit(new Ip(fx.ipStr)), is(fx.expected));
-			} catch (ValidObjException e) {
-				Assert.fail(e.getMessage());
-			}
+		public void isHitの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV4 sut = new AclV4("TAG", fx.aclStr);
+			boolean expected = fx.expected;
+			//exercise
+			boolean actual = sut.isHit(fx.ip);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -118,22 +114,19 @@ public class AclV4Test {
 				new Fixture("192.168.1.0-267"),
 				new Fixture("192.168.1.0/200"),
 		};
+
 		static class Fixture {
 			private String aclStr;
-
 			public Fixture(String aclStr) {
 				this.aclStr = aclStr;
 			}
-			public String toString() {
-				return String.format("new AclV6(%s) => ValidObjException", aclStr);
-			}
 		}
-
+		
 		@Theory
-		public void test(Fixture fx) {
-			TestUtil.prompt(fx.toString()); 
+		public void 例外を発生させるテスト(Fixture fx){
+			//exercise
 			try {
-				new AclV4("TEST", fx.aclStr);
+				new AclV4("TAG", fx.aclStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
 				return;

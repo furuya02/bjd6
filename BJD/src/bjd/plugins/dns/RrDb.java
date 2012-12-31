@@ -444,7 +444,10 @@ public final class RrDb {
 		int type = Integer.valueOf(o.getStrList().get(0));
 		String name = o.getStrList().get(1);
 		String alias = o.getStrList().get(2);
-		Ip ip = new Ip(o.getStrList().get(3));
+		Ip ip = null;
+		if(type!=3){ //Cnameの時、Ipアドレスが入っていないので、例外が発生する
+			ip = new Ip(o.getStrList().get(3));
+		}
 		int priority = Integer.valueOf(o.getStrList().get(4));
 		int ttl = 0; //有効期限なし
 
@@ -501,7 +504,7 @@ public final class RrDb {
 			//PTR名を作成 [例] 192.168.0.1 -> 1.0.168.192.in-addr.arpa;
 			if (ip.getInetKind() == InetKind.V4) { //IPv4
 				String ptrName = String.format("%d.%d.%d.%d.in-addr.arpa.", (ip.getIpV4()[3] & 0xff), (ip.getIpV4()[2] & 0xff), (ip.getIpV4()[1] & 0xff), (ip.getIpV4()[0] & 0xff));
-				add(new RrPtr(name, ttl, ptrName));
+				add(new RrPtr(ptrName, ttl, name));
 			} else { //IPv6
 				StringBuilder sb = new StringBuilder();
 				for (byte a : ip.getIpV6()) {
@@ -514,7 +517,7 @@ public final class RrDb {
 						sb.append(ipStr.charAt(e));
 						sb.append('.');
 					}
-					add(new RrPtr(name, ttl, sb + "ip6.arpa."));
+					add(new RrPtr(sb + "ip6.arpa.", ttl, name));
 				}
 			}
 		}

@@ -5,30 +5,63 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import bjd.util.Util;
+
 public final class RrDbTest_addNamedCaLine {
 
 	int expire = 2400;
+	
+	/**
+	 * 共通メソッド
+	 * リソースレコードのtoString()
+	 * @param o
+	 * @return
+	 */
+	private String print(OneRr o) {
+		switch (o.getDnsType()) {
+			case A:
+				return ((RrA) o).toString();
+			case Aaaa:
+				return ((RrAaaa) o).toString();
+			case Ns:
+				return ((RrNs) o).toString();
+			case Mx:
+				return ((RrMx) o).toString();
+			case Ptr:
+				return ((RrPtr) o).toString();
+			case Soa:
+				return ((RrSoa) o).toString();
+			case Cname:
+				return ((RrCname) o).toString();
+			default:
+				Util.runtimeException("not implement.");
+				break;
+		}
+		return "";
+	}
 
 	@Test
 	public void コメント行は処理されない() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		String tmpName = "";
 		//exercise
-		RrDbTest.addNamedCaLine(sut, tmpName, "; formerly NS.INTERNIC.NET");
+		int expected = 0;
+		RrDbTest.addNamedCaLine(sut, "", "; formerly NS.INTERNIC.NET");
+		int actual = RrDbTest.size(sut);
 		//verify
-		assertThat(RrDbTest.size(sut), is(0));
+		assertThat(actual, is(expected));
 	}
 
 	@Test
 	public void 空白行は処理されない() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		String tmpName = "";
 		//exercise
-		RrDbTest.addNamedCaLine(sut, tmpName, "");
+		int expected = 0;
+		RrDbTest.addNamedCaLine(sut, "", "");
+		int actual = RrDbTest.size(sut);
 		//verify
-		assertThat(RrDbTest.size(sut), is(0));
+		assertThat(actual, is(expected));
 	}
 
 	
@@ -36,54 +69,36 @@ public final class RrDbTest_addNamedCaLine {
 	public void Aレコードの処理() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		String tmpName = "";
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, tmpName, "A.ROOT-SERVERS.NET.      3600000      A     198.41.0.4");
+		String retName = RrDbTest.addNamedCaLine(sut, "", "A.ROOT-SERVERS.NET.      3600000      A     198.41.0.4");
 		//verify
-		RrA o = (RrA) RrDbTest.get(sut, 0);
 		assertThat(retName, is("A.ROOT-SERVERS.NET."));
-		assertThat(RrDbTest.size(sut), is(1));
-		assertThat(o.getDnsType(), is(DnsType.A));
-		assertThat(o.getIp().toString(), is("198.41.0.4"));
-		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
-		assertThat(o.getName(), is("A.ROOT-SERVERS.NET."));
+		assertThat(RrDbTest.size(sut), is(1)); //A
+		assertThat(print(RrDbTest.get(sut, 0)), is("A A.ROOT-SERVERS.NET. TTL=0 198.41.0.4")); //TTLは強制的に0になる
 	}
 
 	@Test
 	public void AAAAレコードの処理() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		String tmpName = "";
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, tmpName, "A.ROOT-SERVERS.NET.      3600000      AAAA  2001:503:BA3E::2:30");
+		String retName = RrDbTest.addNamedCaLine(sut, "", "A.ROOT-SERVERS.NET.      3600000      AAAA  2001:503:BA3E::2:30");
 		//verify
-		RrAaaa o = (RrAaaa) RrDbTest.get(sut, 0);
 		assertThat(retName, is("A.ROOT-SERVERS.NET."));
-		assertThat(RrDbTest.size(sut), is(1));
-		assertThat(o.getDnsType(), is(DnsType.Aaaa));
-		assertThat(o.getIp().toString(), is("2001:503:ba3e::2:30"));
-		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
-		assertThat(o.getName(), is("A.ROOT-SERVERS.NET."));
+		assertThat(RrDbTest.size(sut), is(1)); //Aaaa
+		assertThat(print(RrDbTest.get(sut, 0)), is("Aaaa A.ROOT-SERVERS.NET. TTL=0 2001:503:ba3e::2:30")); //TTLは強制的に0になる
 	}
 
 	@Test
 	public void NSレコードの処理() throws Exception {
 		//setUp
 		RrDb sut = new RrDb();
-		String tmpName = "";
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, tmpName, ".                        3600000  IN  NS    A.ROOT-SERVERS.NET.");
+		String retName = RrDbTest.addNamedCaLine(sut, "", ".                        3600000  IN  NS    A.ROOT-SERVERS.NET.");
 		//verify
-		RrNs o = (RrNs) RrDbTest.get(sut, 0);
 		assertThat(retName, is("."));
-		assertThat(RrDbTest.size(sut), is(1));
-		assertThat(o.getDnsType(), is(DnsType.Ns));
-		assertThat(o.getNsName(), is("A.ROOT-SERVERS.NET."));
-		assertThat(o.getTtl(), is(0)); //TTLは強制的に0になる
-		assertThat(o.getName(), is("."));
+		assertThat(RrDbTest.size(sut), is(1)); //Ns
+		assertThat(print(RrDbTest.get(sut, 0)), is("Ns . TTL=0 A.ROOT-SERVERS.NET.")); //TTLは強制的に0になる
 	}
 
 	@Test(expected = Exception.class)
@@ -147,11 +162,10 @@ public final class RrDbTest_addNamedCaLine {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, "", "@      3600000      A     198.41.0.4");
+		String expected = "example.com.";
+		String actual = RrDbTest.addNamedCaLine(sut, "", "@      3600000      A     198.41.0.4");
 		//verify
-		RrA o = (RrA) RrDbTest.get(sut, 0);
-		assertThat(retName, is("example.com."));
+		assertThat(actual, is(expected));
 	}
 
 	@Test
@@ -159,11 +173,10 @@ public final class RrDbTest_addNamedCaLine {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, "", "www      3600000      A     198.41.0.4");
+		String expected = "www.example.com.";
+		String actual = RrDbTest.addNamedCaLine(sut, "", "www      3600000      A     198.41.0.4");
 		//verify
-		RrA o = (RrA) RrDbTest.get(sut, 0);
-		assertThat(retName, is("www.example.com."));
+		assertThat(actual, is(expected));
 	}
 
 	@Test
@@ -171,10 +184,9 @@ public final class RrDbTest_addNamedCaLine {
 		//setUp
 		RrDb sut = new RrDb();
 		//exercise
-
-		String retName = RrDbTest.addNamedCaLine(sut, "before.aaa.com.", "     3600000      A     198.41.0.4");
+		String expected = "before.aaa.com.";
+		String actual = RrDbTest.addNamedCaLine(sut, "before.aaa.com.", "     3600000      A     198.41.0.4");
 		//verify
-		RrA o = (RrA) RrDbTest.get(sut, 0);
-		assertThat(retName, is("before.aaa.com."));
+		assertThat(actual, is(expected));
 	}
 }

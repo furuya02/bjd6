@@ -15,8 +15,8 @@ public final class RrPtrTest {
 	@Test
 	public void getPtrの確認() throws Exception {
 		//setUp
-		String expected = "ns.google.com.";
-		RrPtr sut = new RrPtr("aaa.com", 0, expected);
+		String expected = "www.aaa.com.";
+		RrPtr sut = new RrPtr("1.0.0.127.in-addr.arpa.", 0, expected);
 		//exercise
 		String actual = sut.getPtr();
 		//verify
@@ -26,8 +26,8 @@ public final class RrPtrTest {
 	@Test
 	public void バイナリ初期化との比較() throws Exception {
 		//setUp
-		RrPtr sut = new RrPtr("aaa.com", 64800, "1.");
-		OneRr expected = new RrPtr("aaa.com", 64800, new byte[] { 01, 49, 0 });
+		RrPtr sut = new RrPtr("1.0.0.127.in-addr.arpa.", 64800, "1.");
+		OneRr expected = new RrPtr("1.0.0.127.in-addr.arpa.", 64800, new byte[] { 01, 49, 0 });
 		//exercise
 		OneRr actual = (OneRr) sut;
 		//verify
@@ -37,9 +37,9 @@ public final class RrPtrTest {
 	@Test
 	public void 実パケット生成したオブジェクトとの比較() throws Exception {
 		//setUp
-		RrPtr sut = new RrPtr("aaa.com", 0x00000e10, "localhost");
+		RrPtr sut = new RrPtr("1.0.0.127.in-addr.arpa.", 0x00000e10, "localhost");
 		PacketRr rr = new PacketRr(TestUtil.hexStream2Bytes(str0), 0);
-		OneRr expected = new RrPtr("aaa.com", rr.getTtl(), rr.getData());
+		OneRr expected = new RrPtr("1.0.0.127.in-addr.arpa.", rr.getTtl(), rr.getData());
 		//exercise
 		OneRr actual = (OneRr) sut;
 		//verify
@@ -49,8 +49,8 @@ public final class RrPtrTest {
 	@Test
 	public void toStringの確認() throws Exception {
 		//setUp
-		String expected = "Ptr aaa.com TTL=0 ns.google.com.";
-		RrPtr sut = new RrPtr("aaa.com", 0, "ns.google.com.");
+		String expected = "Ptr 1.0.0.127.in-addr.arpa. TTL=0 www.aaa.com.";
+		RrPtr sut = new RrPtr("1.0.0.127.in-addr.arpa.", 0, "www.aaa.com.");
 		//exercise
 		String actual = sut.toString();
 		//verify

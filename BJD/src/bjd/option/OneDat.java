@@ -141,7 +141,6 @@ public final class OneDat extends ValidObj  implements IDispose {
 	 */
 	@Override
 	public String toString() {
-		Util.runtimeException("誤って使用されないように例外（未実装）とする");
 		return "ERROR";
 	}
 
