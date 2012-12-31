@@ -200,7 +200,6 @@ public final class LogLimitTest {
 		LogLimit logLimit = new LogLimit(dat, isDisplay);
 		
 		//表示する
-		TestUtil.prompt("[表示する]");
 		boolean expected = true;
 		check(logLimit, "AAA", expected);
 		check(logLimit, "表示A", expected);
@@ -209,7 +208,6 @@ public final class LogLimitTest {
 		check(logLimit, "12アイウ", expected);
 
 		//表示しない
-		TestUtil.prompt("[表示しない]");
 		expected = false;
 		check(logLimit, "AA", expected);
 		check(logLimit, "表a示A", expected);
@@ -221,8 +219,8 @@ public final class LogLimitTest {
 	}
 	
 	private void check(LogLimit logLimit, String str, boolean expected) {
-		TestUtil.prompt(String.format("logLimit(\"%s\")=%s", str, expected));
-		assertThat(logLimit.isDisplay(str), is(expected));
+		boolean actual = logLimit.isDisplay(str);
+		assertThat(actual, is(expected));
 	}
 
 }

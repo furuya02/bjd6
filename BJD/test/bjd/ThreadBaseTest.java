@@ -8,7 +8,7 @@ import org.junit.Test;
 import bjd.test.TestUtil;
 import bjd.util.Util;
 
-public class ThreadBaseTest {
+public final class ThreadBaseTest {
 
 	class MyThread extends ThreadBase {
 
@@ -40,75 +40,90 @@ public class ThreadBaseTest {
 	}
 
 	@Test
-	public final void start及びstopでisRunnigの状態を確認する() {
-
+	public void startする前はisRunningはfalseとなる() throws Exception {
+		//setUp
 		MyThread sut = new MyThread();
-
-		sut.start();
-		TestUtil.prompt("start()");
-		assertThat(sut.isRunnig(), is(true));
-		TestUtil.prompt("isRunnig()=true start()から返った時点で、isRunnig()はTrueになっている");
-
-		sut.stop();
-		TestUtil.prompt("stop()");
-		assertThat(sut.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false stop()から返った時点で、isRunnig()はfalseになっている");
-
-		sut.stop();
-		TestUtil.prompt("stop() stop()が重複しても問題ない");
-
-		//start()から返った時点で、isRunnig()はTrueになっている
-		sut.start();
-		TestUtil.prompt("start()");
-		assertThat(sut.isRunnig(), is(true));
-		TestUtil.prompt("isRunnig()=true");
-
-		sut.start(); //start()が重複しても問題ない
-		TestUtil.prompt("start() start()が重複しても問題ない");
-
-		sut.stop();
-		TestUtil.prompt("stop()");
-		assertThat(sut.isRunnig(), is(false));
-		TestUtil.prompt("isRunnig()=false");
-
+		boolean expected = false;
+		//exercise
+		boolean actual = sut.isRunnig();
+		//verify
+		assertThat(actual, is(expected));
+		//tearDown
 		sut.dispose();
-		TestUtil.prompt("myThread.dispose()");
 	}
 
 	@Test
-	public final void start及びstopしてisRunnigの状態を確認する_負荷テスト() {
-
+	public void startするとisRunningはtrueとなる() throws Exception {
+		//setUp
 		MyThread sut = new MyThread();
+		boolean expected = true;
+		//exercise
+		sut.start();
+		boolean actual = sut.isRunnig();
+		//verify
+		assertThat(actual, is(expected));
+		//tearDown
+		sut.dispose();
+	}
 
+	@Test
+	public void startは重複しても問題ない() throws Exception {
+		//setUp
+		MyThread sut = new MyThread();
+		boolean expected = true;
+		//exercise
+		sut.start();
+		sut.start(); //重複
+		boolean actual = sut.isRunnig();
+		//verify
+		assertThat(actual, is(expected));
+		//tearDown
+		sut.dispose();
+	}
+
+	@Test
+	public void stopは重複しても問題ない() throws Exception {
+		//setUp
+		MyThread sut = new MyThread();
+		boolean expected = false;
+		//exercise
+		sut.stop(); //重複
+		sut.start();
+		sut.stop();
+		sut.stop(); //重複
+		boolean actual = sut.isRunnig();
+		//verify
+		assertThat(actual, is(expected));
+		//tearDown
+		sut.dispose();
+	}
+
+	@Test
+	public final void start及びstopしてisRunnigの状態を確認する_負荷テスト() throws Exception {
+
+		//setUp
+		MyThread sut = new MyThread();
+		//exercise verify 
 		for (int i = 0; i < 5; i++) {
-			TestUtil.prompt(String.format("start() i=%d", i));
 			sut.start();
-			TestUtil.prompt("isRunning() = true");
 			assertThat(sut.isRunnig(), is(true));
-			TestUtil.prompt("stop()");
 			sut.stop();
-			TestUtil.prompt("isRunning() = false");
 			assertThat(sut.isRunnig(), is(false));
 		}
-
+		//tearDown
 		sut.dispose();
 	}
 
 	@Test
 	public final void new及びstart_stop_disposeしてisRunnigの状態を確認する_負荷テスト() {
 
+		//exercise verify 
 		for (int i = 0; i < 3; i++) {
-			TestUtil.prompt(String.format("new i=%d", i));
 			MyThread sut = new MyThread();
-			TestUtil.prompt("start()");
 			sut.start();
-			TestUtil.prompt("isRunning() = true");
 			assertThat(sut.isRunnig(), is(true));
-			TestUtil.prompt("stopt()");
 			sut.stop();
-			TestUtil.prompt("isRunning() = false");
 			assertThat(sut.isRunnig(), is(false));
-			TestUtil.prompt("dispose()");
 			sut.dispose();
 		}
 	}

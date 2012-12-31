@@ -49,8 +49,8 @@ public class CtrlDatTest {
 			ArrayList<String> out = (ArrayList<String>) exportDat.invoke(sut);
 
 			for (int i = 0; i < in.size(); i++) {
-				TestUtil.prompt(String.format("import> %s", in.get(i)));
-				TestUtil.prompt(String.format("export> %s", out.get(i)));
+				//TestUtil.prompt(String.format("import> %s", in.get(i)));
+				//TestUtil.prompt(String.format("export> %s", out.get(i)));
 				
 				assertThat(in.get(i), is(out.get(i)));
 			}
