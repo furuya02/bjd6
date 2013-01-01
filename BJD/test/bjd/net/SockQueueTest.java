@@ -12,66 +12,90 @@ import bjd.test.TestUtil;
 public final class SockQueueTest {
 
 	@Test
-	public void SockQueue入出力() {
-
-		TestUtil.prompt("sockQueue = new SockQueue()");
-		SockQueue sockQueu = new SockQueue();
-
-		int len = sockQueu.length();
-		TestUtil.prompt(String.format("sockQueue.length = %s キューのバイト数は0", len));
-		assertThat(len, is(0));
-
-		TestUtil.prompt(String.format("byte[] buf = sockQueue.dequeu(100) 0のキューから100バイト取得"));
-		byte[] buf = sockQueu.dequeue(100);
-
-		TestUtil.prompt(String.format("buf.length=0 サイズ0のバッファが返される"));
-		assertThat(buf.length, is(0));
-
-		TestUtil.prompt(String.format("byte[] buf = new byte[100]{0,1,2,3....} テスト用データを作成"));
-		buf = new byte[100];
-		for (int i = 0; i < 100; i++) {
-			buf[i] = (byte) i;
-		}
-		TestUtil.prompt(String.format("int len = sockQueue.enqueu(buf,100) 100バイトをキューに入れる"));
-		len = sockQueu.enqueue(buf, 100);
-
-		len = sockQueu.length();
-		TestUtil.prompt(String.format("sockQueue.length = %s", len));
-		assertThat(len, is(100));
-
-		TestUtil.prompt(String.format("byte[] buf = sockQueue.dequeu(50) 50バイト、キューから取り出す"));
-		buf = sockQueu.dequeue(50);
-
-		len = buf.length;
-		TestUtil.prompt(String.format("buf.length == %d", len));
-		assertThat(len, is(50));
-
-		TestUtil.prompt(String.format("byte[] buf = sockQueue.dequeu(30)　30バイト、キューから取り出す"));
-		buf = sockQueu.dequeue(30);
-
-		len = buf.length;
-		TestUtil.prompt(String.format("buf.length == %d", len));
-		assertThat(len, is(30));
-
-		TestUtil.prompt(String.format("buf = {50,51,52....}　取り出した内容を確認する"));
-		for (int i = 0; i < 30; i++) {
-			Assert.assertSame(buf[i], (byte) (50 + i));
-		}
-
-		TestUtil.prompt(String.format("キューの残りは20バイト"));
-
-		TestUtil.prompt(String.format("byte[] buf = sockQueue.dequeu(50) 残り20のキューから50を取得する"));
-		buf = sockQueu.dequeue(50);
-
-		len = buf.length;
-		TestUtil.prompt(String.format("buf.length == %d 20バイトだけ取得できる", len));
-		assertThat(len, is(20));
-
-		len = sockQueu.length();
-		TestUtil.prompt(String.format("sockQueue.length = %s キューの残りは0バイトになる", len));
-		assertThat(len, is(0));
-
+	public void 生成時のlengthは0になる() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		int expected = 0;
+		//exercise
+		int actual = sut.length();
+		//verify
+		assertThat(actual, is(expected));
 	}
+
+	@Test
+	public void lengthが0の時_dequeueで100バイト取得しても0バイトしか返らない() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		int expected = 0;
+		//exercise
+		int actual = sut.dequeue(100).length;
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void lengthが50の時_dequeueで100バイト取得しても50バイトしか返らない() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		sut.enqueue(new byte[50], 50);
+		int expected = 50;
+		//exercise
+		int actual = sut.dequeue(100).length;
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void lengthが200の時_dequeueで100バイト取得すると100バイト返る() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		sut.enqueue(new byte[200], 200);
+		int expected = 100;
+		//exercise
+		int actual = sut.dequeue(100).length;
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void lengthが200の時_dequeueで100バイト取得すると残りは100バイトになる() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		sut.enqueue(new byte[200], 200);
+		sut.dequeue(100);
+		int expected = 100;
+		//exercise
+		int actual = sut.length();
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void enqueueしたデータとdequeueしたデータの整合性を確認する() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		byte[] expected = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		sut.enqueue(expected, 10);
+		//exercise
+		byte[] actual = sut.dequeue(10);
+		//verify
+		assertThat(actual, is(expected));
+	}
+
+	@Test
+	public void enqueueしたデータの一部をdequeueしたデータの整合性を確認する() throws Exception {
+		//setUp
+		SockQueue sut = new SockQueue();
+		byte[] buf = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		sut.enqueue(buf, 10);
+		sut.dequeue(5); //最初に5バイト取得
+		byte[] expected = new byte[] { 5, 6, 7, 8, 9 };
+		//exercise
+		byte[] actual = sut.dequeue(5);
+		//verify
+		assertThat(actual, is(expected));
+	}
+
 
 	@Test
 	public void SockQueue_スペース確認() {
