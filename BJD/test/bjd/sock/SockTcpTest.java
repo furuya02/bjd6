@@ -87,7 +87,7 @@ public final class SockTcpTest implements ILife {
 		for (int i = 0; i < 3; i++) {
 			sut.send(new byte[max]);
 		}
-		Util.sleep(100);
+		Util.sleep(200);
 
 		int expected = max * 3;
 
