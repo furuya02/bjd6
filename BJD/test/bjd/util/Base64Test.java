@@ -32,22 +32,24 @@ public final class Base64Test {
 		};
 
 		static class Fixture {
-			private String actual;
+			private String str;
 			private String expected;
 
-			public Fixture(String actual, String expected) {
-				this.actual = actual;
+			public Fixture(String str, String expected) {
+				this.str = str;
 				this.expected = expected;
 			}
 		}
-
+		
 		@Theory
-		public void test(Fixture fx) throws MessagingException, IOException {
-			
-			String s = Base64.encode(fx.actual);
-			String expected = Base64.decode(s);
-			TestUtil.prompt(String.format("encode(%s)=%s  decode(%s)=%s\n", fx.actual, s, s, expected));
-			assertThat(expected, is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.expected;
+			//exercise
+			String actual = Base64.decode(Base64.encode(fx.str));
+			//verify
+			assertThat(actual, is(expected));
 		}
+		
 	}
 }
