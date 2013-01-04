@@ -159,7 +159,7 @@ public class IpTest {
 				// コンストラクタ文字列,toString()出力
 				new Fixture("1234:56::1234:5678:90ab", 0x12, 0x34, 0x00, 0x56, 0, 0, 0, 0, 0, 0, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab),
 				new Fixture("1::1", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-				new Fixture("ff04::f234", 0xff, 0xff04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xf2, 0x34),
+				new Fixture("ff04::f234", 0xff, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xf2, 0x34),
 				new Fixture("1::1%16", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
 				new Fixture("[1::1]", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
 
@@ -234,7 +234,7 @@ public class IpTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class 演算子イコールイコールの判定_null判定 {
+	public static final class 演算子イコールの判定_null判定 {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -346,7 +346,7 @@ public class IpTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class 文字列によるコンストラクタで例外_IllegalArgumentException_が発生することを確認する {
+	public static final class 無効な文字列で初期化すると例外_IllegalArgumentException_が発生することを確認する {
 
 		@DataPoints
 		public static Fixture[] datas = {
