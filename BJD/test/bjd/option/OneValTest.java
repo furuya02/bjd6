@@ -50,8 +50,12 @@ public class OneValTest {
 		@DataPoints
 		public static Fixture[] datas = {
 				//コントロールの種類,デフォルト値,toRegの出力
-				new Fixture(CtrlType.CHECKBOX, true, "true"), new Fixture(CtrlType.CHECKBOX, false, "false"), new Fixture(CtrlType.INT, 100, "100"),
-				new Fixture(CtrlType.INT, 0, "0"), new Fixture(CtrlType.INT, -100, "-100"), new Fixture(CtrlType.FILE, "c:\\test.txt", "c:\\test.txt"),
+				new Fixture(CtrlType.CHECKBOX, true, "true"),
+				new Fixture(CtrlType.CHECKBOX, false, "false"),
+				new Fixture(CtrlType.INT, 100, "100"),
+				new Fixture(CtrlType.INT, 0, "0"),
+				new Fixture(CtrlType.INT, -100, "-100"),
+				new Fixture(CtrlType.FILE, "c:\\test.txt", "c:\\test.txt"),
 				new Fixture(CtrlType.FOLDER, "c:\\test", "c:\\test"),
 				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３", "abcdefg１２３"),
 				new Fixture(CtrlType.RADIO, 1, "1"),
@@ -69,24 +73,26 @@ public class OneValTest {
 
 		static class Fixture {
 			private CtrlType ctrlType;
-			private Object actual;
+			private Object val;
 			private String expected;
 
-			public Fixture(CtrlType ctrlType, Object actual, String expected) {
+			public Fixture(CtrlType ctrlType, Object val, String expected) {
 				this.ctrlType = ctrlType;
-				this.actual = actual;
+				this.val = val;
 				this.expected = expected;
 			}
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("(%s) default値=%s toReg()=\"%s\"", fx.ctrlType, fx.actual, fx.expected));
-
-			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.actual);
-			boolean isDebug = false;
-			assertThat(oneVal.toReg(isDebug), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			boolean isSecret = false;
+			OneVal sut = Assistance.createOneVal(fx.ctrlType, fx.val);
+			String expected = fx.expected;
+			//exercise
+			String actual = sut.toReg(isSecret);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -96,38 +102,50 @@ public class OneValTest {
 		@DataPoints
 		public static Fixture[] datas = {
 				//コントロールの種類,fromRegで設定してtoRegで取得する文字列(isDebug=false)
-				new Fixture(CtrlType.CHECKBOX, "true"), new Fixture(CtrlType.CHECKBOX, "false"), new Fixture(CtrlType.INT, "100"),
-				new Fixture(CtrlType.INT, "0"), new Fixture(CtrlType.FILE, "c:\\test.txt"), new Fixture(CtrlType.FOLDER, "c:\\test"),
-				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３"), new Fixture(CtrlType.RADIO, "1"), new Fixture(CtrlType.RADIO, "0"),
-				new Fixture(CtrlType.FONT, "Times New Roman,2,15"), new Fixture(CtrlType.FONT, "Serif,1,8"), new Fixture(CtrlType.MEMO, "1\t2\t3\t"),
+				new Fixture(CtrlType.CHECKBOX, "true"),
+				new Fixture(CtrlType.CHECKBOX, "false"),
+				new Fixture(CtrlType.INT, "100"),
+				new Fixture(CtrlType.INT, "0"),
+				new Fixture(CtrlType.FILE, "c:\\test.txt"),
+				new Fixture(CtrlType.FOLDER, "c:\\test"),
+				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３"),
+				new Fixture(CtrlType.RADIO, "1"),
+				new Fixture(CtrlType.RADIO, "0"),
+				new Fixture(CtrlType.FONT, "Times New Roman,2,15"),
+				new Fixture(CtrlType.FONT, "Serif,1,8"),
+				new Fixture(CtrlType.MEMO, "1\t2\t3\t"),
 				new Fixture(CtrlType.HIDDEN, "2d7ee3636680c1f6"),
 				new Fixture(CtrlType.HIDDEN, "60392a0d922b9077"),
-				new Fixture(CtrlType.ADDRESSV4, "192.168.0.1"), new Fixture(CtrlType.DAT, "\tn1\tn2"), new Fixture(CtrlType.DAT, "\tn1\tn2\b\tn1#\tn2"),
-				new Fixture(CtrlType.BINDADDR, "V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT"), new Fixture(CtrlType.BINDADDR, "V6ONLY,198.168.0.1,ffe0::1"),
+				new Fixture(CtrlType.ADDRESSV4, "192.168.0.1"),
+				new Fixture(CtrlType.DAT, "\tn1\tn2"),
+				new Fixture(CtrlType.DAT, "\tn1\tn2\b\tn1#\tn2"),
+				new Fixture(CtrlType.BINDADDR, "V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT"),
+				new Fixture(CtrlType.BINDADDR, "V6ONLY,198.168.0.1,ffe0::1"),
 				new Fixture(CtrlType.COMBOBOX, "1"),
 
 		};
 
 		static class Fixture {
 			private CtrlType ctrlType;
-			private String actual;
+			private String str;
 
-			public Fixture(CtrlType ctrlType, String actual) {
+			public Fixture(CtrlType ctrlType, String str) {
 				this.ctrlType = ctrlType;
-				this.actual = actual;
+				this.str = str;
 			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("(%s) fromReg(\"%s\") toReg()=\"%s\"", fx.ctrlType, fx.actual, fx.actual));
-
-			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, null);
-
-			boolean isDebug = false;
-			oneVal.fromReg(fx.actual);
-			assertThat(oneVal.toReg(isDebug), is(fx.actual));
+			//setUp
+			boolean isSecret = false;
+			OneVal sut = Assistance.createOneVal(fx.ctrlType, null);
+			sut.fromReg(fx.str);
+			String expected = fx.str;
+			//exercise
+			String actual = sut.toReg(isSecret);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -146,8 +164,10 @@ public class OneValTest {
 				new Fixture(CtrlType.INT, "-100", true),
 				new Fixture(CtrlType.INT, "0", true),
 				new Fixture(CtrlType.INT, "aaa", false), // 不正入力
-				new Fixture(CtrlType.FILE, "c:\\test.txt", true), new Fixture(CtrlType.FOLDER, "c:\\test", true),
-				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３", true), new Fixture(CtrlType.RADIO, "0", true), new Fixture(CtrlType.RADIO, "5", true),
+				new Fixture(CtrlType.FILE, "c:\\test.txt", true),
+				new Fixture(CtrlType.FOLDER, "c:\\test", true),
+				new Fixture(CtrlType.TEXTBOX, "abcdefg１２３", true),
+				new Fixture(CtrlType.RADIO, "0", true), new Fixture(CtrlType.RADIO, "5", true),
 				new Fixture(CtrlType.RADIO, "-1", false), //不正入力 Radioは0以上
 				new Fixture(CtrlType.FONT, "Default,-1,1", false), //不正入力(styleが無効値)
 				new Fixture(CtrlType.FONT, "Default,2,-1", false), //不正入力(sizeが0以下)
@@ -170,24 +190,25 @@ public class OneValTest {
 
 		static class Fixture {
 			private CtrlType ctrlType;
-			private String actual;
+			private String str;
 			private boolean expected;
 
-			public Fixture(CtrlType ctrlType, String actual, boolean expected) {
+			public Fixture(CtrlType ctrlType, String str, boolean expected) {
 				this.ctrlType = ctrlType;
-				this.actual = actual;
+				this.str = str;
 				this.expected = expected;
 			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("(%s) fromReg(\"%s\") = %s", fx.ctrlType, fx.actual, fx.expected));
-
-			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, null);
-
-			assertSame(oneVal.fromReg(fx.actual), fx.expected);
+			//setUp
+			OneVal sut = Assistance.createOneVal(fx.ctrlType, null);
+			boolean expected = fx.expected;
+			//exercise
+			boolean actual = sut.fromReg(fx.str);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -207,26 +228,26 @@ public class OneValTest {
 		static class Fixture {
 			private CtrlType ctrlType;
 			private boolean isDebug;
-			private String actual;
+			private String str;
 			private String expected;
 
-			public Fixture(CtrlType ctrlType, boolean isDebug, String actual, String expected) {
+			public Fixture(CtrlType ctrlType, boolean isDebug, String str, String expected) {
 				this.ctrlType = ctrlType;
 				this.isDebug = isDebug;
-				this.actual = actual;
+				this.str = str;
 				this.expected = expected;
 			}
 		}
 
 		@Theory
 		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("(%s) Default=\"%s\" toReg(%s) = %s", fx.ctrlType, fx.actual, fx.isDebug, fx.expected));
-
-			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.actual);
-			//String s = oneVal.toReg(fx.isDebug);
-
-			assertThat(oneVal.toReg(fx.isDebug), is(fx.expected));
+			//setUp
+			OneVal sut = Assistance.createOneVal(fx.ctrlType, fx.str);
+			String expected = fx.expected;
+			//exercise
+			String actual = sut.toReg(fx.isDebug);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -265,19 +286,18 @@ public class OneValTest {
 
 		@Theory
 		public void test(Fixture fx) {
-
-			OneVal oneVal = Assistance.createOneVal(fx.ctrlType, fx.value);
-			oneVal.createCtrl(null, 0, 0);
-			boolean b = oneVal.readCtrl(false); //isConfirm = false; 確認のみではなく、実際に読み込む
-
+			//setUp
+			OneVal sut = Assistance.createOneVal(fx.ctrlType, fx.value);
+			sut.createCtrl(null, 0, 0);
+			boolean b = sut.readCtrl(false); //isConfirm = false; 確認のみではなく、実際に読み込む
 			Assert.assertTrue(b); // readCtrl()の戻り値がfalseの場合、読み込みに失敗している
-
 			Object expected = fx.value;
-			Object actual = oneVal.getValue();
-			TestUtil.prompt(String.format("(%s) new oneVal()->createCtrl()->readCtrl() expected=%s actual=%s", fx.ctrlType, expected, actual));
-
-			assertThat(expected, is(actual));
+			//exercise
+			Object actual = sut.getValue();
+			//verify
+			assertThat(actual, is(expected));
 		}
+
 	}
 
 	/**
