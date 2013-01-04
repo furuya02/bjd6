@@ -18,7 +18,7 @@ public class BytesTest {
 	//*****************************************************
 	//各テストクラスで共通に使用される元データの作成クラス
 	//*****************************************************
-	@Ignore("テストから場外される　-各テストクラスで共通に使用される元データの作成クラス")  //テストから除外
+	@Ignore("テストから除外される　-各テストクラスで共通に使用される元データの作成クラス")  //テストから除外
 	public static final class Data {
 		public static byte [] generate() {
 			int max = 100;
@@ -58,14 +58,16 @@ public class BytesTest {
 				this.expected = expected;
 			}
 		}
-
-		@Theory
-		public void test(Fixture fx) {
-
 		
-			TestUtil.prompt(String.format("data[%d] = %d", fx.offset, fx.expected));
+		@Theory
+		public void test(Fixture fx) throws Exception {
+			//setUp
 			byte [] data = Data.generate();
-			assertThat(data[fx.offset], is(fx.expected));
+			byte expected = fx.expected;
+			//exercise
+			byte actual = data[fx.offset];
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -89,16 +91,17 @@ public class BytesTest {
 				this.expected = expected;
 			}
 		}
-
+		
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("data.indexOf(%d,\"123\") = %d", fx.offset, fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
 			byte [] data = Data.generate();
 			byte [] src = ("123").getBytes();
-
+			int expected = fx.expected;
+			//exercise
 			int actual = Bytes.indexOf(data, fx.offset, src);
-			assertThat(actual, is(fx.expected));
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 }

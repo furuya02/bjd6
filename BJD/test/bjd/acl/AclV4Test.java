@@ -123,15 +123,13 @@ public class AclV4Test {
 		}
 		
 		@Theory
-		public void 例外を発生させるテスト(Fixture fx){
+		public void 例外テスト(Fixture fx){
 			//exercise
 			try {
 				new AclV4("TAG", fx.aclStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				return;
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 }

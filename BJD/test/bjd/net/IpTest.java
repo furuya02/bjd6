@@ -346,7 +346,7 @@ public class IpTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class 無効な文字列で初期化すると例外_IllegalArgumentException_が発生することを確認する {
+	public static final class 無効な文字列で初期化すると例外_IllegalArgumentException_が発生することを確認する_例外テスト {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -373,9 +373,7 @@ public class IpTest {
 				new Ip(fx.ipStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				return;
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 

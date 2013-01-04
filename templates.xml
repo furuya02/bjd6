@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Testの定型句" enabled="true" name="test">@Test&#13;
-public void xxx() throws Exception {&#13;
-	//setUp&#13;
-	var sut = new xxx();&#13;
-	var expected = &#13;
-	//exercise&#13;
-	var actual = &#13;
-	//verify&#13;
-	assertThat(actual, is(expected));&#13;
-	//tearDown&#13;
-	sut.dispose();&#13;
-}&#13;
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="test">		@Theory&#13;
+		public void test(Fixture fx) throws Exception {&#13;
+			//setUp&#13;
+			var sut = new xxx();&#13;
+			var expected = fx.expected;&#13;
+			//exercise&#13;
+			var actual = &#13;
+			//verify&#13;
+			assertThat(actual, is(expected));&#13;
+			//tearDown&#13;
+			sut.dispose();&#13;
+		}&#13;
 </template></templates>

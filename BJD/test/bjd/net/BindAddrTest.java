@@ -98,7 +98,7 @@ public final class BindAddrTest {
 	}
 
 	@RunWith(Theories.class)
-	public static final class 無効文字列を指定してBindAddresをnewすると例がが発生する {
+	public static final class 無効文字列を指定してBindAddresをnewすると例外が発生する_例外テスト {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -123,9 +123,7 @@ public final class BindAddrTest {
 				new BindAddr(fx.bindStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				return;
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 
