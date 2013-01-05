@@ -120,27 +120,22 @@ public class OneServerTest {
 		conf.set("enableAcl", 1);
 		conf.set("timeOut", 3);
 
-		TestUtil.prompt(String.format("new MyServer()"));
 		MyServer myServer = new MyServer(conf, oneBind);
 
 		for (int i = 0; i < 2; i++) {
-			TestUtil.prompt(String.format("[i=%d]", i));
 			myServer.start();
 
 			//			Util.sleep(500);
 
-			TestUtil.prompt(String.format("●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			TestUtil.prompt(String.format("●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 		}
 
-		TestUtil.prompt(String.format("myServer.despose()"));
 		myServer.dispose();
 	}
 
@@ -157,21 +152,16 @@ public class OneServerTest {
 		conf.set("timeOut", 3);
 
 		for (int i = 0; i < 3; i++) {
-			TestUtil.prompt(String.format("[i=%d]", i));
-			TestUtil.prompt(String.format("new MyServer()"));
 			MyServer myServer = new MyServer(conf, oneBind);
 
 			myServer.start();
-			TestUtil.prompt(String.format("myServer.start() => ●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			TestUtil.prompt(String.format("myServer.stop() => ●sockState=%s", myServer.getSockState()));
 			assertThat(myServer.isRunnig(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
-			TestUtil.prompt(String.format("myServer.despose()"));
 			myServer.dispose();
 		}
 	}
@@ -196,20 +186,18 @@ public class OneServerTest {
 		conf.set("enableAcl", 1);
 		conf.set("timeOut", 3);
 
-		TestUtil.prompt(String.format("s = new OneServer() %s:%d multiple=%d", address, port, multiple));
 		MyServer myServer = new MyServer(conf, oneBind);
 		myServer.start();
 
 		ArrayList<MyClient> ar = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			System.out.println(String.format("[%d] client.connet()", i));
 			MyClient myClient = new MyClient(address, port);
 			myClient.connet();
 			ar.add(myClient);
 		}
 
-		System.out.println(String.format("s.count()=%d multiple以上は接続できない", multiple));
+		//multiple以上は接続できない
 		assertThat(myServer.count(), is(multiple));
 
 		myServer.stop();

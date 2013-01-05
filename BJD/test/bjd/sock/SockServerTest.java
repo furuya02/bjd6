@@ -29,7 +29,6 @@ public final class SockServerTest {
 	class Execute {
 		public void startStop(String title, final ProtocolKind protocolKind) {
 
-			TestUtil.prompt(title);
 
 			Ip ip = new Ip(IpKind.V4_LOCALHOST);
 			final Ip bindIp = ip;
@@ -37,10 +36,8 @@ public final class SockServerTest {
 			final int listenMax = 10;
 
 			final SockServer sockServer = new SockServer(protocolKind);
-			TestUtil.prompt(String.format("s = new SockServer()"));
 
 			assertThat(sockServer.getSockState(), is(SockState.IDLE));
-			TestUtil.prompt(String.format("s.getSockState()=%s", sockServer.getSockState()));
 			Thread t = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -53,30 +50,23 @@ public final class SockServerTest {
 			});
 			t.start();
 
-			TestUtil.prompt(String.format("s.bind()"));
-
 			while (sockServer.getSockState() == SockState.IDLE) {
 				Util.sleep(100);
 			}
 			assertThat(sockServer.getSockState(), is(SockState.Bind));
-			TestUtil.prompt(String.format("s.getSockState()=%s", sockServer.getSockState()));
 
-			TestUtil.prompt(String.format("s.close()"));
 			sockServer.close(); //bind()にThreadBaseのポインタを送っていないため、isLifeでブレイクできないので、selectで例外を発生させて終了する
 
 			assertThat(sockServer.getSockState(), is(SockState.Error));
-			TestUtil.prompt(String.format("getSockState()=%s", sockServer.getSockState()));
 		}
 
 		public void getLocalAddress(String title, final ProtocolKind protocolKind) {
-			TestUtil.prompt(title);
 
 			final Ip bindIp = new Ip(IpKind.V4_LOCALHOST);
 			final int port = 9991;
 			final int listenMax = 10;
 
 			final SockServer sockServer = new SockServer(protocolKind);
-			TestUtil.prompt(String.format("s = new SockServer(%s)", protocolKind));
 
 			Thread t = new Thread(new Runnable() {
 				@Override
@@ -96,11 +86,11 @@ public final class SockServerTest {
 
 			InetSocketAddress localAddress = sockServer.getLocalAddress();
 			assertThat(localAddress.toString(), is("/127.0.0.1:9991"));
-			TestUtil.prompt(String.format("s.getLocalAddress() = %s bind()後 localAddressの取得が可能になる", localAddress.toString()));
+			//bind()後 localAddressの取得が可能になる
 
 			InetSocketAddress remoteAddress = sockServer.getRemoteAddress();
 			Assert.assertNull(remoteAddress);
-			TestUtil.prompt(String.format("s.getRemoteAddress() = %s SockServerでは、remoteＡｄｄｒｅｓｓは常にnullになる", remoteAddress));
+			//SockServerでは、remoteＡｄｄｒｅｓｓは常にnullになる
 
 			sockServer.close();
 

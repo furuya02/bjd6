@@ -46,6 +46,13 @@ import bjd.test.TestUtil;
 public class IniDbTest {
 
 	
+//	private static IniDb createIniDb(){
+//		String fileName = "iniDbTestTmp"; //テンポラリファイル名
+//		String progDir = new File(".").getAbsoluteFile().getParent();
+//		String path = String.format("%s\\%s.ini", progDir, fileName);
+//		return new IniDb(progDir, fileName);
+//	}
+	
 	@RunWith(Theories.class)
 	public static final class listVal_add_OneVal_で初期化後saveして当該設定が保存されているかどうか {
 
@@ -78,32 +85,28 @@ public class IniDbTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
+		public void test(Fixture fx) throws Exception {
 
+			//setUp
 			String fileName = "iniDbTestTmp"; //テンポラリファイル名
 			String progDir = new File(".").getAbsoluteFile().getParent(); //カレントディレクトリ
 			String path = String.format("%s\\%s.ini", progDir, fileName);
-
-			IniDb iniDb = new IniDb(progDir, fileName);
-			iniDb.deleteIni();
-			iniDb.deleteTxt();
-			iniDb.deleteBak();
-
+			IniDb sut = new IniDb(progDir, fileName);
+			
 			ListVal listVal = new ListVal();
 			listVal.add(Assistance.createOneVal(fx.ctrlType, fx.value));
-			iniDb.save("Basic", listVal); // nameTagは"Basic"で決め打ちされている
-
-			TestUtil.prompt(String.format("%s", fx.expected));
-			try {
-				ArrayList<String> lines = Util.textFileRead(new File(path));
-				assertThat(lines.get(0), is(fx.expected));
-			} catch (IOException e) {
-				Assert.fail();
-			}
-
-			iniDb.deleteIni();
-			iniDb.deleteTxt();
-			iniDb.deleteBak();
+			sut.save("Basic", listVal); // nameTagは"Basic"で決め打ちされている
+			
+			String expected = fx.expected;
+			//exercise
+			ArrayList<String> lines = Util.textFileRead(new File(path));
+			String actual = lines.get(0);
+			//verify
+			assertThat(actual, is(expected));
+			//tearDown
+			sut.deleteIni();
+			sut.deleteTxt();
+			sut.deleteBak();
 		}
 	}
 
@@ -138,31 +141,38 @@ public class IniDbTest {
 		@Theory
 		public void test(Fixture fx) {
 
+			//setUp
 			String fileName = "iniDbTestTmp"; //テンポラリファイル名
 			String progDir = new File(".").getAbsoluteFile().getParent();
 			String path = String.format("%s\\%s.ini", progDir, fileName);
 
-			IniDb iniDb = new IniDb(progDir, fileName);
-			iniDb.deleteIni();
-			iniDb.deleteTxt();
-			iniDb.deleteBak();
 
+			IniDb sut = new IniDb(progDir, fileName);
+			sut.deleteIni();
+			sut.deleteTxt();
+			sut.deleteBak();
+
+			String expected = fx.value; 
+			//exercise
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add(fx.expected);
 			Util.textFileSave(new File(path), lines);
 
 			ListVal listVal = new ListVal();
 			listVal.add(Assistance.createOneVal(fx.ctrlType, null));
-			iniDb.read("Basic", listVal); // nameTagは"Basic"で決め打ちされている
-			
+			sut.read("Basic", listVal); // nameTagは"Basic"で決め打ちされている
 			OneVal oneVal = listVal.search("name");
 
-			TestUtil.prompt(String.format("%s", fx.expected));
-			assertThat(fx.value, is(oneVal.toReg(false)));
+			String actual = oneVal.toReg(false);
 
-			iniDb.deleteIni();
-			iniDb.deleteTxt();
-			iniDb.deleteBak();
+			//verify
+			assertThat(actual, is(expected));
+
+			
+			//TearDown
+			sut.deleteIni();
+			sut.deleteTxt();
+			sut.deleteBak();
 		}
 	}
 	
@@ -284,39 +294,4 @@ public class IniDbTest {
 	}
 
 }
-
-//	@RunWith(Theories.class)
-//	public static class A001 {
-//		@BeforeClass
-//		public static void before() {
-//			TestUtil.dispHeader("read() -> save() して、同じ設定ファイルが取得できるかどうかのテスト"); //TESTヘッダ
-//		}
-//
-//		@DataPoints
-//		public static Fixture[] datas = {
-//				//コントロールの種類,デフォルト値,toRegの出力
-//				new Fixture("IniDbTest_1.ini"),
-//		};
-//		static class Fixture {
-//			private String fileName;
-//
-//			public Fixture(String fileName) {
-//				this.fileName = fileName;
-//			}
-//		}
-//
-//		@Theory
-//		public void test(Fixture fx) {
-//
-//			TestUtil.dispPrompt(this); //TESTプロンプト
-//
-//			System.out.printf("filename = %s", fx.fileName);
-//			
-//			IniDb iniDb = new IniDb(progDir, fx.fileName);
-//			iniDb..save(nameTag, listVal)
-//
-//			boolean isDebug = false;
-//			assertThat(oneVal.toReg(isDebug), is(fx.expected));
-//		}
-//	}
 

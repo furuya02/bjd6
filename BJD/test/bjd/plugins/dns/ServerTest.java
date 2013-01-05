@@ -87,12 +87,10 @@ public final class ServerTest {
 		if (recvBuf.length == 0) { //受信データが無い場合
 			return null;
 		}
-		//Debug Print
-		System.out.println(String.format("lookup(%s,\"%s\") recv().length=%d", dnsType, name, recvBuf.length));
+		//System.out.println(String.format("lookup(%s,\"%s\") recv().length=%d", dnsType, name, recvBuf.length));
 		//デコード
 		PacketDns p = new PacketDns(recvBuf);
-		//Debug Print
-		System.out.println(print(p));
+		//System.out.println(print(p));
 		return p;
 	}
 

@@ -101,23 +101,21 @@ public final class SockQueueTest {
 	public void SockQueue_スペース確認() {
 		int max = 2000000;
 
-		TestUtil.prompt("sockQueue = new SockQueue()");
 		SockQueue sockQueu = new SockQueue();
 
 		int space = sockQueu.getSpace();
-		TestUtil.prompt(String.format("sockQueue.getSpqce()=%s キューの空きサイズ", space));
+		//キューの空きサイズ
 		assertThat(space, is(max));
 
 		byte[] buf = new byte[max - 100];
 		sockQueu.enqueue(buf, buf.length);
-		TestUtil.prompt(String.format("sockQueue.enqueue(buf,%d)", buf.length));
-
+		
 		space = sockQueu.getSpace();
-		TestUtil.prompt(String.format("sockQueue.getSpqce()=%s キューの空きサイズ", space));
+		//キューの空きサイズ
 		assertThat(space, is(100));
 
 		int len = sockQueu.enqueue(buf, 200);
-		TestUtil.prompt(String.format("sockQueue.enqueue(buf,200)=%s 空きサイズを超えて格納すると失敗する(※0が返る)", len));
+		//空きサイズを超えて格納すると失敗する(※0が返る)
 		assertThat(len, is(0));
 
 	}
@@ -126,31 +124,30 @@ public final class SockQueueTest {
 	public void SockQueue_行取得() {
 		//int max = 1048560;
 
-		TestUtil.prompt("sockQueue = new SockQueue()");
 		SockQueue sockQueu = new SockQueue();
 
 		byte[] lines = new byte[] { 0x61, 0x0d, 0x0a, 0x62, 0x0d, 0x0a, 0x63 };
 		sockQueu.enqueue(lines, lines.length);
-		TestUtil.prompt("sockQueue.enqueu(1/r/n2/r/n3) 2行と改行なしの1行で初期化");
+		//2行と改行なしの1行で初期化
 
 		byte[] buf = sockQueu.dequeueLine();
-		TestUtil.prompt("sockQueue.dequeuLine()=\"1/r/n\" 1行目取得");
+		//sockQueue.dequeuLine()=\"1/r/n\" 1行目取得
 		assertThat(buf, is(new byte[] { 0x61, 0x0d, 0x0a }));
 
-		TestUtil.prompt("sockQueue.dequeuLine()=\"2/r/n\" 2行目取得 ");
+		//sockQueue.dequeuLine()=\"2/r/n\" 2行目取得 
 		buf = sockQueu.dequeueLine();
 		assertThat(buf, is(new byte[] { 0x62, 0x0d, 0x0a }));
 
 		buf = sockQueu.dequeueLine();
-		TestUtil.prompt("sockQueue.dequeuLine()=\"\" 3行目の取得は失敗する");
+		//sockQueue.dequeuLine()=\"\" 3行目の取得は失敗する
 		assertThat(buf, is(new byte[0]));
 
 		lines = new byte[] { 0x0d, 0x0a };
 		sockQueu.enqueue(lines, lines.length);
-		TestUtil.prompt("sockQueue.enqueu(/r/n) 改行のみ追加");
+		//"sockQueue.enqueu(/r/n) 改行のみ追加
 
 		buf = sockQueu.dequeueLine();
-		TestUtil.prompt("sockQueue.dequeuLine()=\"3\" 3行目の取得に成功する");
+		//sockQueue.dequeuLine()=\"3\" 3行目の取得に成功する"
 		assertThat(buf, is(new byte[] { 0x63, 0x0d, 0x0a }));
 
 	}

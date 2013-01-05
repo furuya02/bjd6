@@ -399,8 +399,11 @@ public final class Server extends OneServer {
 								mask = param;
 								break;
 							default:
-								Util.runtimeException(String.format("ExistsKind=%s", existsKind));
-								break;
+								session.stringSend(String.format("500 %s: command requires a parameter.", param));
+								session.setSockData(null);
+								return true;
+								//Util.runtimeException(String.format("ExistsKind=%s", existsKind));
+								//break;
 						}
 					}
 				}

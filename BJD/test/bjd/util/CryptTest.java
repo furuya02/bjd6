@@ -3,10 +3,6 @@ package bjd.util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-
-import javax.mail.MessagingException;
-
 import junit.framework.Assert;
 
 import org.junit.experimental.runners.Enclosed;
@@ -14,9 +10,6 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-
-import bjd.ValidObjException;
-import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class CryptTest {
@@ -93,7 +86,7 @@ public class CryptTest {
 		static class Fixture {
 			private String str;
 
-			public Fixture(String actual) {
+			public Fixture(String str) {
 				this.str = str;
 			}
 		}

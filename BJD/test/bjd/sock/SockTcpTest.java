@@ -119,7 +119,6 @@ public final class SockTcpTest implements ILife {
 			Assert.fail(ex.getMessage());
 		}
 		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
-		TestUtil.prompt("tcpObj = new TcpObj()");
 
 		int max = 1000;
 		int loop = 3;
@@ -130,7 +129,6 @@ public final class SockTcpTest implements ILife {
 
 		int recvCount = 0;
 		for (int i = 0; i < loop; i++) {
-			TestUtil.prompt(String.format("tcpObj.send(%dbyte)", tmp.length));
 			int len = sockTcp.send(tmp);
 			Assert.assertEquals(len, tmp.length);
 
@@ -138,15 +136,12 @@ public final class SockTcpTest implements ILife {
 
 			byte[] b = sockTcp.recv(len, timeout, this);
 			recvCount += b.length;
-			TestUtil.prompt(String.format("len=%d  recv()=%d", len, b.length));
 			for (int m = 0; m < max; m += 10) {
 				Assert.assertEquals(b[m], tmp[m]); //送信したデータと受信したデータが同一かどうかのテスト
 			}
 		}
-		TestUtil.prompt(String.format("loop*max=%dbyte  recvCount:%d", loop * max, recvCount));
 		Assert.assertEquals(loop * max, recvCount); //送信したデータ数と受信したデータ数が一致するかどうかのテスト
 
-		TestUtil.prompt(String.format("tcpObj.close()"));
 		sockTcp.close();
 		echoServer.stop();
 	}

@@ -1,3 +1,9 @@
+LIST=Resource-aaa.comtype=0
+STRING=Resource-aaa.comname=
+STRING=Resource-aaa.comalias=
+STRING=Resource-aaa.comaddress=
+INT=Resource-aaa.compriority=10
+DAT=Resource-aaa.comresourceList=	0	www		192.168.0.10	0	1	ns		192.168.0.1	0	0	ws0		192.168.0.1	0	4	www		fe80::3882:6dac:af18:cba6	0	2	smtp		192.168.0.2	15	3	www	www2		0
 BOOL=BasicuseExitDlg=false
 BOOL=BasicuseLastSize=true
 BOOL=BasicisWindowOpen=true
@@ -18,7 +24,7 @@ STRING=BasicaclName=
 STRING=BasicaclAddress=
 LIST=LognormalLogKind=2
 LIST=LogsecureLogKind=2
-FOLDER=LogsaveDirectory=C:\dev
+FOLDER=LogsaveDirectory=
 BOOL=LoguseLogFile=true
 BOOL=LoguseLogClear=false
 INT=LogsaveDays=31
@@ -27,7 +33,7 @@ INT=LoglinesDelete=1000
 RADIO=LogisDisplay=1
 STRING=LogCharacter=
 BOOL=LoguseLimitString=false
-BOOL=DnsuseServer=true
+BOOL=DnsuseServer=false
 LIST=DnsprotocolKind=1
 INT=Dnsport=53
 BINDADDR=DnsbindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT
@@ -41,20 +47,13 @@ STRING=DnssoaMail=postmaster
 INT=DnssoaSerial=1
 INT=DnssoaRefresh=3600
 INT=DnssoaRetry=300
-INT=DnssoaExpire=2400
-INT=DnssoaMinimum=1200
-RADIO=DnsenableAcl=1
+INT=DnssoaExpire=360000
+INT=DnssoaMinimum=3600
+RADIO=DnsenableAcl=0
 STRING=DnsaclName=
 STRING=DnsaclAddress=
 STRING=DnsDomainname=
-DAT=DnsDomaindomainList=	aaa.com
-LIST=Resource-aaa.comtype=0
-STRING=Resource-aaa.comname=
-STRING=Resource-aaa.comalias=
-STRING=Resource-aaa.comaddress=
-INT=Resource-aaa.compriority=10
-DAT=Resource-aaa.comresourceList=	0	www		192.168.0.10	0	1	ns		192.168.0.1	0	0	ws0		192.168.0.1	0	4	www		fe80::3882:6dac:af18:cba6	0	2	smtp		192.168.0.2	15	3	www	www2		0
-BOOL=FtpuseServer=false
+BOOL=FtpuseServer=true
 LIST=FtpprotocolKind=0
 INT=Ftpport=21
 BINDADDR=FtpbindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT
@@ -62,16 +61,17 @@ BOOL=FtpuseResolve=false
 BOOL=FtpuseDetailsLog=true
 INT=Ftpmultiple=10
 INT=FtptimeOut=60
-STRING=FtpbannerMessage=FTP ( $p Version $v ) ready
-BOOL=FtpuseSyst=false
-INT=FtpreservationTime=5000
+STRING=FtpbannerMessage=FTP ( $p Version TEST ) ready
+BOOL=FtpuseSyst=true
+INT=FtpreservationTime=1
 FOLDER=FtpfromFolder=
 FOLDER=FtptoFolder=
 LIST=FtpaccessControl=0
 FOLDER=FtphomeDirectory=
 STRING=FtpuserName=
 HIDE_STRING=Ftppassword=***
-RADIO=FtpenableAcl=0
+DAT=Ftpuser=	0	C:\dev\bjd6\work\FtpTestDir	user1	***	2	C:\dev\bjd6\work\FtpTestDir	user2	***	1	C:\dev\bjd6\work\FtpTestDir	user3	***	0	C:\dev\bjd6\work\FtpTestDir	Anonymous	***
+RADIO=FtpenableAcl=1
 STRING=FtpaclName=
 STRING=FtpaclAddress=
 BOOL=SampleuseServer=false
