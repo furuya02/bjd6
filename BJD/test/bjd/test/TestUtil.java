@@ -18,6 +18,10 @@ public final class TestUtil {
 		//デフォルトコンストラクタの隠蔽
 	}
 
+	public static String getProhjectDirectory() {
+		return "c:\\dev\\bjd6";
+	}
+
 	/**
 	 * テンポラリディレクトリの作成<br>
 	 * 最初に呼ばれたとき、ディレクトリが存在しないので、新規に作成される
@@ -71,33 +75,33 @@ public final class TestUtil {
 	 * テスト用のプロンプト
 	 * @param str 詳細情報
 	 */
-//	public static void prompt(String msg) {
-//		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-//
-//		String className = "";
-//		String methodName = "";
-//
-//		String str = ste[2].getClassName();
-//		String[] n = str.split("\\$");
-//		if (n.length == 1) {
-//			String[] m = str.split("\\.");
-//			className = m[m.length - 1];
-//			methodName = ste[2].getMethodName();
-//
-//		} else {
-//			String[] m = n[0].split("\\.");
-//			className = m[m.length - 1];
-//			methodName = n[1];
-//		}
-//		String banner = String.format("%s %s", className, methodName);
-//		if (!banner.equals(lastBanner)) {
-//			lastBanner = banner;
-//			System.out.println("-------------------------------------------------------------------");
-//			System.out.println(banner);
-//			System.out.println("-------------------------------------------------------------------");
-//		}
-//		System.out.println(msg);
-//	}
+	//	public static void prompt(String msg) {
+	//		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+	//
+	//		String className = "";
+	//		String methodName = "";
+	//
+	//		String str = ste[2].getClassName();
+	//		String[] n = str.split("\\$");
+	//		if (n.length == 1) {
+	//			String[] m = str.split("\\.");
+	//			className = m[m.length - 1];
+	//			methodName = ste[2].getMethodName();
+	//
+	//		} else {
+	//			String[] m = n[0].split("\\.");
+	//			className = m[m.length - 1];
+	//			methodName = n[1];
+	//		}
+	//		String banner = String.format("%s %s", className, methodName);
+	//		if (!banner.equals(lastBanner)) {
+	//			lastBanner = banner;
+	//			System.out.println("-------------------------------------------------------------------");
+	//			System.out.println(banner);
+	//			System.out.println("-------------------------------------------------------------------");
+	//		}
+	//		System.out.println(msg);
+	//	}
 
 	/**
 	 * テスト用のIpオブジェクトの生成<br>
@@ -158,7 +162,7 @@ public final class TestUtil {
 		if (msg == null) {
 			System.out.println("");
 		} else {
-			System.out.print("\n"+msg);
+			System.out.print("\n" + msg);
 			Runnable r = new Runnable() {
 				public void run() {
 					while (true) {
