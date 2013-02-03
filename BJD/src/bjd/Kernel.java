@@ -242,7 +242,7 @@ public final class Kernel implements IDispose {
 		//ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
 		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
 		for (OnePlugin o : listPlugin) {
-			tmpLogger.set(LogKind.NORMAL, null, 9000008, String.format("%sServer", o.getName()));
+			tmpLogger.set(LogKind.DETAIL, null, 9000008, String.format("%sServer", o.getName()));
 		}
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
