@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 import bjd.Kernel;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class TmpOption implements IDispose {
+public final class TmpOption implements IDisposable {
 	private Kernel kernel = new Kernel();
 	private File origin;
 	private File backup;

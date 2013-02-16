@@ -1,5 +1,5 @@
 package bjd.util;
 
-public interface IDispose {
+public interface IDisposable {
 	void dispose();
 }

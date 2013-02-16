@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
 /**
@@ -16,7 +16,7 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public final class Reg implements IDispose {
+public final class Reg implements IDisposable {
 
 	private String path;
 	private HashMap<String, String> ar = new HashMap<>();

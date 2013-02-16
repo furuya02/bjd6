@@ -9,11 +9,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import bjd.ctrl.ListView;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Msg;
 import bjd.util.MsgKind;
 
-public final class LogView implements IDispose {
+public final class LogView implements IDisposable {
 
 	private ListView listView = null;
 	private Timer timer = null;

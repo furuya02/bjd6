@@ -2,9 +2,9 @@ package bjd.net;
 
 import java.net.Socket;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
-public final class Ssl implements IDispose {
+public final class Ssl implements IDisposable {
 
 	@Override
 	public void dispose() {

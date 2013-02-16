@@ -11,10 +11,10 @@ import bjd.net.OneBind;
 import bjd.option.Conf;
 import bjd.option.OneOption;
 import bjd.server.OneServer;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class OnePlugin implements IDispose {
+public final class OnePlugin implements IDisposable {
 	private File file;
 	private String classNameOption;
 	private String classNameServer;

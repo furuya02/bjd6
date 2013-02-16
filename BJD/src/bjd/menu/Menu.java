@@ -11,14 +11,14 @@ import javax.swing.KeyStroke;
 
 import bjd.Kernel;
 import bjd.RunMode;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
 /**
  * メニューを管理するクラス
  * @author SIN
  *
  */
-public final class Menu implements ActionListener, IDispose {
+public final class Menu implements ActionListener, IDisposable {
 	private Kernel kernel;
 	private JMenuBar menuBar;
 	private ArrayList<JMenuItem> ar = new ArrayList<>();

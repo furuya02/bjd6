@@ -13,7 +13,7 @@ import org.junit.Test;
 public final class ListBaseTest {
 
 	//テストのためにListBaseを継承するクラスを定義する
-	class OneClass implements IDispose {
+	class OneClass implements IDisposable {
 		private String s;
 
 		public OneClass(String s) {

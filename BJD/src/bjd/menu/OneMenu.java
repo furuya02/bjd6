@@ -1,8 +1,8 @@
 package bjd.menu;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
-public final class OneMenu implements IDispose {
+public final class OneMenu implements IDisposable {
 	private String jpTitle;
 	private String enTitle;
 	private String name;

@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import junit.framework.Assert;
@@ -40,7 +39,6 @@ import bjd.option.Crlf;
 import bjd.option.Dat;
 import bjd.option.ListVal;
 import bjd.option.OneVal;
-import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class IniDbTest {
@@ -60,7 +58,7 @@ public class IniDbTest {
 		public static Fixture[] datas = { 
 			new Fixture(CtrlType.INT, 123, "INT=Basic\bname=123"),
 			new Fixture(CtrlType.TEXTBOX, "123", "STRING=Basic\bname=123"), 
-			new Fixture(CtrlType.COMBOBOX, "1", "LIST=Basic\bname=1"), 
+			new Fixture(CtrlType.COMBOBOX, 1, "LIST=Basic\bname=1"), 
 			new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"), 
 			new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"), 
 			new Fixture(CtrlType.CHECKBOX, true, "BOOL=Basic\bname=true"), 
@@ -120,7 +118,7 @@ public class IniDbTest {
 			new Fixture(CtrlType.COMBOBOX, "1", "LIST=Basic\bname=1"), 
 			new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"), 
 			new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"), 
-			new Fixture(CtrlType.CHECKBOX, "true", "BOOL=Basic\bname=1"), 
+			new Fixture(CtrlType.CHECKBOX, "true", "BOOL=Basic\bname=true"), 
 			new Fixture(CtrlType.HIDDEN, "2d7ee3636680c1f6", "HIDE_STRING=Basic\bname=2d7ee3636680c1f6"),
 			new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"), new Fixture(CtrlType.RADIO, "1", "RADIO=Basic\bname=1"),
 			new Fixture(CtrlType.ADDRESSV4, "192.168.0.1", "ADDRESS_V4=Basic\bname=192.168.0.1"),		
@@ -129,12 +127,12 @@ public class IniDbTest {
 		static class Fixture {
 			private CtrlType ctrlType;
 			private String value;
-			private String expected;
+			private String regStr;
 
-			public Fixture(CtrlType ctrlType, String value, String expected) {
+			public Fixture(CtrlType ctrlType, String value, String regStr) {
 				this.ctrlType = ctrlType;
 				this.value = value;
-				this.expected = expected;
+				this.regStr = regStr;
 			}
 		}
 
@@ -155,7 +153,7 @@ public class IniDbTest {
 			String expected = fx.value; 
 			//exercise
 			ArrayList<String> lines = new ArrayList<>();
-			lines.add(fx.expected);
+			lines.add(fx.regStr);
 			Util.textFileSave(new File(path), lines);
 
 			ListVal listVal = new ListVal();

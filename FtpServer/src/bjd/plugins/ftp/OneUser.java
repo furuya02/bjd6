@@ -1,6 +1,6 @@
 package bjd.plugins.ftp;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
 /**
  * Datオブジェクトの各プロパティをObject形式ではない本来の型で強制するため、これを表現するクラスを定義する
@@ -8,7 +8,7 @@ import bjd.util.IDispose;
  * @author SIN
  *
  */
-class OneUser implements IDispose {
+class OneUser implements IDisposable {
 
 	private FtpAcl ftpAcl;
 	private String userName;

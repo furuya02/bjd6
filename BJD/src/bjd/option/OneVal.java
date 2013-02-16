@@ -18,7 +18,7 @@ import bjd.ctrl.OnePage;
 import bjd.net.BindAddr;
 import bjd.net.Ip;
 import bjd.util.Crypt;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Msg;
 import bjd.util.MsgKind;
 
@@ -29,7 +29,7 @@ import bjd.util.MsgKind;
  * @author SIN
  *
  */
-public final class OneVal implements IDispose {
+public final class OneVal implements IDisposable {
 
 	private String name;
 	private Object value;

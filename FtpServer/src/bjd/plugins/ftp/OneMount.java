@@ -2,9 +2,9 @@ package bjd.plugins.ftp;
 
 import java.io.File;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
-public final class OneMount implements IDispose {
+public final class OneMount implements IDisposable {
 
 	private String fromFolder;
 	private String toFolder;

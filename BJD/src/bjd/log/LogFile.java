@@ -13,10 +13,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import bjd.util.FileSearch;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class LogFile implements IDispose {
+public final class LogFile implements IDisposable {
 
 	private Object lock = new Object(); //排他制御用オブジェクト
 	private String saveDirectory;

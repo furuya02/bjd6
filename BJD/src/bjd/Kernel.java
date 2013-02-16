@@ -28,10 +28,10 @@ import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class Kernel implements IDispose {
+public final class Kernel implements IDisposable {
 
 	//プロセス起動時に初期化される変数
 	private RunMode runMode = RunMode.Normal; //通常起動;

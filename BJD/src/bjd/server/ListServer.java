@@ -9,11 +9,11 @@ import bjd.option.Conf;
 import bjd.option.OneOption;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.ListBase;
 import bjd.util.Util;
 
-public final class ListServer extends ListBase<OneServer> implements IDispose {
+public final class ListServer extends ListBase<OneServer> implements IDisposable {
 
 	private Kernel kernel;
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import bjd.ValidObj;
 import bjd.ValidObjException;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
 /**
@@ -14,7 +14,7 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public final class OneDat extends ValidObj  implements IDispose {
+public final class OneDat extends ValidObj  implements IDisposable {
 
 	private boolean enable;
 	private ArrayList<String> strList = new ArrayList<>();

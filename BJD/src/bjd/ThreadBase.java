@@ -3,7 +3,7 @@ package bjd;
 import bjd.log.ILogger;
 import bjd.log.LogKind;
 import bjd.log.Logger;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
 /**
@@ -12,7 +12,7 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public abstract class ThreadBase implements IDispose, ILogger, ILife {
+public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	private MyThread myThread = null;
 	private boolean isRunnig = false;
 	private boolean life;
