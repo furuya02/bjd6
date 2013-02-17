@@ -19,9 +19,9 @@ import bjd.sock.SockObj;
 import bjd.sock.SockServer;
 import bjd.sock.SockState;
 import bjd.sock.SockTcp;
+import bjd.util.ExistsKind;
 import bjd.util.Inet;
 import bjd.util.Util;
-import bjd.util.Util.ExistsKind;
 
 public final class Server extends OneServer {
 

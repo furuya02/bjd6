@@ -112,11 +112,6 @@ public final class Util {
 		return null;
 	}
 
-	public enum ExistsKind {
-		FILE,
-		DIR,
-		NONE
-	}
 
 	/**
 	 * ファイル若しくはディレクトリが存在するかどうか<br>
