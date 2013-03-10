@@ -66,6 +66,7 @@ public class IniDbTest {
 			new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"), 
 			new Fixture(CtrlType.RADIO, 1, "RADIO=Basic\bname=1"),
 			new Fixture(CtrlType.ADDRESSV4,	new Ip(InetKind.V4), "ADDRESS_V4=Basic\bname=0.0.0.0"),
+
 			//new Fixture(CtrlType.ADDRESSV4,	new Ip("192.168.0.1"), "ADDRESS_V4=Basic\bname=192.168.0.1"),
 		};
 
