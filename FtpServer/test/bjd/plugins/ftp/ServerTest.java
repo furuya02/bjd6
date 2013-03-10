@@ -98,7 +98,8 @@ public final class ServerTest implements ILife {
 	public void パスワード認証成功() {
 
 		assertThat(cl.stringRecv(1, this), is(bannerStr));
-		cl.stringSend("USER user1");
+		//cl.stringSend("USER user1");
+		cl.stringSend("user user1");
 		assertThat(cl.stringRecv(1, this), is("331 Password required for user1.\r\n"));
 		cl.stringSend("PASS user1");
 		assertThat(cl.stringRecv(1, this), is("230 User user1 logged in.\r\n"));
