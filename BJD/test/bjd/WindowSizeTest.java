@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
+import bjd.option.OneOption;
 import bjd.test.TestUtil;
 import bjd.util.Util;
 
@@ -43,6 +44,9 @@ public final class WindowSizeTest {
 	 */
 	private Conf createConf() {
 		Conf conf = TestUtil.createConf("OptionBasic");
+//		Kernel kernel = new Kernel();
+//		OneOption op = kernel.getListOption().get("Basic");
+//		Conf conf = new Conf(op);
 		conf.set("useLastSize", true);
 		return conf;
 	}

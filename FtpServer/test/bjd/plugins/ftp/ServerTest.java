@@ -35,7 +35,7 @@ public final class ServerTest implements ILife {
 	public static void beforeClass() throws Exception {
 
 		//設定ファイルの退避と上書き
-		op = new TmpOption(String.format("%s\\FtpServer\\test\\FtpServerTest.ini",TestUtil.getProhjectDirectory()));
+		op = new TmpOption(String.format("%s\\FtpServer\\test\\FtpServerTest.ini", TestUtil.getProhjectDirectory()));
 		OneBind oneBind = new OneBind(new Ip(IpKind.V4_LOCALHOST), ProtocolKind.Tcp);
 		Kernel kernel = new Kernel();
 		Option option = new Option(kernel, "");
