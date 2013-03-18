@@ -161,8 +161,15 @@ public final class Kernel implements IDisposable {
 		//  }
 		//}
 
+		
 		listInitialize(); //サーバ再起動で、再度実行される初期化 
 
+		//Java fix
+		if(this.isTest){
+			return;
+		}
+			
+		
 		//ウインドサイズの復元
 		String path = String.format("%s\\BJD.ini", getProgDir());
 		try {

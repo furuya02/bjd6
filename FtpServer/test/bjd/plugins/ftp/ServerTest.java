@@ -75,11 +75,11 @@ public final class ServerTest implements ILife {
 
 	//共通処理(ログイン成功)
 	void login(String userName) {
-		assertThat(cl.stringRecv(1, this), is(bannerStr));
+		assertThat(cl.stringRecv(3, this), is(bannerStr));
 		cl.stringSend(String.format("USER %s", userName));
-		assertThat(cl.stringRecv(1, this), is(String.format("331 Password required for %s.\r\n", userName)));
+		assertThat(cl.stringRecv(3, this), is(String.format("331 Password required for %s.\r\n", userName)));
 		cl.stringSend(String.format("PASS %s", userName));
-		assertThat(cl.stringRecv(1, this), is(String.format("230 User %s logged in.\r\n", userName)));
+		assertThat(cl.stringRecv(3, this), is(String.format("230 User %s logged in.\r\n", userName)));
 	}
 
 	@Test
@@ -277,6 +277,7 @@ public final class ServerTest implements ILife {
 		login("user1");
 
 		cl.stringSend("PORT 127,3,x,x,1,0,256");
+		
 		assertThat(cl.stringRecv(1, this), is("501 Illegal PORT command.\r\n"));
 
 	}
