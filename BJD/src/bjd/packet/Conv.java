@@ -20,7 +20,7 @@ public final class Conv {
 	}
 
 	public static byte[] getBytes(long val) {
-		byte[] buf = { (byte) (val >> 52), (byte) (val >> 48), (byte) (val >> 40), (byte) (val >> 32), (byte) (val >> 24), (byte) (val >> 16), (byte) (val >> 8), (byte) val };
+		byte[] buf = { (byte) (val >> 56), (byte) (val >> 48), (byte) (val >> 40), (byte) (val >> 32), (byte) (val >> 24), (byte) (val >> 16), (byte) (val >> 8), (byte) val };
 		return buf;
 	}
 

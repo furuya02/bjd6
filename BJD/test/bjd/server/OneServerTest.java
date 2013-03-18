@@ -127,11 +127,11 @@ public class OneServerTest {
 
 			//			Util.sleep(500);
 
-			assertThat(myServer.isRunnig(), is(true));
+			assertThat(myServer.isRunning(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			assertThat(myServer.isRunnig(), is(false));
+			assertThat(myServer.isRunning(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 		}
@@ -155,11 +155,11 @@ public class OneServerTest {
 			MyServer myServer = new MyServer(conf, oneBind);
 
 			myServer.start();
-			assertThat(myServer.isRunnig(), is(true));
+			assertThat(myServer.isRunning(), is(true));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			assertThat(myServer.isRunnig(), is(false));
+			assertThat(myServer.isRunning(), is(false));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 			myServer.dispose();

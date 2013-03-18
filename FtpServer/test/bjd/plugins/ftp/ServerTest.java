@@ -672,6 +672,7 @@ public final class ServerTest implements ILife {
 		cl.stringSend("RNTO home0");
 		assertThat(cl.stringRecv(1, this), is("250 RNTO command successful.\r\n"));
 	}
+	
 	@Test
     public void RMDコマンド_空でないディレクトリの削除は失敗する() {
 

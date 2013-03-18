@@ -14,7 +14,7 @@ import bjd.util.Util;
  */
 public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	private MyThread myThread = null;
-	private boolean isRunnig = false;
+	private boolean isRunning = false;
 	private boolean life;
 	private Logger logger;
 
@@ -30,8 +30,8 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	 * スレッドが動作中かどうか
 	 * @return
 	 */
-	public final boolean isRunnig() {
-		return isRunnig;
+	public final boolean isRunning() {
+		return isRunning;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	 * Override可能<br>
 	 */
 	public void start() {
-		if (isRunnig()) {
+		if (isRunning()) {
 			return;
 		}
 		if (!onStartThread()) {
@@ -72,7 +72,7 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 			life = true;
 			myThread = new MyThread();
 			myThread.start();
-			while (!isRunnig()) { //start()を抜けた時点でisRunnigがtrueになるように、スレッド処理を待つ
+			while (!isRunning()) { //start()を抜けた時点でisRunnigがtrueになるように、スレッド処理を待つ
 				Util.sleep(10);
 			}
 
@@ -92,7 +92,7 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	 */
 	public void stop() {
 		life = false; //スイッチを切るとLoop内の無限ループからbreakする
-		while (isRunnig()) { //stop()を抜けた時点でisRunnigがfalseになるように、処理が終了するまで待つ
+		while (isRunning()) { //stop()を抜けた時点でisRunnigがfalseになるように、処理が終了するまで待つ
 			Util.sleep(100);
 		}
 		onStopThread();
@@ -107,7 +107,7 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	private class MyThread extends Thread {
 		@Override
 		public void run() {
-			isRunnig = true;
+			isRunning = true;
 			try {
 				onRunThread();
 			} catch (Exception ex) {
@@ -116,7 +116,7 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 				}
 			}
 			//	kernel.getView().setColor();
-			isRunnig = false;
+			isRunning = false;
 		}
 	}
 }

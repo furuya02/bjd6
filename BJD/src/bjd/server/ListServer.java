@@ -127,7 +127,7 @@ public final class ListServer extends ListBase<OneServer> implements IDisposable
 	public boolean isRunnig() {
 		//全スレッドの状態確認
 		for (OneServer sv : getAr()) {
-			if (sv.isRunnig()) {
+			if (sv.isRunning()) {
 				return true;
 			}
 		}

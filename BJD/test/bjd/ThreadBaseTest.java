@@ -45,7 +45,7 @@ public final class ThreadBaseTest {
 		MyThread sut = new MyThread();
 		boolean expected = false;
 		//exercise
-		boolean actual = sut.isRunnig();
+		boolean actual = sut.isRunning();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -59,7 +59,7 @@ public final class ThreadBaseTest {
 		boolean expected = true;
 		//exercise
 		sut.start();
-		boolean actual = sut.isRunnig();
+		boolean actual = sut.isRunning();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -74,7 +74,7 @@ public final class ThreadBaseTest {
 		//exercise
 		sut.start();
 		sut.start(); //重複
-		boolean actual = sut.isRunnig();
+		boolean actual = sut.isRunning();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -91,7 +91,7 @@ public final class ThreadBaseTest {
 		sut.start();
 		sut.stop();
 		sut.stop(); //重複
-		boolean actual = sut.isRunnig();
+		boolean actual = sut.isRunning();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -106,9 +106,9 @@ public final class ThreadBaseTest {
 		//exercise verify 
 		for (int i = 0; i < 5; i++) {
 			sut.start();
-			assertThat(sut.isRunnig(), is(true));
+			assertThat(sut.isRunning(), is(true));
 			sut.stop();
-			assertThat(sut.isRunnig(), is(false));
+			assertThat(sut.isRunning(), is(false));
 		}
 		//tearDown
 		sut.dispose();
@@ -121,9 +121,9 @@ public final class ThreadBaseTest {
 		for (int i = 0; i < 3; i++) {
 			MyThread sut = new MyThread();
 			sut.start();
-			assertThat(sut.isRunnig(), is(true));
+			assertThat(sut.isRunning(), is(true));
 			sut.stop();
-			assertThat(sut.isRunnig(), is(false));
+			assertThat(sut.isRunning(), is(false));
 			sut.dispose();
 		}
 	}
