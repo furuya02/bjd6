@@ -313,6 +313,7 @@ public final class ServerTest implements ILife {
 		String[] tmp = cl.stringRecv(1, this).split("[|]");
 		int port = Integer.valueOf(tmp[3]);
 		SockTcp dl = Inet.connect(new Ip(IpKind.V6_LOCALHOST), port, 10, null, this);
+		dl.close();
 	}
 
 	@Test
