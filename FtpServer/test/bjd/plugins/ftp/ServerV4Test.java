@@ -24,7 +24,7 @@ import bjd.test.TmpOption;
 import bjd.util.Inet;
 import bjd.util.Util;
 
-public final class ServerTest implements ILife {
+public final class ServerV4Test implements ILife {
 
 	private static TmpOption op = null; //設定ファイルの上書きと退避
 	private static Server sv = null; //サーバ
@@ -308,44 +308,6 @@ public final class ServerTest implements ILife {
 		dl.close();
 	}
 
-	@Test
-	public void EPSVコマンド() {
-		//共通処理(ログイン成功)
-		login("user1");
-
-		cl.stringSend("EPSV");
-
-		//229 Entering Extended Passive Mode. (|||xxxx|)
-		String[] tmp = cl.stringRecv(1, this).split("[|]");
-		int port = Integer.valueOf(tmp[3]);
-		SockTcp dl = Inet.connect(new Ip(IpKind.V6_LOCALHOST), port, 10, null, this);
-		dl.close();
-	}
-
-	@Test
-	public void EPRTコマンド() {
-
-		//共通処理(ログイン成功)
-		login("user1");
-
-		int port = 252; //テストの連続のためにPORTコマンドのテストとはポート番号をずらす必要がある
-		cl.stringSend("EPRT |2|::1|252|");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V6_LOCALHOST), port, this);
-		assertThat(cl.stringRecv(1, this), is("200 EPRT command successful.\r\n"));
-
-		dl.close();
-	}
-
-	@Test
-	public void EPORTコマンド_パラメータ誤り() {
-
-		//共通処理(ログイン成功)
-		login("user1");
-
-		cl.stringSend("EPRT |x|");
-		assertThat(cl.stringRecv(1, this), is("501 Illegal EPRT command.\r\n"));
-
-	}
 
 	@Test
 	public void MKD_RMDコマンド() {
