@@ -23,6 +23,22 @@
   			destdir="${project}/bin" includeantruntime="false" classpath="${dev}/BJD/bin">
   			<compilerarg value="-J-Dfile.encoding=UTF8"/>
   		</javac>
+		
+		<!-- 【Test】-->
+		<property  name="junit.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
+		<property  name="hamcrest.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+		
+		<javac fork="true" encoding="utf-8" srcdir="${project}/test" 
+	  		destdir="${project}/bin" includeantruntime="false" >
+	  		<compilerarg value="-J-Dfile.encoding=UTF8" />
+			<classpath>
+				<pathelement location="${junit.jar}" />
+				<pathelement location="${hamcrest.jar}" />
+				<pathelement path="${project}/lib/*"/>
+				<pathelement path="${dev}/BJD/bin" />
+			</classpath>
+	  	</javac>
+
 		<!-- 出力フォルダにjarファイルを生成 -->
 		<jar destfile="${out}/${target}.jar" filesetmanifest="mergewithoutmain">
 	        <fileset dir="${project}/bin"/>

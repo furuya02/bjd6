@@ -2,6 +2,7 @@ package bjd.plugins.ftp;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -236,7 +237,12 @@ public final class ServerTest implements ILife {
 
 		//syst
 		cl.stringSend("SYST");
-		assertThat(cl.stringRecv(1, this), is("215 Windows 8\r\n"));
+		//assertThat(cl.stringRecv(1, this), is("215 Windows 8\r\n"));
+		String str = cl.stringRecv(1, this);
+		if(str.equals("215 Windows 7\r\n") || str.equals("215 Windows 8\r\n")){
+			return;
+		}
+		Assert.fail();
 
 	}
 
