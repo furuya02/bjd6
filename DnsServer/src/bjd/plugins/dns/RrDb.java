@@ -237,21 +237,25 @@ public final class RrDb {
 			try {
 				Ip ipV4 = new Ip(dataStr);
 				if (ipV4.getInetKind() != InetKind.V4) {
-					throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (AレコードにIPv4でないアドレスが指定されました [ip=%s str=%s])", dataStr, str));
+					throw new IOException(String.format(
+							"ルートサーバ情報の読み込みに失敗しました (AレコードにIPv4でないアドレスが指定されました [ip=%s str=%s])", dataStr, str));
 				}
 				add(new RrA(name, ttl, ipV4));
 			} catch (ValidObjException e) {
-				throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (Ipアドレスに矛盾があります [ip=%s str=%s])", dataStr, str));
+				throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (Ipアドレスに矛盾があります [ip=%s str=%s])", dataStr,
+						str));
 			}
 		} else if (dnsType == DnsType.Aaaa) {
 			try {
 				Ip ipV6 = new Ip(dataStr);
 				if (ipV6.getInetKind() != InetKind.V6) {
-					throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (AAAAレコードにIPv6でないアドレスが指定されました [ip=%s str=%s])", dataStr, str));
+					throw new IOException(String.format(
+							"ルートサーバ情報の読み込みに失敗しました (AAAAレコードにIPv6でないアドレスが指定されました [ip=%s str=%s])", dataStr, str));
 				}
 				add(new RrAaaa(name, ttl, ipV6));
 			} catch (ValidObjException e) {
-				throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (Ipアドレスに矛盾があります [ip=%s str=%s])", dataStr, str));
+				throw new IOException(String.format("ルートサーバ情報の読み込みに失敗しました (Ipアドレスに矛盾があります [ip=%s str=%s])", dataStr,
+						str));
 			}
 		} else if (dnsType == DnsType.Ns) {
 			add(new RrNs(name, ttl, dataStr));
@@ -323,7 +327,7 @@ public final class RrDb {
 		//検索中に期限の過ぎたリソースがあった場合は、このリストに追加しておいて最後に削除する
 		ArrayList<OneRr> removeList = new ArrayList<OneRr>();
 
-		long now = Calendar.getInstance().getTimeInMillis();
+		long now = Calendar.getInstance().getTimeInMillis() / 1000; //秒単位
 
 		// 排他制御
 		synchronized (lock) {
@@ -445,7 +449,7 @@ public final class RrDb {
 		String name = o.getStrList().get(1);
 		String alias = o.getStrList().get(2);
 		Ip ip = null;
-		if(type!=3){ //Cnameの時、Ipアドレスが入っていないので、例外が発生する
+		if (type != 3) { //Cnameの時、Ipアドレスが入っていないので、例外が発生する
 			ip = new Ip(o.getStrList().get(3));
 		}
 		int priority = Integer.valueOf(o.getStrList().get(4));
@@ -461,34 +465,34 @@ public final class RrDb {
 
 		DnsType dnsType = DnsType.Unknown;
 		switch (type) {
-			case 0:
-				dnsType = DnsType.A;
-				if (ip.getInetKind() != InetKind.V4) {
-					throw new ValidObjException("IPv6 cannot address it in an A(PTR) record");
-				}
-				add(new RrA(name, ttl, ip));
-				break;
-			case 1:
-				dnsType = DnsType.Ns;
-				add(new RrNs(domainName, ttl, name));
-				break;
-			case 2:
-				dnsType = DnsType.Mx;
-				add(new RrMx(domainName, ttl, (short) priority, name));
-				break;
-			case 3:
-				dnsType = DnsType.Cname;
-				add(new RrCname(alias, ttl, name));
-				break;
-			case 4:
-				dnsType = DnsType.Aaaa;
-				if (ip.getInetKind() != InetKind.V6) {
-					throw new ValidObjException("IPv4 cannot address it in an AAAA record");
-				}
-				add(new RrAaaa(name, ttl, ip));
-				break;
-			default:
-				throw new ValidObjException(String.format("unknown type (%d)", type));
+		case 0:
+			dnsType = DnsType.A;
+			if (ip.getInetKind() != InetKind.V4) {
+				throw new ValidObjException("IPv6 cannot address it in an A(PTR) record");
+			}
+			add(new RrA(name, ttl, ip));
+			break;
+		case 1:
+			dnsType = DnsType.Ns;
+			add(new RrNs(domainName, ttl, name));
+			break;
+		case 2:
+			dnsType = DnsType.Mx;
+			add(new RrMx(domainName, ttl, (short) priority, name));
+			break;
+		case 3:
+			dnsType = DnsType.Cname;
+			add(new RrCname(alias, ttl, name));
+			break;
+		case 4:
+			dnsType = DnsType.Aaaa;
+			if (ip.getInetKind() != InetKind.V6) {
+				throw new ValidObjException("IPv4 cannot address it in an AAAA record");
+			}
+			add(new RrAaaa(name, ttl, ip));
+			break;
+		default:
+			throw new ValidObjException(String.format("unknown type (%d)", type));
 		}
 
 		//MX及びNSの場合は、A or AAAAも追加する
@@ -503,7 +507,8 @@ public final class RrDb {
 		if (dnsType != DnsType.Cname) {
 			//PTR名を作成 [例] 192.168.0.1 -> 1.0.168.192.in-addr.arpa;
 			if (ip.getInetKind() == InetKind.V4) { //IPv4
-				String ptrName = String.format("%d.%d.%d.%d.in-addr.arpa.", (ip.getIpV4()[3] & 0xff), (ip.getIpV4()[2] & 0xff), (ip.getIpV4()[1] & 0xff), (ip.getIpV4()[0] & 0xff));
+				String ptrName = String.format("%d.%d.%d.%d.in-addr.arpa.", (ip.getIpV4()[3] & 0xff),
+						(ip.getIpV4()[2] & 0xff), (ip.getIpV4()[1] & 0xff), (ip.getIpV4()[0] & 0xff));
 				add(new RrPtr(ptrName, ttl, name));
 			} else { //IPv6
 				StringBuilder sb = new StringBuilder();
@@ -576,6 +581,10 @@ public final class RrDb {
 		soaMail = soaMail + "."; //最後に.を追加する
 		ar.add(new RrSoa(domainName, ttl, nsName, soaMail, serial, refresh, retry, expire, minimum));
 		return true;
+	}
+
+	public int count() {
+		return ar.size();
 	}
 
 }

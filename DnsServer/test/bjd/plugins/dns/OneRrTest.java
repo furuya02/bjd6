@@ -37,12 +37,12 @@ public final class OneRrTest {
 	@Test
 	public void isEffective_ttlが10秒の場合_10秒後で確認するとtrueが返る() throws Exception {
 		//setUp
-		long now = Calendar.getInstance().getTimeInMillis(); //現在時間
+		long now = Calendar.getInstance().getTimeInMillis() / 1000; //現在時間(秒単位)
 		int ttl = 10; //生存時間は10秒
 		RrTest sut = new RrTest("name", DnsType.A, ttl, "123");
 		boolean expected = true;
 		//exercise
-		boolean actual = sut.isEffective(now + 10 * 1000); //10秒後
+		boolean actual = sut.isEffective(now + 10); //10秒後
 		//verify
 		assertThat(actual, is(expected));
 	}
@@ -55,7 +55,7 @@ public final class OneRrTest {
 		RrTest sut = new RrTest("name", DnsType.A, ttl, "123");
 		boolean expected = false;
 		//exercise
-		boolean actual = sut.isEffective(now + 11 * 1000); //11秒後
+		boolean actual = sut.isEffective(now + 11); //11秒後
 		//verify
 		assertThat(actual, is(expected));
 	}

@@ -29,7 +29,7 @@ public abstract class OneRr {
 	 * @param data
 	 */
 	public OneRr(String name, DnsType dnsType, int ttl, byte[] data) {
-		createTime = Calendar.getInstance().getTimeInMillis();
+		createTime = Calendar.getInstance().getTimeInMillis() / 1000; //秒単位
 		this.name = name;
 		this.dnsType = dnsType;
 		this.ttl = ttl;
@@ -43,23 +43,23 @@ public abstract class OneRr {
 	 */
 	public final OneRr clone(int t) {
 		switch (dnsType) {
-			case A:
-				return new RrA(name, t, data);
-			case Aaaa:
-				return new RrAaaa(name, t, data);
-			case Ns:
-				return new RrNs(name, t, data);
-			case Mx:
-				return new RrMx(name, t, data);
-			case Cname:
-				return new RrCname(name, t, data);
-			case Ptr:
-				return new RrPtr(name, t, data);
-			case Soa:
-				return new RrSoa(name, t, data);
-			default:
-				Util.runtimeException(String.format("OneRr.close() not implement DnsType=%s", dnsType));
-				break;
+		case A:
+			return new RrA(name, t, data);
+		case Aaaa:
+			return new RrAaaa(name, t, data);
+		case Ns:
+			return new RrNs(name, t, data);
+		case Mx:
+			return new RrMx(name, t, data);
+		case Cname:
+			return new RrCname(name, t, data);
+		case Ptr:
+			return new RrPtr(name, t, data);
+		case Soa:
+			return new RrSoa(name, t, data);
+		default:
+			Util.runtimeException(String.format("OneRr.close() not implement DnsType=%s", dnsType));
+			break;
 		}
 		return null; //これは実行されない
 	}
@@ -131,20 +131,15 @@ public abstract class OneRr {
 
 	/**
 	 * データの有効・無効判断
-	 * @param now
+	 * @param now 秒単位
 	 * @return
 	 */
 	public final boolean isEffective(long now) {
 		if (ttl == 0) {
 			return true;
 		}
-		//Ver5.7.3 みずき氏から情報提供いただきました
-		//    long ttl = Util.htonl(Ttl2);
-		//    if (_createTime + ttl < now)
-		// nowとcreateTimeはTicksから得ているので100ns単位
-		long t = ttl * 1000;
-		//t *= 1000;
-		if (createTime + t >= now) {
+		// nowとcreateTimeは秒単位
+		if (createTime + ttl >= now) {
 			return true;
 		}
 		return false;

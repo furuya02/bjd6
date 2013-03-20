@@ -143,7 +143,7 @@ public final class RrDbTest {
 		int expected = 0;
 
 		TestUtil.waitDisp("RrDb.getList()で期限切れリソースの削除を確認するため、TTL指定時間が経過するまで待機");
-		Util.sleep(1001); //1001ms経過
+		Util.sleep(2000); //2秒経過
 		//exercise
 		sut.getList("www.example.com.", DnsType.A);
 		int actual = RrDbTest.size(sut); //DBのサイズは0になっている

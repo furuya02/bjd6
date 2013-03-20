@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import junit.framework.Assert;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,11 +22,9 @@ import bjd.net.IpKind;
 import bjd.net.OneBind;
 import bjd.net.ProtocolKind;
 import bjd.option.Conf;
-import bjd.sock.SockTcp;
 import bjd.sock.SockUdp;
 import bjd.test.TestUtil;
 import bjd.test.TmpOption;
-import bjd.util.Inet;
 import bjd.util.Util;
 
 /**
@@ -44,12 +42,12 @@ public final class ServerTest {
 	public static void beforeClass() throws Exception {
 
 		//named.caのコピー
-		String src = String.format("%s\\DnsServer\\test\\named.ca",TestUtil.getProhjectDirectory()); 
-		String dst = String.format("%s\\BJD\\bin\\named.ca",TestUtil.getProhjectDirectory()); 
-		Util.fileCopy(new File(src),new File(dst));
-		
+		String src = String.format("%s\\DnsServer\\test\\named.ca", TestUtil.getProhjectDirectory());
+		String dst = String.format("%s\\BJD\\bin\\named.ca", TestUtil.getProhjectDirectory());
+		Util.fileCopy(new File(src), new File(dst));
+
 		//設定ファイルの退避と上書き
-		op = new TmpOption(String.format("%s\\DnsServer\\test\\DnsServerTest.ini",TestUtil.getProhjectDirectory()));
+		op = new TmpOption(String.format("%s\\DnsServer\\test\\DnsServerTest.ini", TestUtil.getProhjectDirectory()));
 		OneBind oneBind = new OneBind(new Ip(IpKind.V4_LOCALHOST), ProtocolKind.Udp);
 		Kernel kernel = new Kernel();
 		Option option = new Option(kernel, "");
@@ -58,8 +56,7 @@ public final class ServerTest {
 		//サーバ起動
 		sv = new Server(kernel, conf, oneBind);
 		sv.start();
-		
-		
+
 	}
 
 	@AfterClass
@@ -74,6 +71,10 @@ public final class ServerTest {
 
 	}
 
+	private PacketDns lookup(DnsType dnsType, String name) throws IOException {
+		return lookup(dnsType, name, false);
+	}
+
 	/**
 	 * 共通メソッド<br>
 	 * リクエスト送信して、サーバから返ったデータをDNSパケットとしてデコードする<br>
@@ -82,11 +83,11 @@ public final class ServerTest {
 	 * @throws ValidObjException 
 	 * @throws Exception
 	 */
-	private PacketDns lookup(DnsType dnsType, String name) throws IOException {
+	private PacketDns lookup(DnsType dnsType, String name, boolean rd) throws IOException {
 		//乱数で識別子生成
 		short id = (short) (new Random()).nextInt(100);
 		//送信パケット生成
-		PacketDns sp = new PacketDns(id, false, false, false, false);
+		PacketDns sp = new PacketDns(id, false, false, rd, false);
 		//質問フィールド追加
 		sp.addRR(RrKind.QD, new RrQuery(name, dnsType));
 		//クライアントソケット生成、及び送信
@@ -110,7 +111,8 @@ public final class ServerTest {
 	 * @return
 	 */
 	private String print(PacketDns p) {
-		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN), p.getCount(RrKind.NS), p.getCount(RrKind.AR));
+		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN),
+				p.getCount(RrKind.NS), p.getCount(RrKind.AR));
 	}
 
 	/**
@@ -137,23 +139,23 @@ public final class ServerTest {
 	 */
 	private String print(OneRr o) {
 		switch (o.getDnsType()) {
-			case A:
-				return ((RrA) o).toString();
-			case Aaaa:
-				return ((RrAaaa) o).toString();
-			case Ns:
-				return ((RrNs) o).toString();
-			case Mx:
-				return ((RrMx) o).toString();
-			case Ptr:
-				return ((RrPtr) o).toString();
-			case Soa:
-				return ((RrSoa) o).toString();
-			case Cname:
-				return ((RrCname) o).toString();
-			default:
-				Util.runtimeException("not implement.");
-				break;
+		case A:
+			return ((RrA) o).toString();
+		case Aaaa:
+			return ((RrAaaa) o).toString();
+		case Ns:
+			return ((RrNs) o).toString();
+		case Mx:
+			return ((RrMx) o).toString();
+		case Ptr:
+			return ((RrPtr) o).toString();
+		case Soa:
+			return ((RrSoa) o).toString();
+		case Cname:
+			return ((RrCname) o).toString();
+		default:
+			Util.runtimeException("not implement.");
+			break;
 		}
 		return "";
 	}
@@ -220,8 +222,10 @@ public final class ServerTest {
 		PacketDns p = lookup(DnsType.Ptr, "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa");
 		//verify
 		assertThat(print(p), is("QD=1 AN=1 NS=0 AR=0"));
-		assertThat(print(p, RrKind.QD, 0), is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
-		assertThat(print(p, RrKind.AN, 0), is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
+		assertThat(print(p, RrKind.QD, 0),
+				is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
+		assertThat(print(p, RrKind.AN, 0),
+				is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
 	}
 
 	@Test
@@ -344,7 +348,63 @@ public final class ServerTest {
 
 		//verify
 		Assert.assertNull(p); //レスポンスが無いことを確認する
-		
+
+	}
+
+	@Test
+	public void 他ドメインの検索_タイプA() throws Exception {
+		//exercise
+		PacketDns p = lookup(DnsType.A, "www.google.com", true);
+
+		//verify
+		assertThat(print(p), is("QD=1 AN=5 NS=4 AR=4"));
+		assertThat(print(p, RrKind.QD, 0), is("Query A www.google.com."));
+
+		ArrayList<String> ar = new ArrayList<String>();
+		for (int i = 0; i < 5; i++){
+			ar.add(print(p, RrKind.AN, i));
+		}
+		Collections.sort(ar);
+				
+		assertThat(ar.get(0), is("A www.google.com. TTL=300 173.194.38.112"));
+		assertThat(ar.get(1), is("A www.google.com. TTL=300 173.194.38.113"));
+		assertThat(ar.get(2), is("A www.google.com. TTL=300 173.194.38.114"));
+		assertThat(ar.get(3), is("A www.google.com. TTL=300 173.194.38.115"));
+		assertThat(ar.get(4), is("A www.google.com. TTL=300 173.194.38.116"));
+
+		ar.clear();
+		for (int i = 0; i < 4; i++){
+			ar.add(print(p, RrKind.NS, i));
+		}
+		Collections.sort(ar);
+		assertThat(ar.get(0), is("Ns google.com. TTL=172800 ns1.google.com."));
+		assertThat(ar.get(1), is("Ns google.com. TTL=172800 ns2.google.com."));
+		assertThat(ar.get(2), is("Ns google.com. TTL=172800 ns3.google.com."));
+		assertThat(ar.get(3), is("Ns google.com. TTL=172800 ns4.google.com."));
+
+		ar.clear();
+		for (int i = 0; i < 4; i++)
+			ar.add(print(p, RrKind.AR, i));
+		Collections.sort(ar);
+		assertThat(ar.get(0), is("A ns1.google.com. TTL=172800 216.239.32.10"));
+		assertThat(ar.get(1), is("A ns2.google.com. TTL=172800 216.239.34.10"));
+		assertThat(ar.get(2), is("A ns3.google.com. TTL=172800 216.239.36.10"));
+		assertThat(ar.get(3), is("A ns4.google.com. TTL=172800 216.239.38.10"));
+
+	}
+
+	@Test
+	public void 他ドメインの検索_タイプMX() throws Exception {
+		//exercise
+		PacketDns p = lookup(DnsType.Mx, "sapporoworks.ne.jp", true);
+
+		//verify
+		assertThat(print(p), is("QD=1 AN=1 NS=0 AR=1"));
+		assertThat(print(p, RrKind.QD, 0), is("Query Mx sapporoworks.ne.jp."));
+
+		assertThat(print(p, RrKind.AN, 0), is("Mx sapporoworks.ne.jp. TTL=3600 10 sapporoworks.ne.jp."));
+		assertThat(print(p, RrKind.AR, 0), is("A sapporoworks.ne.jp. TTL=3600 59.106.27.208"));
+
 	}
 
 }
