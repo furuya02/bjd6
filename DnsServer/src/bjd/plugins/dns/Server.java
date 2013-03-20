@@ -219,12 +219,14 @@ public final class Server extends OneServer {
 
 		// (B)「回答セクション」作成
 		ArrayList<OneRr> ansList = targetCache.getList(rp.getRequestName(), rp.getDnsType());
-		getLogger().set(LogKind.DETAIL, sockUdp, 13, String.format("%s ansList.Count=%d", rp.getDnsType(), ansList.size())); //"Create Response (AN)"
+		getLogger().set(LogKind.DETAIL, sockUdp, 13,
+				String.format("%s ansList.Count=%d", rp.getDnsType(), ansList.size())); //"Create Response (AN)"
 
 		if (0 < ansList.size()) { //検索でヒットした場合
 			for (OneRr oneRR : ansList) {
 				//Java fix
-				appendRr(sp, RrKind.AN, DnsUtil.createRr(rp.getRequestName(), rp.getDnsType(), oneRR.getTtl(), oneRR.getData()));
+				appendRr(sp, RrKind.AN,
+						DnsUtil.createRr(rp.getRequestName(), rp.getDnsType(), oneRR.getTtl(), oneRR.getData()));
 				if (rp.getDnsType() == DnsType.Mx || rp.getDnsType() == DnsType.Cname || rp.getDnsType() == DnsType.Ns) {
 
 					String targetName = "";
@@ -270,11 +272,13 @@ public final class Server extends OneServer {
 			}
 		}
 
-		if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa || rp.getDnsType() == DnsType.Cname) {
+		if (rp.getDnsType() == DnsType.A || rp.getDnsType() == DnsType.Aaaa || rp.getDnsType() == DnsType.Soa
+				|| rp.getDnsType() == DnsType.Cname) {
 			// (C)「権威セクション」「追加情報セクション」作成
 			List<OneRr> nsList = targetCache.getList(domainName, DnsType.Ns);
 			//Java fix 13->22
-			getLogger().set(LogKind.DETAIL, sockUdp, 22, String.format("%s nsList.Count=%d", DnsType.Ns, nsList.size())); // Create Response (AR)
+			getLogger()
+					.set(LogKind.DETAIL, sockUdp, 22, String.format("%s nsList.Count=%d", DnsType.Ns, nsList.size())); // Create Response (AR)
 			for (OneRr o : nsList) {
 				RrNs ns = (RrNs) o;
 
@@ -413,7 +417,7 @@ public final class Server extends OneServer {
 				}
 			}
 			//ネームサーバ一覧から、そのアドレスの一覧を作成する
-			ArrayList<Ip> nsIpList = getIpList(nsList);
+			ArrayList<Ip> nsIpList = getIpList(nsList, depth, remoteAddr);
 			//ネームサーバのアドレスが取得できない場合、処理の継続はできない（検索不能）
 			if (nsIpList.size() == 0) {
 				return false;
@@ -456,10 +460,16 @@ public final class Server extends OneServer {
 	}
 
 	//ネームサーバ一覧から、そのアドレスの一覧を作成する
-	ArrayList<Ip> getIpList(ArrayList<String> nsList) {
+	ArrayList<Ip> getIpList(ArrayList<String> nsList, int depth, Ip remoteAddr) throws IOException {
 		ArrayList<Ip> ipList = new ArrayList<Ip>();
 		for (String ns : nsList) {
 			ArrayList<OneRr> rrList = rootCache.getList(ns, DnsType.A);
+
+			//IP情報が無い場合、再帰検索
+			if (rrList.size() == 0) {
+				searchLoop(ns, DnsType.A, depth, remoteAddr);
+				rrList = rootCache.getList(ns, DnsType.A);
+			}
 
 			rrList.addAll(rootCache.getList(ns, DnsType.Aaaa));
 
@@ -536,55 +546,55 @@ public final class Server extends OneServer {
 		//	return isJp() ? "標準問合(OPCODE=0)以外のリクエストには対応できません" : "Because I am different from 0 in OPCODE,can't process it.";
 		//case 1:
 		//	return isJp() ? "質問エントリーが１でないパケットは処理できません" : "Because I am different from 1 a question entry,can't process it.";
-			case 2:
-				return isJp() ? "ルートキャッシュの読み込みに失敗しました" : "Failed in reading of route cash.";
-			case 3:
-				return isJp() ? "ルートキャッシュ(ファイル)が見つかりません" : "Root chace (file) is not found";
-			case 4:
-				return isJp() ? "パケットの解釈に失敗しました。正常なDNSリクエストでない可能性があります。"
-						: "Failed in interpretation of a packet.It may not be a normal DNS request.";
-			case 5:
-				return isJp() ? "Lookup() パケット受信でタイムアウトが発生しました。" : "Timeout occurred in Lookup()";
-			case 6:
-				return isJp() ? "ルートキャッシュを読み込みました" : "root cache database initialised.";
-			case 7:
-				return "zone database initialised.";
-			case 8:
-				return "Query";
-			case 9:
-				return "request to a domain under auto (localhost)";
-			case 10:
-				return "request to a domain under management";
-			case 11:
-				return "request to a domain under auto (localhost)";
-			case 12:
-				return "request to a domain under management";
-			case 13:
-				return "Search LocalCache";
-				//case 14://Java fix
-				//    return "Append RR";
-			case 15:
-				return "Create Response (AN.CNAME)";
-				//case 16://Java fix
-				//    return "Append RR";
-			case 17:
-				return "Lookup send";
-			case 18:
-				return "Lookup recv";
-			case 19:
-				return isJp() ? "リソースデータの読み込みに失敗しました" : "Failed in reading of resource data";
-			case 20:
-				return isJp() ? "リソース(SOA)は追加されませんでした" : "Resource (SOA) was not added";
-			case 21:
-				return isJp() ? "ドメインのリソース定義を読み込みました" : "Read a resource definition of a domain";
-			case 22:
-				return "Create Response (AR)";
-			case 23:
-				return "Append RR";
-			case 24:
-				return "_rootCache.Add";
-			default:
-				return "unknown";
+		case 2:
+			return isJp() ? "ルートキャッシュの読み込みに失敗しました" : "Failed in reading of route cash.";
+		case 3:
+			return isJp() ? "ルートキャッシュ(ファイル)が見つかりません" : "Root chace (file) is not found";
+		case 4:
+			return isJp() ? "パケットの解釈に失敗しました。正常なDNSリクエストでない可能性があります。"
+					: "Failed in interpretation of a packet.It may not be a normal DNS request.";
+		case 5:
+			return isJp() ? "Lookup() パケット受信でタイムアウトが発生しました。" : "Timeout occurred in Lookup()";
+		case 6:
+			return isJp() ? "ルートキャッシュを読み込みました" : "root cache database initialised.";
+		case 7:
+			return "zone database initialised.";
+		case 8:
+			return "Query";
+		case 9:
+			return "request to a domain under auto (localhost)";
+		case 10:
+			return "request to a domain under management";
+		case 11:
+			return "request to a domain under auto (localhost)";
+		case 12:
+			return "request to a domain under management";
+		case 13:
+			return "Search LocalCache";
+			//case 14://Java fix
+			//    return "Append RR";
+		case 15:
+			return "Create Response (AN.CNAME)";
+			//case 16://Java fix
+			//    return "Append RR";
+		case 17:
+			return "Lookup send";
+		case 18:
+			return "Lookup recv";
+		case 19:
+			return isJp() ? "リソースデータの読み込みに失敗しました" : "Failed in reading of resource data";
+		case 20:
+			return isJp() ? "リソース(SOA)は追加されませんでした" : "Resource (SOA) was not added";
+		case 21:
+			return isJp() ? "ドメインのリソース定義を読み込みました" : "Read a resource definition of a domain";
+		case 22:
+			return "Create Response (AR)";
+		case 23:
+			return "Append RR";
+		case 24:
+			return "_rootCache.Add";
+		default:
+			return "unknown";
 
 		}
 	}
