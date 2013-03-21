@@ -91,9 +91,9 @@ public final class ServerTest {
 		//質問フィールド追加
 		sp.addRR(RrKind.QD, new RrQuery(name, dnsType));
 		//クライアントソケット生成、及び送信
-		SockUdp cl = new SockUdp(new Ip(IpKind.V4_LOCALHOST), 53, 100, null, sp.getBytes());
+		SockUdp cl = new SockUdp(new Ip(IpKind.V4_LOCALHOST), 53, null, sp.getBytes());
 		//受信
-		byte[] recvBuf = cl.recv(1000);
+		byte[] recvBuf = cl.recv(3);
 		if (recvBuf.length == 0) { //受信データが無い場合
 			return null;
 		}
@@ -111,8 +111,7 @@ public final class ServerTest {
 	 * @return
 	 */
 	private String print(PacketDns p) {
-		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN),
-				p.getCount(RrKind.NS), p.getCount(RrKind.AR));
+		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN), p.getCount(RrKind.NS), p.getCount(RrKind.AR));
 	}
 
 	/**
@@ -139,23 +138,23 @@ public final class ServerTest {
 	 */
 	private String print(OneRr o) {
 		switch (o.getDnsType()) {
-		case A:
-			return ((RrA) o).toString();
-		case Aaaa:
-			return ((RrAaaa) o).toString();
-		case Ns:
-			return ((RrNs) o).toString();
-		case Mx:
-			return ((RrMx) o).toString();
-		case Ptr:
-			return ((RrPtr) o).toString();
-		case Soa:
-			return ((RrSoa) o).toString();
-		case Cname:
-			return ((RrCname) o).toString();
-		default:
-			Util.runtimeException("not implement.");
-			break;
+			case A:
+				return ((RrA) o).toString();
+			case Aaaa:
+				return ((RrAaaa) o).toString();
+			case Ns:
+				return ((RrNs) o).toString();
+			case Mx:
+				return ((RrMx) o).toString();
+			case Ptr:
+				return ((RrPtr) o).toString();
+			case Soa:
+				return ((RrSoa) o).toString();
+			case Cname:
+				return ((RrCname) o).toString();
+			default:
+				Util.runtimeException("not implement.");
+				break;
 		}
 		return "";
 	}
@@ -222,10 +221,8 @@ public final class ServerTest {
 		PacketDns p = lookup(DnsType.Ptr, "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa");
 		//verify
 		assertThat(print(p), is("QD=1 AN=1 NS=0 AR=0"));
-		assertThat(print(p, RrKind.QD, 0),
-				is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
-		assertThat(print(p, RrKind.AN, 0),
-				is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
+		assertThat(print(p, RrKind.QD, 0), is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
+		assertThat(print(p, RrKind.AN, 0), is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
 	}
 
 	@Test
@@ -361,11 +358,11 @@ public final class ServerTest {
 		assertThat(print(p, RrKind.QD, 0), is("Query A www.google.com."));
 
 		ArrayList<String> ar = new ArrayList<String>();
-		for (int i = 0; i < 5; i++){
+		for (int i = 0; i < 5; i++) {
 			ar.add(print(p, RrKind.AN, i));
 		}
 		Collections.sort(ar);
-				
+
 		assertThat(ar.get(0), is("A www.google.com. TTL=300 173.194.38.112"));
 		assertThat(ar.get(1), is("A www.google.com. TTL=300 173.194.38.113"));
 		assertThat(ar.get(2), is("A www.google.com. TTL=300 173.194.38.114"));
@@ -373,7 +370,7 @@ public final class ServerTest {
 		assertThat(ar.get(4), is("A www.google.com. TTL=300 173.194.38.116"));
 
 		ar.clear();
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 4; i++) {
 			ar.add(print(p, RrKind.NS, i));
 		}
 		Collections.sort(ar);

@@ -69,7 +69,7 @@ public class OneServerTest2 implements ILife {
 		}
 
 		private void udp(SockUdp sockUdp) {
-			byte[] buf = sockUdp.recv();
+			byte[] buf = sockUdp.getRecvBuf();
 			sockUdp.send(buf);
 			//echoしたらセッションを閉じる
 		}
@@ -157,13 +157,8 @@ public class OneServerTest2 implements ILife {
 		buf[8] = 100; //CheckData
 
 		for (int i = 0; i < 3; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, timeout, null, buf);
-
-			while (sockUdp.length() == 0) {
-				Util.sleep(100);
-			}
-
-			byte[] b = sockUdp.recv();
+			SockUdp sockUdp = new SockUdp(ip, port, null, buf);
+			byte[] b = sockUdp.recv(timeout);
 			assertThat(b[8], is(buf[8])); //CheckData
 			assertThat(max, is(b.length));
 

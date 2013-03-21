@@ -130,7 +130,7 @@ public final class Server extends OneServer {
 		PacketDns rp; //受信パケット
 		try {
 			//パケットの読込(受信パケットrp)            
-			rp = new PacketDns(sockUdp.recv());
+			rp = new PacketDns(sockUdp.getRecvBuf());
 		} catch (IOException e) {
 			//データ解釈に失敗した場合は、処理なし
 			getLogger().set(LogKind.SECURE, sockUdp, 4, ""); //不正パケットの可能性あり 
@@ -341,10 +341,10 @@ public final class Server extends OneServer {
 		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
 		byte[] sendBuf = null;
 		sendBuf = sp.getBytes();
-		SockUdp sockUdp = new SockUdp(ip, port, timeout, null, sendBuf); //送信
+		SockUdp sockUdp = new SockUdp(ip, port, null, sendBuf); //送信
 
 		//この辺のロジックを動作確認する必要がある
-		byte[] recvBuf = sockUdp.recv(timeout * 1000);
+		byte[] recvBuf = sockUdp.recv(timeout);
 		if (recvBuf != null && 12 <= recvBuf.length) {
 
 			try {

@@ -60,7 +60,7 @@ public final class SockUdpTest {
 					while (isLife() && child.getSockState() == SockState.CONNECT) {
 						int len = child.length();
 						if (len > 0) {
-							byte[] buf = child.recv();
+							byte[] buf = child.getRecvBuf();
 							child.send(buf);
 							//送信が完了したら、この処理は終了
 							break;
@@ -81,7 +81,7 @@ public final class SockUdpTest {
 		EchoServer echoServer = new EchoServer(addr, port);
 		echoServer.start();
 
-		int timeout = 100;
+		int timeout = 3;
 		Ssl ssl = null;
 
 		int max = 1500;
@@ -93,13 +93,13 @@ public final class SockUdpTest {
 
 		Ip ip = ip = new Ip(addr);
 		for (int i = 0; i < loop; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, timeout, ssl, tmp);
-			int len = 0;
-			while (len == 0) {
-				len = sockUdp.length();
-				Util.sleep(0);
-			}
-			byte[] b = sockUdp.recv();
+			SockUdp sockUdp = new SockUdp(ip, port, ssl, tmp);
+//			int len = 0;
+//			while (len == 0) {
+//				len = sockUdp.length();
+//				Util.sleep(0);
+//			}
+			byte[] b = sockUdp.recv(timeout);
 			
 			//verify
 			for (int m = 0; m < max; m += 10) {
