@@ -295,10 +295,6 @@ public final class Kernel implements IDisposable {
 		logger = createLogger("kernel", true, null);
 		tmpLogger.release(logger);
 
-		listServer = new ListServer(this, listPlugin);
-
-		//listTool = new ListTool(this);
-
 		//mailBox初期化
 		//        foreach (var o in ListOption) {
 		//            //SmtpServer若しくは、Pop3Serverが使用される場合のみメールボックスを初期化する                
@@ -309,6 +305,11 @@ public final class Kernel implements IDisposable {
 		//                }
 		//            }
 		//        }
+
+		listServer = new ListServer(this, listPlugin);
+
+		//listTool = new ListTool(this);
+
 		remoteServer = listServer.get("RemoteServer");
 
 		view.setColumnText(); //Logビューのカラムテキストの初期化
