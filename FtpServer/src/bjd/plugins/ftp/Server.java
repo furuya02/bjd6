@@ -30,7 +30,7 @@ public final class Server extends OneServer {
 	private ListMount listMount;
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
-		super(kernel, "Ftp", conf, oneBind);
+		super(kernel, conf, oneBind);
 
 		bannerMessage = kernel.changeTag((String) getConf().get("bannerMessage"));
 		//ユーザ情報

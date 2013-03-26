@@ -28,7 +28,7 @@ public final class Server extends OneServer {
 	private Kernel kernel;
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
-		super(kernel, "Dns", conf, oneBind);
+		super(kernel, conf, oneBind);
 
 		this.kernel = kernel;
 

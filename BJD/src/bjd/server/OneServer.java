@@ -108,10 +108,10 @@ public abstract class OneServer extends ThreadBase {
 	}
 
 	//コンストラクタ
-	protected OneServer(Kernel kernel, String nameTag, Conf conf, OneBind oneBind) {
-		super(kernel.createLogger(nameTag, true, null));
+	protected OneServer(Kernel kernel, Conf conf, OneBind oneBind) {
+		super(kernel.createLogger(conf.getNameTag(), true, null));
 
-		this.nameTag = nameTag;
+		this.nameTag = conf.getNameTag();
 		this.conf = conf;
 		this.oneBind = oneBind;
 		this.isJp = kernel.isJp();

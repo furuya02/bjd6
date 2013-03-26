@@ -20,7 +20,7 @@ public final class ServerTest {
 	//サーバ動作確認用
 	class MyServer extends OneServer {
 		public MyServer(Conf conf, OneBind oneBind) {
-			super(new Kernel(), "TEST-SERVER", conf, oneBind);
+			super(new Kernel(), conf, oneBind);
 		}
 
 		@Override

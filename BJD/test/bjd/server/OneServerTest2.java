@@ -27,7 +27,7 @@ public class OneServerTest2 implements ILife {
 		private ProtocolKind protocolKind;
 
 		public EchoServer(Conf conf, OneBind oneBind) {
-			super(new Kernel(), "EchoServer", conf, oneBind);
+			super(new Kernel(), conf, oneBind);
 
 			protocolKind = oneBind.getProtocol();
 		}
