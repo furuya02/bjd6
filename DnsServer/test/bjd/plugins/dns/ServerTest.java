@@ -93,7 +93,7 @@ public final class ServerTest {
 		//クライアントソケット生成、及び送信
 		SockUdp cl = new SockUdp(new Ip(IpKind.V4_LOCALHOST), 53, null, sp.getBytes());
 		//受信
-		byte[] recvBuf = cl.recv(3);
+		byte[] recvBuf = cl.recv(5);
 		if (recvBuf.length == 0) { //受信データが無い場合
 			return null;
 		}

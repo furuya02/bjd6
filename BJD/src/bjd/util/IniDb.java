@@ -289,11 +289,11 @@ public final class IniDb {
 				}
 			}
 			// 対象のValListを書き込む
-			for (OneVal o : listVal.getList(null)) {
+			for (OneVal o : listVal.getSaveList(null)) {
 				// nullで初期化され、実行中に一度も設定されていない値は、保存の対象外となる
-				if (o.getValue() == null) {
-					continue;
-				}
+				//if (o.getValue() == null) {
+				//	continue;
+				//}
 
 				// データ保存の必要のない型は省略する（下位互換のため）
 				CtrlType ctrlType = o.getOneCtrl().getCtrlType();

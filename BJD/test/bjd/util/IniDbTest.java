@@ -40,34 +40,34 @@ import bjd.option.Dat;
 import bjd.option.ListVal;
 import bjd.option.OneVal;
 
+
 @RunWith(Enclosed.class)
 public class IniDbTest {
 
-	
-//	private static IniDb createIniDb(){
-//		String fileName = "iniDbTestTmp"; //テンポラリファイル名
-//		String progDir = new File(".").getAbsoluteFile().getParent();
-//		String path = String.format("%s\\%s.ini", progDir, fileName);
-//		return new IniDb(progDir, fileName);
-//	}
-	
+	//	private static IniDb createIniDb(){
+	//		String fileName = "iniDbTestTmp"; //テンポラリファイル名
+	//		String progDir = new File(".").getAbsoluteFile().getParent();
+	//		String path = String.format("%s\\%s.ini", progDir, fileName);
+	//		return new IniDb(progDir, fileName);
+	//	}
+
 	@RunWith(Theories.class)
 	public static final class listVal_add_OneVal_で初期化後saveして当該設定が保存されているかどうか {
 
 		@DataPoints
-		public static Fixture[] datas = { 
-			new Fixture(CtrlType.INT, 123, "INT=Basic\bname=123"),
-			new Fixture(CtrlType.TEXTBOX, "123", "STRING=Basic\bname=123"), 
-			new Fixture(CtrlType.COMBOBOX, 1, "LIST=Basic\bname=1"), 
-			new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"), 
-			new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"), 
-			new Fixture(CtrlType.CHECKBOX, true, "BOOL=Basic\bname=true"), 
-			new Fixture(CtrlType.HIDDEN, "123", "HIDE_STRING=Basic\bname=2d7ee3636680c1f6"),
-			new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"), 
-			new Fixture(CtrlType.RADIO, 1, "RADIO=Basic\bname=1"),
-			new Fixture(CtrlType.ADDRESSV4,	new Ip(InetKind.V4), "ADDRESS_V4=Basic\bname=0.0.0.0"),
+		public static Fixture[] datas = {
+				new Fixture(CtrlType.INT, 123, "INT=Basic\bname=123"),
+				new Fixture(CtrlType.TEXTBOX, "123", "STRING=Basic\bname=123"),
+				new Fixture(CtrlType.COMBOBOX, 1, "LIST=Basic\bname=1"),
+				new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"),
+				new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"),
+				new Fixture(CtrlType.CHECKBOX, true, "BOOL=Basic\bname=true"),
+				new Fixture(CtrlType.HIDDEN, "123", "HIDE_STRING=Basic\bname=2d7ee3636680c1f6"),
+				new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"),
+				new Fixture(CtrlType.RADIO, 1, "RADIO=Basic\bname=1"),
+				new Fixture(CtrlType.ADDRESSV4, new Ip(InetKind.V4), "ADDRESS_V4=Basic\bname=0.0.0.0"),
 
-			//new Fixture(CtrlType.ADDRESSV4,	new Ip("192.168.0.1"), "ADDRESS_V4=Basic\bname=192.168.0.1"),
+				//new Fixture(CtrlType.ADDRESSV4,	new Ip("192.168.0.1"), "ADDRESS_V4=Basic\bname=192.168.0.1"),
 		};
 
 		static class Fixture {
@@ -91,11 +91,11 @@ public class IniDbTest {
 			String progDir = new File(".").getAbsoluteFile().getParent(); //カレントディレクトリ
 			String path = String.format("%s\\%s.ini", progDir, fileName);
 			IniDb sut = new IniDb(progDir, fileName);
-			
+
 			ListVal listVal = new ListVal();
 			listVal.add(Assistance.createOneVal(fx.ctrlType, fx.value));
 			sut.save("Basic", listVal); // nameTagは"Basic"で決め打ちされている
-			
+
 			String expected = fx.expected;
 			//exercise
 			ArrayList<String> lines = Util.textFileRead(new File(path));
@@ -113,16 +113,16 @@ public class IniDbTest {
 	public static final class 設定ファイルにテキストでセットしてreadして当該設定が読み込めるかどうか {
 
 		@DataPoints
-		public static Fixture[] datas = { 
-			new Fixture(CtrlType.INT, "123", "INT=Basic\bname=123"),
-			new Fixture(CtrlType.TEXTBOX, "123", "STRING=Basic\bname=123"), 
-			new Fixture(CtrlType.COMBOBOX, "1", "LIST=Basic\bname=1"), 
-			new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"), 
-			new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"), 
-			new Fixture(CtrlType.CHECKBOX, "true", "BOOL=Basic\bname=true"), 
-			new Fixture(CtrlType.HIDDEN, "2d7ee3636680c1f6", "HIDE_STRING=Basic\bname=2d7ee3636680c1f6"),
-			new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"), new Fixture(CtrlType.RADIO, "1", "RADIO=Basic\bname=1"),
-			new Fixture(CtrlType.ADDRESSV4, "192.168.0.1", "ADDRESS_V4=Basic\bname=192.168.0.1"),		
+		public static Fixture[] datas = {
+				new Fixture(CtrlType.INT, "123", "INT=Basic\bname=123"),
+				new Fixture(CtrlType.TEXTBOX, "123", "STRING=Basic\bname=123"),
+				new Fixture(CtrlType.COMBOBOX, "1", "LIST=Basic\bname=1"),
+				new Fixture(CtrlType.FILE, "c:\\1.txt", "FILE=Basic\bname=c:\\1.txt"),
+				new Fixture(CtrlType.FOLDER, "c:\\tmp", "FOLDER=Basic\bname=c:\\tmp"),
+				new Fixture(CtrlType.CHECKBOX, "true", "BOOL=Basic\bname=true"),
+				new Fixture(CtrlType.HIDDEN, "2d7ee3636680c1f6", "HIDE_STRING=Basic\bname=2d7ee3636680c1f6"),
+				new Fixture(CtrlType.MEMO, "123", "MEMO=Basic\bname=123"), new Fixture(CtrlType.RADIO, "1", "RADIO=Basic\bname=1"),
+				new Fixture(CtrlType.ADDRESSV4, "192.168.0.1", "ADDRESS_V4=Basic\bname=192.168.0.1"),
 		};
 
 		static class Fixture {
@@ -145,13 +145,12 @@ public class IniDbTest {
 			String progDir = new File(".").getAbsoluteFile().getParent();
 			String path = String.format("%s\\%s.ini", progDir, fileName);
 
-
 			IniDb sut = new IniDb(progDir, fileName);
 			sut.deleteIni();
 			sut.deleteTxt();
 			sut.deleteBak();
 
-			String expected = fx.value; 
+			String expected = fx.value;
 			//exercise
 			ArrayList<String> lines = new ArrayList<>();
 			lines.add(fx.regStr);
@@ -167,7 +166,6 @@ public class IniDbTest {
 			//verify
 			assertThat(actual, is(expected));
 
-			
 			//TearDown
 			sut.deleteIni();
 			sut.deleteTxt();
@@ -261,7 +259,7 @@ public class IniDbTest {
 					} catch (ValidObjException e) {
 						Assert.fail(e.getMessage());
 					}
-					oneCtrl = new CtrlBindAddr(help, list.toArray(new Ip[]{}), list.toArray(new Ip[]{}));
+					oneCtrl = new CtrlBindAddr(help, list.toArray(new Ip[] {}), list.toArray(new Ip[] {}));
 					break;
 				case COMBOBOX:
 					//listを{"1","2"}で決め打ち
@@ -293,4 +291,3 @@ public class IniDbTest {
 	}
 
 }
-

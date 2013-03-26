@@ -138,7 +138,7 @@ public final class ListServer extends ListBase<OneServer> implements IDisposable
 	 * サーバ停止処理
 	 */
 	public void stop() {
-		//全スレッドスタート
+		//全スレッド停止 
 		for (OneServer sv : getAr()) {
 			sv.stop();
 		}
@@ -152,7 +152,7 @@ public final class ListServer extends ListBase<OneServer> implements IDisposable
 		if (isRunnig()) {
 			return;
 		}
-		//全スレッド停止 
+		//全スレッドスタート
 		for (OneServer sv : getAr()) {
 			sv.start();
 		}

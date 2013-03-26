@@ -51,6 +51,24 @@ public final class ListVal extends ListBase<OneVal> {
 	}
 
 	/**
+	 * 階層下のOneValを一覧する<br>
+	 * Datの階層下は再帰しない<br>
+	 * toREg()用に使用される<br>
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public ArrayList<OneVal> getSaveList(ArrayList<OneVal> list) {
+		if (list == null) {
+			list = new ArrayList<>();
+		}
+		for (OneVal o : getAr()) {
+			list = o.getSaveList(list);
+		}
+		return list;
+	}
+
+	/**
 	 * 階層下のOneValを検索する<br>
 	 * 見つからないときnullが返る<br>
 	 * この処理は多用されるため、スピードアップのため、例外を外してnullを返すようにした<br>
@@ -138,4 +156,5 @@ public final class ListVal extends ListBase<OneVal> {
 			o.setListener(listener);
 		}
 	}
+
 }
