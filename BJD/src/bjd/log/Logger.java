@@ -107,7 +107,7 @@ public class Logger {
 						: "Reception character string is too long (cut off so that there was possibility of an unjust request in it)";
 				break;
 			case 9000006:
-				message = isJp ? "bind()でエラーが発生しました" : "An error occurred in bind()";
+				message = isJp ? "このポートは、既に他のプログラムが使用しているため使用できません" : "Cannot use this port so that other programs already use it";
 				break;
 			case 9000007:
 				message = isJp ? "callBack関数が指定されていません[UDP]" : "It is not appointed in callback function [UDP]";

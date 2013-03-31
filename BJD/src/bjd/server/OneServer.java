@@ -261,7 +261,7 @@ public abstract class OneServer extends ThreadBase {
 	private void runUdpServer(int port) {
 
 		if (!sockServer.bind(oneBind.getAddr(), port)) {
-			System.out.println(String.format("bind()=false %s", sockServer.getLastEror()));
+			logger.set(LogKind.ERROR, sockServer, 9000006, sockServer.getLastEror());
 		} else {
 
 			while (isLife()) {
