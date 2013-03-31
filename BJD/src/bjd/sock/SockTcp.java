@@ -390,9 +390,13 @@ public final class SockTcp extends SockObj {
 	 * @return 送信バイト数
 	 */
 	public int lineSend(byte[] buf) {
-		int s1 = send(buf);
-		int s2 = send(new byte[] { 0x0d, 0x0a });
-		return s1 + s2;
+
+		byte[] b = new byte[buf.length + 2];
+
+		System.arraycopy(buf, 0, b, 0, buf.length);
+		b[buf.length] = 0x0d;
+		b[buf.length + 1] = 0x0a;
+		return send(b);
 	}
 
 	/**

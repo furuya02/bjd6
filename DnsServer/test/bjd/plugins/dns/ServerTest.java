@@ -47,7 +47,7 @@ public final class ServerTest {
 		Util.fileCopy(new File(src), new File(dst));
 
 		//設定ファイルの退避と上書き
-		op = new TmpOption(String.format("%s\\DnsServer\\test\\DnsServerTest.ini", TestUtil.getProhjectDirectory()));
+		op = new TmpOption("DnsServer\\test", "DnsServerTest.ini");
 		OneBind oneBind = new OneBind(new Ip(IpKind.V4_LOCALHOST), ProtocolKind.Udp);
 		Kernel kernel = new Kernel();
 		Option option = new Option(kernel, "");
@@ -111,7 +111,8 @@ public final class ServerTest {
 	 * @return
 	 */
 	private String print(PacketDns p) {
-		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN), p.getCount(RrKind.NS), p.getCount(RrKind.AR));
+		return String.format("QD=%d AN=%d NS=%d AR=%d", p.getCount(RrKind.QD), p.getCount(RrKind.AN),
+				p.getCount(RrKind.NS), p.getCount(RrKind.AR));
 	}
 
 	/**
@@ -138,23 +139,23 @@ public final class ServerTest {
 	 */
 	private String print(OneRr o) {
 		switch (o.getDnsType()) {
-			case A:
-				return ((RrA) o).toString();
-			case Aaaa:
-				return ((RrAaaa) o).toString();
-			case Ns:
-				return ((RrNs) o).toString();
-			case Mx:
-				return ((RrMx) o).toString();
-			case Ptr:
-				return ((RrPtr) o).toString();
-			case Soa:
-				return ((RrSoa) o).toString();
-			case Cname:
-				return ((RrCname) o).toString();
-			default:
-				Util.runtimeException("not implement.");
-				break;
+		case A:
+			return ((RrA) o).toString();
+		case Aaaa:
+			return ((RrAaaa) o).toString();
+		case Ns:
+			return ((RrNs) o).toString();
+		case Mx:
+			return ((RrMx) o).toString();
+		case Ptr:
+			return ((RrPtr) o).toString();
+		case Soa:
+			return ((RrSoa) o).toString();
+		case Cname:
+			return ((RrCname) o).toString();
+		default:
+			Util.runtimeException("not implement.");
+			break;
 		}
 		return "";
 	}
@@ -221,8 +222,10 @@ public final class ServerTest {
 		PacketDns p = lookup(DnsType.Ptr, "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa");
 		//verify
 		assertThat(print(p), is("QD=1 AN=1 NS=0 AR=0"));
-		assertThat(print(p, RrKind.QD, 0), is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
-		assertThat(print(p, RrKind.AN, 0), is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
+		assertThat(print(p, RrKind.QD, 0),
+				is("Query Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa."));
+		assertThat(print(p, RrKind.AN, 0),
+				is("Ptr 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. TTL=2400 localhost."));
 	}
 
 	@Test

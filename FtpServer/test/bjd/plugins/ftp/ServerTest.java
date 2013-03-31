@@ -19,7 +19,6 @@ import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.sock.SockServer;
 import bjd.sock.SockTcp;
-import bjd.test.TestUtil;
 import bjd.test.TmpOption;
 import bjd.util.Inet;
 import bjd.util.Util;
@@ -38,7 +37,7 @@ public final class ServerTest implements ILife {
 	public static void beforeClass() throws Exception {
 
 		//設定ファイルの退避と上書き
-		op = new TmpOption(String.format("%s\\FtpServer\\test\\FtpServerTest.ini", TestUtil.getProhjectDirectory()));
+		op = new TmpOption("FtpServer\\test", "FtpServerTest.ini");
 		Kernel kernel = new Kernel();
 		Option option = new Option(kernel, "");
 		Conf conf = new Conf(option);

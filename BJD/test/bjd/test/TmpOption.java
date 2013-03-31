@@ -14,12 +14,11 @@ public final class TmpOption implements IDisposable {
 	private File target = null;
 	private String testDataPath;
 
-
-	public TmpOption(String confFile) throws IOException {
+	public TmpOption(String subDir, String fileName) throws IOException {
 		//String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
 		//testDataPath = String.format("%s\\testData", currentDir);
 		testDataPath = Util.createTempDirectory().getPath();
-		
+
 		//TODO Debug Print
 		//System.out.println(String.format("□currentDir=%s",currentDir));
 
@@ -31,8 +30,7 @@ public final class TmpOption implements IDisposable {
 		//BACKUPファイル
 		backup = new File(backupName);
 		//上書きファイル
-		//String targetName = String.format("%s\\%s", testDataPath, fileName);
-		String targetName = confFile;
+		String targetName = String.format("%s\\%s\\%s", TestUtil.getProhjectDirectory(), subDir, fileName);
 		target = new File(targetName);
 
 		if (!target.exists()) {
