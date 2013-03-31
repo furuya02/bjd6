@@ -560,7 +560,7 @@ public final class Server extends OneServer {
 		case 7:
 			return "zone database initialised.";
 		case 8:
-			return "Query";
+			return "Query recv";
 		case 9:
 			return "request to a domain under auto (localhost)";
 		case 10:
@@ -570,13 +570,11 @@ public final class Server extends OneServer {
 		case 12:
 			return "request to a domain under management";
 		case 13:
-			return "Search LocalCache";
-			//case 14://Java fix
-			//    return "Append RR";
+			return "Create Response (AN)";
+			//case 14:
 		case 15:
 			return "Create Response (AN.CNAME)";
-			//case 16://Java fix
-			//    return "Append RR";
+			//case 16:
 		case 17:
 			return "Lookup send";
 		case 18:
