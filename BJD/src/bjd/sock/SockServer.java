@@ -11,6 +11,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 import bjd.ILife;
+import bjd.Kernel;
 import bjd.net.InetKind;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
@@ -28,7 +29,13 @@ public class SockServer extends SockObj {
 		return protocolKind;
 	}
 
-	public SockServer(ProtocolKind protocolKind) {
+	//***************************************************************************
+	//パラメータのKernelはSockObjにおけるTrace()のためだけに使用されているので、
+	//Traceしない場合は削除することができる
+	//***************************************************************************
+
+	public SockServer(Kernel kernel, ProtocolKind protocolKind) {
+		super(kernel);
 		this.protocolKind = protocolKind;
 		//************************************************
 		//selector生成(channelの生成はbindで行う)
@@ -139,12 +146,12 @@ public class SockServer extends SockObj {
 					it.remove();
 					if (protocolKind == ProtocolKind.Udp) {
 						if (key.isReadable()) {
-							return new SockUdp((DatagramChannel) key.channel());
+							return new SockUdp(getKernel(), (DatagramChannel) key.channel());
 						}
 					} else {
 						if (key.isAcceptable()) {
 							try {
-								return new SockTcp(serverChannel.accept()); //ACCEPT
+								return new SockTcp(getKernel(), serverChannel.accept()); //ACCEPT
 							} catch (IOException ex) {
 								//accept()が失敗した場合は処理を継続する
 								ex.printStackTrace();
@@ -166,8 +173,8 @@ public class SockServer extends SockObj {
 	 * @param iLife ILifeインターフェースオブジェクト
 	 * @return SockTcp
 	 */
-	public static SockTcp createConnection(Ip ip, int port, ILife iLife) {
-		SockServer sockServer = new SockServer(ProtocolKind.Tcp);
+	public static SockTcp createConnection(Kernel kernel, Ip ip, int port, ILife iLife) {
+		SockServer sockServer = new SockServer(kernel, ProtocolKind.Tcp);
 		if (sockServer.getSockState() != SockState.Error) {
 			int listenMax = 1;
 			if (sockServer.bind(ip, port, listenMax)) {
@@ -184,14 +191,15 @@ public class SockServer extends SockObj {
 		sockServer.close();
 		return null;
 	}
+
 	/**
 	 * bindが可能かどうかの確認
 	 * @param ip
 	 * @param port
 	 * @return
 	 */
-	public static boolean isAvailable(Ip ip, int port) {
-		SockServer sockServer = new SockServer(ProtocolKind.Tcp);
+	public static boolean isAvailable(Kernel kernel, Ip ip, int port) {
+		SockServer sockServer = new SockServer(kernel, ProtocolKind.Tcp);
 		if (sockServer.getSockState() != SockState.Error) {
 			int listenMax = 1;
 			if (sockServer.bind(ip, port, listenMax)) {
@@ -202,5 +210,5 @@ public class SockServer extends SockObj {
 		sockServer.close();
 		return false;
 	}
-	
+
 }

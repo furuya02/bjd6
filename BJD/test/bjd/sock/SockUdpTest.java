@@ -4,13 +4,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import bjd.Kernel;
 import bjd.ThreadBase;
 import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
-import bjd.test.TestUtil;
-import bjd.util.Util;
 
 //**************************************************
 // Echoサーバを使用したテスト
@@ -23,7 +22,7 @@ public final class SockUdpTest {
 
 		public EchoServer(String addr, int port) {
 			super(null);
-			sockServer = new SockServer(ProtocolKind.Udp);
+			sockServer = new SockServer(new Kernel(), ProtocolKind.Udp);
 			this.addr = addr;
 			this.port = port;
 		}
@@ -93,7 +92,7 @@ public final class SockUdpTest {
 
 		Ip ip = ip = new Ip(addr);
 		for (int i = 0; i < loop; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, ssl, tmp);
+			SockUdp sockUdp = new SockUdp(new Kernel(), ip, port, ssl, tmp);
 //			int len = 0;
 //			while (len == 0) {
 //				len = sockUdp.length();

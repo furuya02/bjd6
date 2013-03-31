@@ -104,7 +104,7 @@ public class OneServerTest2 implements ILife {
 		byte[] buf = new byte[max];
 		buf[8] = 100; //CheckData
 		for (int i = 0; i < 3; i++) {
-			SockTcp sockTcp = new SockTcp(ip, port, timeout, null);
+			SockTcp sockTcp = new SockTcp(new Kernel(), ip, port, timeout, null);
 
 			int len = sockTcp.send(buf);
 
@@ -157,7 +157,7 @@ public class OneServerTest2 implements ILife {
 		buf[8] = 100; //CheckData
 
 		for (int i = 0; i < 3; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, null, buf);
+			SockUdp sockUdp = new SockUdp(new Kernel(), ip, port, null, buf);
 			byte[] b = sockUdp.recv(timeout);
 			assertThat(b[8], is(buf[8])); //CheckData
 			assertThat(max, is(b.length));

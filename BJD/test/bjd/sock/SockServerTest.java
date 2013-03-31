@@ -9,10 +9,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.IpKind;
 import bjd.net.ProtocolKind;
-import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public final class SockServerTest {
@@ -35,7 +35,7 @@ public final class SockServerTest {
 			final int port = 8881;
 			final int listenMax = 10;
 
-			final SockServer sockServer = new SockServer(protocolKind);
+			final SockServer sockServer = new SockServer(new Kernel(), protocolKind);
 
 			assertThat(sockServer.getSockState(), is(SockState.IDLE));
 			Thread t = new Thread(new Runnable() {
@@ -66,7 +66,7 @@ public final class SockServerTest {
 			final int port = 9991;
 			final int listenMax = 10;
 
-			final SockServer sockServer = new SockServer(protocolKind);
+			final SockServer sockServer = new SockServer(new Kernel(), protocolKind);
 
 			Thread t = new Thread(new Runnable() {
 				@Override

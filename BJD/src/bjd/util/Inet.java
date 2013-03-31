@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import bjd.ILife;
+import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.Ssl;
 import bjd.sock.SockState;
@@ -185,8 +186,8 @@ public final class Inet {
 	 * @param iLife ILifeインターフェースオブジェクト
 	 * @return SockTcp
 	 */
-	public static SockTcp connect(Ip ip, int port, int timeout, Ssl ssl, ILife iLife) {
-		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
+	public static SockTcp connect(Kernel kernel, Ip ip, int port, int timeout, Ssl ssl, ILife iLife) {
+		SockTcp sockTcp = new SockTcp(kernel, ip, port, timeout, ssl);
 		Util.sleep(0);
 		while (iLife.isLife()) {
 			if (sockTcp.getSockState() == SockState.CONNECT) {

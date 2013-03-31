@@ -341,7 +341,7 @@ public final class Server extends OneServer {
 		//SockUdp sockUdp = new UdpObj(Kernel, getLogger(), ip, port);
 		byte[] sendBuf = null;
 		sendBuf = sp.getBytes();
-		SockUdp sockUdp = new SockUdp(ip, port, null, sendBuf); //送信
+		SockUdp sockUdp = new SockUdp(kernel, ip, port, null, sendBuf); //送信
 
 		//この辺のロジックを動作確認する必要がある
 		byte[] recvBuf = sockUdp.recv(timeout);

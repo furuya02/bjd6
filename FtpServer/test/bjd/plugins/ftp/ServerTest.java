@@ -69,8 +69,8 @@ public final class ServerTest implements ILife {
 	@Before
 	public void setUp() {
 		//クライアント起動
-		clV4 = Inet.connect(new Ip(IpKind.V4_LOCALHOST), 21, 10, null, this);
-		clV6 = Inet.connect(new Ip(IpKind.V6_LOCALHOST), 21, 10, null, this);
+		clV4 = Inet.connect(new Kernel(), new Ip(IpKind.V4_LOCALHOST), 21, 10, null, this);
+		clV6 = Inet.connect(new Kernel(), new Ip(IpKind.V6_LOCALHOST), 21, 10, null, this);
 		//クライアントの接続が完了するまで、少し時間がかかる
 		//Util.sleep(10);
 
@@ -491,7 +491,7 @@ public final class ServerTest implements ILife {
 
 		int port = 256; //テストの連続のためにPORTコマンドのテストとはポート番号をずらす必要がある
 		cl.stringSend("PORT 127,0,0,1,0,256");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		dl.close();
@@ -526,8 +526,8 @@ public final class ServerTest implements ILife {
 		int m = Integer.valueOf(tmp[5]);
 		int port = n * 256 + m;
 
-		Util.sleep(10);
-		SockTcp dl = Inet.connect(new Ip(IpKind.V4_LOCALHOST), port, 10, null, this);
+		Util.sleep(50);
+		SockTcp dl = Inet.connect(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, 10, null, this);
 		dl.close();
 	}
 
@@ -543,7 +543,7 @@ public final class ServerTest implements ILife {
 		//229 Entering Extended Passive Mode. (|||xxxx|)
 		String[] tmp = cl.stringRecv(1, this).split("[|]");
 		int port = Integer.valueOf(tmp[3]);
-		SockTcp dl = Inet.connect(new Ip(IpKind.V6_LOCALHOST), port, 10, null, this);
+		SockTcp dl = Inet.connect(new Kernel(), new Ip(IpKind.V6_LOCALHOST), port, 10, null, this);
 		dl.close();
 	}
 
@@ -556,7 +556,7 @@ public final class ServerTest implements ILife {
 
 		int port = 252; //テストの連続のためにPORTコマンドのテストとはポート番号をずらす必要がある
 		cl.stringSend("EPRT |2|::1|252|");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V6_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V6_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 EPRT command successful.\r\n"));
 
 		dl.close();
@@ -660,7 +660,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -682,7 +682,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -704,7 +704,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 249;
 		cl.stringSend("PORT 127,0,0,1,0,249");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//stor
@@ -732,7 +732,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 249;
 		cl.stringSend("PORT 127,0,0,1,0,249");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//stor
@@ -760,7 +760,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -782,7 +782,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -860,7 +860,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 249;
 		cl.stringSend("PORT 127,0,0,1,0,249");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//stor
@@ -879,7 +879,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 249;
 		cl.stringSend("PORT 127,0,0,1,0,249");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//stor
@@ -924,7 +924,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -946,7 +946,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 250;
 		cl.stringSend("PORT 127,0,0,1,0,250");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//retr
@@ -1024,7 +1024,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 251;
 		cl.stringSend("PORT 127,0,0,1,0,251");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//list
@@ -1051,7 +1051,7 @@ public final class ServerTest implements ILife {
 		//port
 		int port = 251;
 		cl.stringSend("PORT 127,0,0,1,0,251");
-		SockTcp dl = SockServer.createConnection(new Ip(IpKind.V4_LOCALHOST), port, this);
+		SockTcp dl = SockServer.createConnection(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, this);
 		assertThat(cl.stringRecv(1, this), is("200 PORT command successful.\r\n"));
 
 		//list

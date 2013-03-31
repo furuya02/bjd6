@@ -47,6 +47,13 @@ public abstract class OneServer extends ThreadBase {
 	private int timeout;
 	private boolean isJp;
 
+	//このKernelはTrace()のためだけに使用されているので、Traceしない場合は削除することができる
+	private Kernel kernel;
+
+	public Kernel getKernel() {
+		return kernel;
+	}
+
 	protected final Conf getConf() {
 		return conf;
 	}
@@ -111,6 +118,7 @@ public abstract class OneServer extends ThreadBase {
 	protected OneServer(Kernel kernel, Conf conf, OneBind oneBind) {
 		super(kernel.createLogger(conf.getNameTag(), true, null));
 
+		this.kernel = kernel;
 		this.nameTag = conf.getNameTag();
 		this.conf = conf;
 		this.oneBind = oneBind;
@@ -204,7 +212,7 @@ public abstract class OneServer extends ThreadBase {
 		//DOSを受けた場合、multiple数まで連続アクセスまでは記憶してしまう
 		//DOSが終わった後も、その分だけ復帰に時間を要する
 
-		sockServer = new SockServer(oneBind.getProtocol());
+		sockServer = new SockServer(getKernel(), oneBind.getProtocol());
 
 		if (sockServer.getSockState() != SockState.Error) {
 			if (sockServer.getProtocolKind() == ProtocolKind.Tcp) {

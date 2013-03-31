@@ -11,6 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
 
+import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.Ssl;
 import bjd.util.Util;
@@ -25,13 +26,21 @@ public final class SockUdp extends SockObj {
 
 	private ByteBuffer recvBuf = ByteBuffer.allocate(1600);
 
+	//***************************************************************************
+	//パラメータのKernelはSockObjにおけるTrace()のためだけに使用されているので、
+	//Traceしない場合は削除することができる
+	//***************************************************************************
+
 	@SuppressWarnings("unused")
-	private SockUdp() {
+	private SockUdp(Kernel kernel) {
+		super(kernel);
 		//隠蔽する
 	}
 
 	//ACCEPT
-	public SockUdp(DatagramChannel channel) {
+	public SockUdp(Kernel kernel, DatagramChannel channel) {
+		super(kernel);
+
 		sockKind = SockKind.ACCEPT;
 
 		//************************************************
@@ -64,7 +73,8 @@ public final class SockUdp extends SockObj {
 	}
 
 	//CLIENT
-	public SockUdp(Ip ip, int port, Ssl ssl, byte[] buf) {
+	public SockUdp(Kernel kernel, Ip ip, int port, Ssl ssl, byte[] buf) {
+		super(kernel);
 		//SSL通信を使用する場合は、このオブジェクトがセットされる 通常の場合は、null
 		//this.ssl = ssl;
 
@@ -206,7 +216,6 @@ public final class SockUdp extends SockObj {
 		recvBuf.get(buf);
 		return buf;
 	}
-
 
 	//ACCEPTのみで使用する　CLIENTは、コンストラクタで送信する
 	public int send(byte[] buf) {

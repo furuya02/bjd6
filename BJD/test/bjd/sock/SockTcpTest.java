@@ -7,12 +7,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import bjd.ILife;
+import bjd.Kernel;
 import bjd.ThreadBase;
 import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
-import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public final class SockTcpTest implements ILife {
@@ -28,7 +28,7 @@ public final class SockTcpTest implements ILife {
 
 		public EchoServer(String addr, int port) {
 			super(null);
-			sockServer = new SockServer(ProtocolKind.Tcp);
+			sockServer = new SockServer(new Kernel(), ProtocolKind.Tcp);
 			this.addr = addr;
 			this.port = port;
 		}
@@ -82,7 +82,7 @@ public final class SockTcpTest implements ILife {
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
 
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		int max = 1000;
 		for (int i = 0; i < 3; i++) {
 			sut.send(new byte[max]);
@@ -118,7 +118,7 @@ public final class SockTcpTest implements ILife {
 		} catch (ValidObjException ex) {
 			Assert.fail(ex.getMessage());
 		}
-		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
+		SockTcp sockTcp = new SockTcp(new Kernel(), ip, port, timeout, ssl);
 
 		int max = 1000;
 		int loop = 3;
@@ -154,7 +154,7 @@ public final class SockTcpTest implements ILife {
 
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		sut.stringSend("本日は晴天なり", "UTF-8");
 		Util.sleep(10);
 
@@ -179,7 +179,7 @@ public final class SockTcpTest implements ILife {
 
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		sut.lineSend("本日は晴天なり".getBytes("UTF-8"));
 		Util.sleep(10);
 
