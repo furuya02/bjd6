@@ -144,7 +144,6 @@ public final class Kernel implements IDisposable {
 		dnsCache = new DnsCache();
 		//ver = new Ver();//バージョン管理
 
-		OptionIni.create(this); //インスタンスの初期化
 
 		//RunModeの初期化
 		//if (mainForm == null) {
@@ -161,6 +160,7 @@ public final class Kernel implements IDisposable {
 		//  }
 		//}
 
+		OptionIni.create(this); //インスタンスの初期化
 		
 		listInitialize(); //サーバ再起動で、再度実行される初期化 
 

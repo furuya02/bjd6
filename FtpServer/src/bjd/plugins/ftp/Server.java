@@ -404,6 +404,8 @@ public final class Server extends OneServer {
 				}
 				if (p.toUpperCase().indexOf("-L") == 0) {
 					wideMode = true;
+				}else if (p.toUpperCase().indexOf("-A") == 0) {
+						wideMode = true;
 				} else {
 					//ワイルドカード指定
 					if (p.indexOf('*') != -1 || p.indexOf('?') != -1) {

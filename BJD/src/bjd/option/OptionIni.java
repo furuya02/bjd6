@@ -1,6 +1,7 @@
 package bjd.option;
 
 import bjd.Kernel;
+import bjd.RunMode;
 import bjd.util.IniDb;
 import bjd.util.Util;
 
@@ -23,7 +24,7 @@ public final class OptionIni {
 		if (iniDb != null) {
 			//Util.runtimeException("既にcreate()されています");
 		}
-		iniDb = new IniDb(kernel.getProgDir(), "Option");
+		iniDb = new IniDb(kernel.getProgDir(), (kernel.getRunMode() == RunMode.Remote) ? "$remote" : "Option");
 	}
 
 	public static IniDb getInstance() {
