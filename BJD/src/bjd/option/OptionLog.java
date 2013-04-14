@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import bjd.Kernel;
 import bjd.OptionDlg;
-import bjd.RunMode;
 import bjd.ctrl.CtrlCheckBox;
 import bjd.ctrl.CtrlComboBox;
 import bjd.ctrl.CtrlDat;
@@ -45,7 +44,7 @@ public final class OptionLog extends OneOption {
 		
 		ArrayList<OnePage> pageList = new ArrayList<>();
 		boolean editBrowse = false;
-		pageList.add(page1("Basic", isJp() ? "基本設定" : "Basic", kernel.getRunMode(), editBrowse));
+		pageList.add(page1("Basic", isJp() ? "基本設定" : "Basic", kernel));
 		pageList.add(page2("Limit", isJp() ? "表示制限" : "Limit Display"));
 		add(new OneVal("tab", null, Crlf.NEXTLINE, new CtrlTabPage("tabPage", pageList)));
 		
@@ -53,7 +52,7 @@ public final class OptionLog extends OneOption {
 
 	}
 
-	private OnePage page1(String name, String title , RunMode runMode, boolean editBrowse) {
+	private OnePage page1(String name, String title , Kernel kernel) {
 		OnePage onePage = new OnePage(name, title);
 		onePage.add(new OneVal("normalLogKind", 2, Crlf.NEXTLINE, new CtrlComboBox(isJp() ? "通常ログ ファイル名" : "Nomal Log", new String[]{
 			isJp() ? "日ごと ( bjd.yyyy.mm.dd.log )" : "daily （bjd.yyyy.mm.dd.log）",
@@ -64,7 +63,7 @@ public final class OptionLog extends OneOption {
 			isJp() ? "月ごと ( secure.yyyy.mm.log )" : "monthly （secure.yyyy.mm.log）",
 			isJp() ? "一定 ( Secure.Log )" : "Uniformity (secure.Log)"	}, 200)));
 		
-		onePage.add(new OneVal("saveDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp(), isJp() ? "ログの保存場所" : "Save place", 40, runMode, editBrowse)));
+		onePage.add(new OneVal("saveDirectory", "", Crlf.NEXTLINE, new CtrlFolder(isJp() ? "ログの保存場所" : "Save place", 40, kernel)));
 		onePage.add(new OneVal("useLogFile", true, Crlf.NEXTLINE, new CtrlCheckBox(isJp() ? "ログファイルを生成する" : "Generate a Log File")));
 		onePage.add(new OneVal("useLogClear", false, Crlf.NEXTLINE, new CtrlCheckBox(isJp() ? "ログの削除を自動的に行う" : "Eliminate it regularly")));
 		onePage.add(new OneVal("saveDays", 31, Crlf.NEXTLINE, new CtrlInt(isJp() ? "ログ保存日数(0を指定した場合、削除しない)" : "Save days(When You appointed 0, Don't eliminate)", 3)));

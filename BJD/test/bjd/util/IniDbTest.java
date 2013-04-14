@@ -204,13 +204,13 @@ public class IniDbTest {
 					if (val == null) {
 						val = "1.txt";
 					}
-					oneCtrl = new CtrlFile(kernel.isJp(), help, 200, kernel.getRunMode(), editBrowse);
+					oneCtrl = new CtrlFile(help, 200, kernel);
 					break;
 				case FOLDER:
 					if (val == null) {
 						val = "c:\temp";
 					}
-					oneCtrl = new CtrlFolder(kernel.isJp(), help, 200, kernel.getRunMode(), editBrowse);
+					oneCtrl = new CtrlFolder(help, 200, kernel);
 					break;
 				case TEXTBOX:
 					if (val == null) {

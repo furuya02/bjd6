@@ -354,43 +354,38 @@ public final class ServerTest {
 	@Test
 	public void 他ドメインの検索_タイプA() throws Exception {
 		//exercise
-		PacketDns p = lookup(DnsType.A, "www.google.com", true);
+		PacketDns p = lookup(DnsType.A, "www.sapporoworks.ne.jp", true);
 
 		//verify
-		assertThat(print(p), is("QD=1 AN=5 NS=4 AR=4"));
-		assertThat(print(p, RrKind.QD, 0), is("Query A www.google.com."));
+		assertThat(print(p), is("QD=1 AN=1 NS=3 AR=3"));
+		assertThat(print(p, RrKind.QD, 0), is("Query A www.sapporoworks.ne.jp."));
 
 		ArrayList<String> ar = new ArrayList<String>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 1; i++) {
 			ar.add(print(p, RrKind.AN, i));
 		}
 		Collections.sort(ar);
 
-		assertThat(ar.get(0), is("A www.google.com. TTL=300 173.194.38.112"));
-		assertThat(ar.get(1), is("A www.google.com. TTL=300 173.194.38.113"));
-		assertThat(ar.get(2), is("A www.google.com. TTL=300 173.194.38.114"));
-		assertThat(ar.get(3), is("A www.google.com. TTL=300 173.194.38.115"));
-		assertThat(ar.get(4), is("A www.google.com. TTL=300 173.194.38.116"));
+		assertThat(ar.get(0), is("A www.sapporoworks.ne.jp. TTL=86400 59.106.27.208"));
 
 		ar.clear();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 			ar.add(print(p, RrKind.NS, i));
 		}
 		Collections.sort(ar);
-		assertThat(ar.get(0), is("Ns google.com. TTL=172800 ns1.google.com."));
-		assertThat(ar.get(1), is("Ns google.com. TTL=172800 ns2.google.com."));
-		assertThat(ar.get(2), is("Ns google.com. TTL=172800 ns3.google.com."));
-		assertThat(ar.get(3), is("Ns google.com. TTL=172800 ns4.google.com."));
+		assertThat(ar.get(0), is("Ns sapporoworks.ne.jp. TTL=86400 ns1.dns.ne.jp."));
+		assertThat(ar.get(1), is("Ns sapporoworks.ne.jp. TTL=86400 ns2.dns.ne.jp."));
+		assertThat(ar.get(2), is("Ns sapporoworks.ne.jp. TTL=86400 www.sapporoworks.ne.jp."));
 
 		ar.clear();
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 			ar.add(print(p, RrKind.AR, i));
 		Collections.sort(ar);
-		assertThat(ar.get(0), is("A ns1.google.com. TTL=172800 216.239.32.10"));
-		assertThat(ar.get(1), is("A ns2.google.com. TTL=172800 216.239.34.10"));
-		assertThat(ar.get(2), is("A ns3.google.com. TTL=172800 216.239.36.10"));
-		assertThat(ar.get(3), is("A ns4.google.com. TTL=172800 216.239.38.10"));
-
+		assertThat(ar.get(0), is("A ns1.dns.ne.jp. TTL=86400 210.188.224.9"));
+		assertThat(ar.get(1), is("A ns2.dns.ne.jp. TTL=86400 210.224.172.13"));
+		assertThat(ar.get(2), is("A www.sapporoworks.ne.jp. TTL=86400 59.106.27.208"));
+		
+		
 	}
 
 	@Test

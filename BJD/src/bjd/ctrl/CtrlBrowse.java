@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import bjd.Kernel;
 import bjd.RunMode;
 
 //CtrlFile及びCtrlFolderの親クラス
@@ -20,16 +21,18 @@ public abstract class CtrlBrowse extends OneCtrl implements DocumentListener {
 	private JTextField textField = null;
 	private JButton button = null;
 	private int digits;
+	private Kernel kernel;
 	private RunMode runMode;
 	private boolean isJp;
 	private boolean editBrowse;
 
-	public CtrlBrowse(boolean isJp, String help, int digits, RunMode runMode, boolean editBrowse) {
+	public CtrlBrowse(String help, int digits, Kernel kernel) {
 		super(help);
-		this.isJp = isJp;
+		this.kernel = kernel;
+		this.isJp = kernel.isJp();
 		this.digits = digits;
-		this.runMode = runMode;
-		this.editBrowse = editBrowse;
+		this.runMode = kernel.getRunMode();
+		this.editBrowse = kernel.getEditBrowse();
 	}
 
 	@Override

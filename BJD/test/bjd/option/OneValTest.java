@@ -17,7 +17,7 @@ import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
-import bjd.RunMode;
+import bjd.Kernel;
 import bjd.ValidObjException;
 import bjd.ctrl.CtrlAddress;
 import bjd.ctrl.CtrlBindAddr;
@@ -39,7 +39,6 @@ import bjd.net.BindStyle;
 import bjd.net.InetKind;
 import bjd.net.Ip;
 import bjd.net.IpKind;
-import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class OneValTest {
@@ -310,12 +309,12 @@ public class OneValTest {
 		 *            デフォルト値(nullを設定した場合、適切な値を自動でセットする)
 		 */
 		public static OneVal createOneVal(CtrlType ctrlType, Object val) {
-			//Kernel kernel = new Kernel();
+			Kernel kernel = new Kernel();
 			final String help = "help";
 			OneCtrl oneCtrl = null;
 			boolean isJp = true;
-			RunMode runMode = RunMode.Normal;
-			boolean editBrowse = true;
+			//RunMode runMode = RunMode.Normal;
+			//boolean editBrowse = true;
 			switch (ctrlType) {
 				case CHECKBOX:
 					if (val == null) {
@@ -333,13 +332,13 @@ public class OneValTest {
 					if (val == null) {
 						val = "1.txt";
 					}
-					oneCtrl = new CtrlFile(isJp, help, 200, runMode, editBrowse);
+					oneCtrl = new CtrlFile(help, 200, kernel);
 					break;
 				case FOLDER:
 					if (val == null) {
 						val = "c:\temp";
 					}
-					oneCtrl = new CtrlFolder(isJp, help, 200, runMode, editBrowse);
+					oneCtrl = new CtrlFolder( help, 200, kernel);
 					break;
 				case TEXTBOX:
 					if (val == null) {

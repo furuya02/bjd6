@@ -1,11 +1,12 @@
 package bjd.ctrl;
 
-import bjd.RunMode;
+import bjd.Kernel;
+
 
 public final class CtrlFolder extends CtrlBrowse {
 	
-	public CtrlFolder(boolean isJp, String help, int digits, RunMode runMode, boolean editBrowse) {
-		super(isJp, help, digits, runMode, editBrowse);
+	public CtrlFolder(String help, int digits, Kernel kernel) {
+		super(help, digits, kernel);
 	}
 
 	@Override
