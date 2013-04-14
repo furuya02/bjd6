@@ -144,7 +144,6 @@ public final class Kernel implements IDisposable {
 		dnsCache = new DnsCache();
 		//ver = new Ver();//バージョン管理
 
-
 		//RunModeの初期化
 		//if (mainForm == null) {
 		//	RunMode = RunMode.Service;//サービス起動
@@ -161,15 +160,14 @@ public final class Kernel implements IDisposable {
 		//}
 
 		OptionIni.create(this); //インスタンスの初期化
-		
+
 		listInitialize(); //サーバ再起動で、再度実行される初期化 
 
 		//Java fix
-		if(this.isTest){
+		if (this.isTest) {
 			return;
 		}
-			
-		
+
 		//ウインドサイズの復元
 		String path = String.format("%s\\BJD.ini", getProgDir());
 		try {
@@ -245,11 +243,14 @@ public final class Kernel implements IDisposable {
 		//************************************************************
 		//ListPlugin は。ListOptionとListServerを初期化する間だけ生存する
 		//isTest=trueの場合、パスを""にして、プラグイン0個で初期化さあせる
-		
+
 		//ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
 		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
 		for (OnePlugin o : listPlugin) {
-			tmpLogger.set(LogKind.DETAIL, null, 9000008, String.format("%sServer", o.getName()));
+			//リモートクライアントの場合、このログは、ややこしいので表示しない
+			if (getRunMode() == RunMode.Normal) {
+				tmpLogger.set(LogKind.DETAIL, null, 9000008, String.format("%sServer", o.getName()));
+			}
 		}
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
