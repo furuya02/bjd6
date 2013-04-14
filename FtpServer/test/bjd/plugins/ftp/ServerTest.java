@@ -525,7 +525,7 @@ public final class ServerTest implements ILife {
 		int m = Integer.valueOf(tmp[5]);
 		int port = n * 256 + m;
 
-		Util.sleep(50);
+		Util.sleep(200);
 		SockTcp dl = Inet.connect(new Kernel(), new Ip(IpKind.V4_LOCALHOST), port, 10, null, this);
 		dl.close();
 	}
