@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
 /**
  * 生成時に１つのファイルをオープンしてset()で１行ずつ格納するクラス
@@ -12,7 +12,7 @@ import bjd.util.IDispose;
  * @author SIN
  *
  */
-final class OneLogFile implements IDispose {
+final class OneLogFile implements IDisposable {
 
     private FileWriter fw;
     private File file;

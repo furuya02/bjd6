@@ -1,7 +1,7 @@
 package bjd.acl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.junit.experimental.runners.Enclosed;
@@ -11,6 +11,7 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import bjd.ValidObjException;
+import bjd.acl.AclV4Test.getStart及びgetEndの確認.Fixture;
 import bjd.net.Ip;
 import bjd.test.TestUtil;
 
@@ -41,24 +42,28 @@ public class AclV6Test {
 				this.startStr = startStr;
 				this.endStr = endStr;
 			}
-			
-			public String toString() {
-				return String.format("new AclV6(%s) => getStartr()=%s getEnd()=%s", aclStr, startStr, endStr);
-			}
+		}
+		
+		@Theory
+		public void getStartの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV6 sut = new AclV6("TAG", fx.aclStr);
+			String expected = fx.startStr;
+			//exercise
+			String actual = sut.getStart().toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(fx.toString()); 
-			try {
-				AclV6 sut = new AclV6("TEST", fx.aclStr);
-				assertThat(fx.toString(), sut.getStart().toString(), is(fx.startStr));
-				assertThat(fx.toString(), sut.getEnd().toString(), is(fx.endStr));				
-				
-			} catch (ValidObjException e) {
-				Assert.fail(e.getMessage());
-			}
+		public void getEndの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV6 sut = new AclV6("TAG", fx.aclStr);
+			String expected = fx.endStr;
+			//exercise
+			String actual = sut.getEnd().toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 	
@@ -74,33 +79,24 @@ public class AclV6Test {
 		};
 		static class Fixture {
 			private String aclStr;
-			private String ipStr;
 			private boolean expected;
+			private Ip ip;
 
 			public Fixture(String aclStr, String ipStr, boolean expected) {
 				this.aclStr = aclStr;
-				this.ipStr = ipStr;
 				this.expected = expected;
-			}
-
-			public String toString() {
-				return String.format("new AclV6(%s) => isHit(%s)=%s", aclStr, ipStr, expected);
+				this.ip = TestUtil.createIp(ipStr);
 			}
 		}
-
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(fx.toString()); 
-
-			try {
-				AclV6 sut = new AclV6("TEST", fx.aclStr);
-				boolean actual = sut.isHit(new Ip(fx.ipStr));
-				assertThat(fx.toString(), actual, is(fx.expected));
-
-			} catch (ValidObjException e) {
-				Assert.fail(e.getMessage());
-			}
+		public void isHitの検証(Fixture fx) throws Exception {
+			//setUp
+			AclV6 sut = new AclV6("TAG", fx.aclStr);
+			boolean expected = fx.expected;
+			//exercise
+			boolean actual = sut.isHit(fx.ip);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 	
@@ -121,24 +117,16 @@ public class AclV6Test {
 			public Fixture(String aclStr) {
 				this.aclStr = aclStr;
 			}
-
-			public String toString() {
-				return String.format("new AclV6(%s) => ValidObjException", aclStr);
-			}
 		}
-
+		
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(fx.toString()); 
-			
+		public void 例外テスト(Fixture fx){
+			//exercise
 			try {
-				new AclV6("TEST", fx.aclStr);
+				new AclV6("TAG", fx.aclStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				return;
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 }

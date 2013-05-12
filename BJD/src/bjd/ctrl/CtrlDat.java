@@ -21,7 +21,7 @@ import bjd.util.MsgKind;
 import bjd.util.Util;
 
 //public class CtrlDat extends OneCtrl implements ActionListener, ListSelectionListener, ICtrlEventListener {
-public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListener {
+public class CtrlDat extends OneCtrl implements ActionListener, ICtrlEventListener {
 
 	private JPanel border = null;
 	private JButton[] buttonList = null;
@@ -40,7 +40,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	private String[] tagList = new String[] { "Add", "Edit", "Del", "Import", "Export", "Clear" };
 	private String[] strList = new String[] { "追加", "変更", "削除", "インポート", "エクスポート", "クリア" };
 
-	public CtrlType[] getCtrlTypeList() {
+	public final CtrlType[] getCtrlTypeList() {
 		CtrlType[] ctrlTypeList = new CtrlType[listVal.size()];
 		int i = 0;
 		for (OneVal o : listVal) {
@@ -57,17 +57,17 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	//OnePage(CtrlTabPage.pageList) CtrlGroup CtrlDatにのみ存在する
-	public ListVal getListVal() {
+	public final ListVal getListVal() {
 		return listVal;
 	}
 
 	@Override
-	public CtrlType getCtrlType() {
+	public final CtrlType getCtrlType() {
 		return CtrlType.DAT;
 	}
 
 	@Override
-	protected void abstractCreate(Object value) {
+	protected final void abstractCreate(Object value) {
 		int left = margin;
 		int top = margin;
 
@@ -118,7 +118,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	@Override
-	protected void abstractDelete() {
+	protected final void abstractDelete() {
 		listVal.deleteCtrl(); //これが無いと、グループの中のコントロールが２回目以降表示されなくなる
 
 		if (buttonList != null) {
@@ -133,7 +133,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public final void actionPerformed(ActionEvent e) {
 
 		String cmd = e.getActionCommand();
 		String source = e.getSource().getClass().getName();
@@ -147,7 +147,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	//チェックリストボックスのイベント
-	void actionCheckListBox(String cmd) {
+	final void actionCheckListBox(String cmd) {
 		if (cmd.equals("cahngeSelectIndex")) {
 			int index = checkListBox.getSelectedIndex();
 			buttonsInitialise(); //ボタン状態の初期化
@@ -161,7 +161,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	//ボタンのイベント
-	void actionButton(String cmd) {
+	final void actionButton(String cmd) {
 		int selectedIndex = checkListBox.getSelectedIndex(); // 選択行
 		if (cmd.equals(tagList[ADD])) {
 			//コントロールの内容をテキストに変更したもの
@@ -265,7 +265,10 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 
 	}
 
-	//コントロールの入力内容に変化があった場合
+	/**
+	 * コントロールの入力内容に変化があった場合<br>
+	 * Override可能<br>
+	 */
 	@Override
 	public void onChange(OneCtrl oneCtrl) {
 		buttonsInitialise(); //ボタン状態の初期化
@@ -274,7 +277,8 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	//ボタン状態の初期化
 	private void buttonsInitialise() {
 		//コントロールの入力が完了しているか
-		boolean isComplete = listVal.isComplete();
+		//boolean isComplete = listVal.isComplete();
+		boolean isComplete = isComplete();
 		//チェックリストボックスのデータ件数
 		int count = checkListBox.getItemCount();
 		//チェックリストボックスの選択行
@@ -341,19 +345,20 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 		return lines;
 	}
 
-	//***********************************************************************
-	//コントロールの入力が完了しているか
-	//***********************************************************************
-	//@Override
-	//public boolean isComplete() {
-	//	return listVal.isComplete();
-	//}
+	/**
+	 * コントロールの入力が完了しているか
+	 * Override可能<br>
+	 */
+	@Override
+	public boolean isComplete() {
+		return listVal.isComplete();
+	}
 
 	//***********************************************************************
 	// コントロールの値の読み書き
 	//***********************************************************************
 	@Override
-	protected Object abstractRead() {
+	protected final Object abstractRead() {
 		Dat dat = new Dat(getCtrlTypeList());
 		//チェックリストボックスの内容からDatオブジェクトを生成する
 		for (int i = 0; i < checkListBox.getItemCount(); i++) {
@@ -366,7 +371,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	}
 
 	@Override
-	protected void abstractWrite(Object value) {
+	protected final void abstractWrite(Object value) {
 		if (value == null) {
 			return;
 		}
@@ -393,7 +398,7 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	//***********************************************************************
 	// コントロールへの有効・無効
 	//***********************************************************************
-	protected void abstractSetEnable(boolean enabled) {
+	protected final void abstractSetEnable(boolean enabled) {
 		if (border != null) {
 			//CtrlDatの場合は、disableで非表示にする
 			panel.setVisible(enabled);
@@ -409,24 +414,24 @@ public final class CtrlDat extends OneCtrl implements ActionListener, ICtrlEvent
 	// CtrlDat関連
 	//***********************************************************************
 	@Override
-	protected boolean abstractIsComplete() {
+	protected final boolean abstractIsComplete() {
 		Util.runtimeException("使用禁止");
 		return false;
 	}
 
 	@Override
-	protected String abstractToText() {
+	protected final String abstractToText() {
 		Util.runtimeException("使用禁止");
 		return "";
 	}
 
 	@Override
-	protected void abstractFromText(String s) {
+	protected final void abstractFromText(String s) {
 		Util.runtimeException("使用禁止");
 	}
 
 	@Override
-	protected void abstractClear() {
+	protected final void abstractClear() {
 		Util.runtimeException("使用禁止");
 	}
 }

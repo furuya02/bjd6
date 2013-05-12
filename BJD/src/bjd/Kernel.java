@@ -28,10 +28,10 @@ import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class Kernel implements IDispose {
+public final class Kernel implements IDisposable {
 
 	//プロセス起動時に初期化される変数
 	private RunMode runMode = RunMode.Normal; //通常起動;
@@ -144,8 +144,6 @@ public final class Kernel implements IDispose {
 		dnsCache = new DnsCache();
 		//ver = new Ver();//バージョン管理
 
-		OptionIni.create(this); //インスタンスの初期化
-
 		//RunModeの初期化
 		//if (mainForm == null) {
 		//	RunMode = RunMode.Service;//サービス起動
@@ -161,7 +159,14 @@ public final class Kernel implements IDispose {
 		//  }
 		//}
 
+		OptionIni.create(this); //インスタンスの初期化
+
 		listInitialize(); //サーバ再起動で、再度実行される初期化 
+
+		//Java fix
+		if (this.isTest) {
+			return;
+		}
 
 		//ウインドサイズの復元
 		String path = String.format("%s\\BJD.ini", getProgDir());
@@ -182,6 +187,9 @@ public final class Kernel implements IDispose {
 			case Remote:
 				//                RemoteClient = new RemoteClient(this);
 				//                RemoteClient.Start();
+				break;
+			default:
+				Util.runtimeException("Kernel.defaultInitialize() not implement (RunMode)");
 				break;
 		}
 
@@ -235,9 +243,14 @@ public final class Kernel implements IDispose {
 		//************************************************************
 		//ListPlugin は。ListOptionとListServerを初期化する間だけ生存する
 		//isTest=trueの場合、パスを""にして、プラグイン0個で初期化さあせる
-		ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
+
+		//ListPlugin listPlugin = new ListPlugin((isTest) ? "" : String.format("%s\\plugins", getProgDir()));
+		ListPlugin listPlugin = new ListPlugin(String.format("%s\\plugins", getProgDir()));
 		for (OnePlugin o : listPlugin) {
-			tmpLogger.set(LogKind.NORMAL, null, 9000008, o.getName());
+			//リモートクライアントの場合、このログは、ややこしいので表示しない
+			if (getRunMode() == RunMode.Normal) {
+				tmpLogger.set(LogKind.DETAIL, null, 9000008, String.format("%sServer", o.getName()));
+			}
 		}
 
 		//listOptionで各オプションを初期化する前に、isJpだけは初期化しておく必要があるので
@@ -246,11 +259,9 @@ public final class Kernel implements IDispose {
 
 		listOption = new ListOption(this, listPlugin);
 
-
 		//OptionBasic
 		Conf confBasic = new Conf(listOption.get("Basic"));
 		editBrowse = (boolean) confBasic.get("editBrowse");
-
 
 		//OptionLog
 		Conf confOption = new Conf(listOption.get("Log"));
@@ -285,11 +296,6 @@ public final class Kernel implements IDispose {
 		logger = createLogger("kernel", true, null);
 		tmpLogger.release(logger);
 
-		listServer = new ListServer(this, listPlugin);
-		
-
-		//listTool = new ListTool(this);
-
 		//mailBox初期化
 		//        foreach (var o in ListOption) {
 		//            //SmtpServer若しくは、Pop3Serverが使用される場合のみメールボックスを初期化する                
@@ -300,8 +306,12 @@ public final class Kernel implements IDispose {
 		//                }
 		//            }
 		//        }
-		remoteServer = listServer.get("RemoteServer");
 
+		listServer = new ListServer(this, listPlugin);
+
+		//listTool = new ListTool(this);
+
+		remoteServer = listServer.get("RemoteServer");
 
 		view.setColumnText(); //Logビューのカラムテキストの初期化
 		menu.initialize(); //メニュー構築（内部テーブルの初期化）

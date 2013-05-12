@@ -1,7 +1,7 @@
 package bjd.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -89,24 +89,18 @@ public final class FileSearchTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-
-			FileSearch fileSearch = new FileSearch(tmpDir.getPath());
-			File[] files = fileSearch.listFiles(fx.pattern);
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			FileSearch sut = new FileSearch(tmpDir.getPath());
+			//exercise
+			File[] files = sut.listFiles(fx.pattern);
 			Arrays.sort(files);
-
-			TestUtil.prompt(String.format("[%s] length=%d ", fx.pattern, files.length));
-			for (int i = 0; i < files.length; i++) {
-				TestUtil.prompt(String.format("%s ", files[i].getName()));
-			}
-
-			assertThat(files.length, is(fx.expected.length));
-
+			//verify
+			//System.out.println(String.format("[pattern %s]",fx.pattern));
 			for (int i = 0; i < fx.expected.length; i++) {
+				//System.out.println(String.format("%s",files[i].getName()));
 				assertThat(files[i].getName(), is(fx.expected[i]));
 			}
-			TestUtil.prompt("");
 		}
 	}
 }

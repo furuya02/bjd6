@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="build" default="echo" basedir="./">
+	<property name="name" value="Dns" />
+
+	<!-- ソースの配置が換わる場合、ここを修正する -->
+	<property name="dev" value="C:/dev/bjd6" />
+
+	<property name="target" value="BJD" />
+	<property name="project" value="${dev}/${target}" />
+	<property name="out" value="${dev}/BJD/bin/plugins" />
+
+	<target name="echo">
+	    <echo>${src.dir}</echo> 
+	    <echo>${classes.dir}</echo> 
+	    <echo>${project.ver}</echo> 
+	    <echo>${env.Path}</echo> 
+		<echo>${java.class.path}</echo>
+	</target> 
+
+</project>

@@ -61,7 +61,7 @@ public class Logger {
 
 	/**
 	 * ログ出力<br>
-	 * 【オーバーライド可能（テストで使用）】
+	 * Override可能（テストで使用）<br>
 	 * @param logKind
 	 * @param sockBase
 	 * @param messageNo
@@ -107,7 +107,7 @@ public class Logger {
 						: "Reception character string is too long (cut off so that there was possibility of an unjust request in it)";
 				break;
 			case 9000006:
-				message = isJp ? "bind()でエラーが発生しました" : "An error occurred in bind()";
+				message = isJp ? "このポートは、既に他のプログラムが使用しているため使用できません" : "Cannot use this port so that other programs already use it";
 				break;
 			case 9000007:
 				message = isJp ? "callBack関数が指定されていません[UDP]" : "It is not appointed in callback function [UDP]";
@@ -219,7 +219,7 @@ public class Logger {
 				message = isJp ? "サーバ側が切断されました" : "The server side was cut off";
 				break;
 			case 9000045:
-				message = isJp ? "「ログ保存場所」が指定されていません" : "\"log save place\" is not appointed";
+				message = isJp ? "「オプション(O)-ログ表示(L)-基本設定-ログの保存場所」が指定されていません" : "\"log save place\" is not appointed";
 				break;
 			case 9000046:
 				message = isJp ? "socket.send()でエラーが発生しました" : "socket.send()";

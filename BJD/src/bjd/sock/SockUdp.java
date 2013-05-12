@@ -11,6 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
 
+import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.Ssl;
 import bjd.util.Util;
@@ -25,13 +26,21 @@ public final class SockUdp extends SockObj {
 
 	private ByteBuffer recvBuf = ByteBuffer.allocate(1600);
 
+	//***************************************************************************
+	//パラメータのKernelはSockObjにおけるTrace()のためだけに使用されているので、
+	//Traceしない場合は削除することができる
+	//***************************************************************************
+
 	@SuppressWarnings("unused")
-	private SockUdp() {
+	private SockUdp(Kernel kernel) {
+		super(kernel);
 		//隠蔽する
 	}
 
 	//ACCEPT
-	public SockUdp(DatagramChannel channel) {
+	public SockUdp(Kernel kernel, DatagramChannel channel) {
+		super(kernel);
+
 		sockKind = SockKind.ACCEPT;
 
 		//************************************************
@@ -64,7 +73,8 @@ public final class SockUdp extends SockObj {
 	}
 
 	//CLIENT
-	public SockUdp(Ip ip, int port, int timeout, Ssl ssl, byte[] buf) {
+	public SockUdp(Kernel kernel, Ip ip, int port, Ssl ssl, byte[] buf) {
+		super(kernel);
 		//SSL通信を使用する場合は、このオブジェクトがセットされる 通常の場合は、null
 		//this.ssl = ssl;
 
@@ -93,9 +103,9 @@ public final class SockUdp extends SockObj {
 		} catch (UnknownHostException ex) {
 			setException(ex);
 		}
-		
-//		InetSocketAddress remoteAddress = new InetSocketAddress(inetAddress, port);
-//		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), remoteAddress);
+
+		//		InetSocketAddress remoteAddress = new InetSocketAddress(inetAddress, port);
+		//		set(SockState.CONNECT, (InetSocketAddress) channel.socket().getLocalSocketAddress(), remoteAddress);
 		//set(SockState.CONNECT, getLocalAddress(), remoteAddress);
 
 		send(buf);
@@ -103,6 +113,45 @@ public final class SockUdp extends SockObj {
 		//************************************************
 		//read待機
 		//************************************************
+		//recv(timeout);
+		//		try {
+		//			channel.register(selector, SelectionKey.OP_READ);
+		//			Thread t = new Thread(new Runnable() {
+		//				@Override
+		//				public void run() {
+		//					while (getSockState() == SockState.CONNECT) {
+		//						try {
+		//							if (selector.select() <= 0) {
+		//								break;
+		//							}
+		//						} catch (IOException ex) {
+		//							setException(ex);
+		//							return;
+		//						}
+		//						for (Iterator<SelectionKey> it = selector.selectedKeys().iterator(); it.hasNext();) {
+		//							SelectionKey key = (SelectionKey) it.next();
+		//							it.remove();
+		//							if (key.isReadable()) {
+		//								doRead(channel);
+		//								break; // UDPの場合は、１度受信したら、もう待機しない
+		//							}
+		//						}
+		//					}
+		//					close();
+		//				}
+		//			});
+		//			t.start();
+		//		} catch (Exception ex) {
+		//			setException(ex);
+		//		}
+	}
+
+	/**
+	 * ミリ秒まで受信を待機する
+	 * @param timeout 秒
+	 * @return
+	 */
+	public byte[] recv(int timeout) {
 		try {
 			channel.register(selector, SelectionKey.OP_READ);
 			Thread t = new Thread(new Runnable() {
@@ -133,6 +182,15 @@ public final class SockUdp extends SockObj {
 		} catch (Exception ex) {
 			setException(ex);
 		}
+
+		timeout *= 1000;
+		for (int i = 0; i < timeout / 10; i++) {
+			Util.sleep(10);
+			if (recvBuf.position() != 0) {
+				break;
+			}
+		}
+		return getRecvBuf();
 	}
 
 	//ACCEPT・CLIENT
@@ -147,11 +205,12 @@ public final class SockUdp extends SockObj {
 		}
 	}
 
+	//ACCEPTの場合、すでに受信が完了しているので、こちらを使用する
 	public int length() {
 		return recvBuf.position();
 	}
 
-	public byte[] recv() {
+	public byte[] getRecvBuf() {
 		byte[] buf = new byte[recvBuf.position()];
 		recvBuf.flip();
 		recvBuf.get(buf);

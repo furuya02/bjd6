@@ -9,11 +9,11 @@ import bjd.option.Conf;
 import bjd.option.OneOption;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.ListBase;
 import bjd.util.Util;
 
-public final class ListServer extends ListBase<OneServer> implements IDispose {
+public final class ListServer extends ListBase<OneServer> implements IDisposable {
 
 	private Kernel kernel;
 
@@ -51,15 +51,11 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	private void initialize(ListPlugin listPlugin) {
 		getAr().clear();
 
-
-		
 		for (OneOption op : kernel.getListOption()) {
-
 
 			if (!op.getUseServer()) { //サーバオプション以外は対象外にする
 				continue;
 			}
-
 
 			//プラグイン情報の検索
 			OnePlugin onePlugin = listPlugin.get(op.getNameTag());
@@ -77,12 +73,14 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 				for (OneServer sv : getAr()) {
 					if (sv.getNameTag().indexOf("Web-") == 0) {
 						OneOption o = kernel.getListOption().get(sv.getNameTag());
-						//同一ポートの設定が既にリストされているかどうか
-						if (port == (int) o.getValue("port")) {
-							// バインドアドレスが競合しているかどうか
-							if (bindAddr.checkCompetition((BindAddr) o.getValue("bindAddress2"))) {
-								find = true;
-								break;
+						if (o != null) {
+							//同一ポートの設定が既にリストされているかどうか
+							if (port == (int) o.getValue("port")) {
+								// バインドアドレスが競合しているかどうか
+								if (bindAddr.checkCompetition((BindAddr) o.getValue("bindAddress2"))) {
+									find = true;
+									break;
+								}
 							}
 						}
 					}
@@ -129,7 +127,7 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	public boolean isRunnig() {
 		//全スレッドの状態確認
 		for (OneServer sv : getAr()) {
-			if (sv.isRunnig()) {
+			if (sv.isRunning()) {
 				return true;
 			}
 		}
@@ -140,7 +138,7 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 	 * サーバ停止処理
 	 */
 	public void stop() {
-		//全スレッドスタート
+		//全スレッド停止 
 		for (OneServer sv : getAr()) {
 			sv.stop();
 		}
@@ -154,7 +152,7 @@ public final class ListServer extends ListBase<OneServer> implements IDispose {
 		if (isRunnig()) {
 			return;
 		}
-		//全スレッド停止 
+		//全スレッドスタート
 		for (OneServer sv : getAr()) {
 			sv.start();
 		}

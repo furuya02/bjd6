@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 本プロジェクトを再コンパイルしてBJD/bin/pluginsの下にjarファイルを生成する -->
+<project name="build" default="default" basedir="./">
+	<!-- ここだけプロジェクトごとに名前を変えればよい -->
+   	<property name="name" value="Dns"/>
+
+	<!-- ソースの配置が換わる場合、ここを修正する -->
+	<property name="dev" value="C:/dev/bjd6"/>
+
+   	<property name="target" value="${name}Server"/>
+   	<property name="project" value="${dev}/${target}"/>
+	<property name="out" value="${dev}/BJD/bin/plugins"/>
+
+	<target name="default">
+  		
+		<!-- 出力フォルダの作成 -->
+   		<mkdir dir="${out}"/>
+
+  		
+		<!-- コンパイル class生成 -->
+		<delete dir="${project}/bin"/>
+   		<mkdir dir="${project}/bin"/>
+  		<javac fork="true" encoding="utf-8" srcdir="${project}/src" 
+  			destdir="${project}/bin" includeantruntime="false" classpath="${dev}/BJD/bin">
+  			<compilerarg value="-J-Dfile.encoding=UTF8"/>
+  		</javac>
+		
+		<!-- 【Test】-->
+		<!--
+		<property  name="junit.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
+		<property  name="hamcrest.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+		-->
+		<property  name="junit.jar" value="D:\eclipse\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
+		<property  name="hamcrest.jar" value="D:\eclipse\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+		
+		<javac fork="true" encoding="utf-8" srcdir="${project}/test" 
+	  		destdir="${project}/bin" includeantruntime="false" >
+	  		<compilerarg value="-J-Dfile.encoding=UTF8" />
+			<classpath>
+				<pathelement location="${junit.jar}" />
+				<pathelement location="${hamcrest.jar}" />
+				<pathelement path="${project}/lib/*"/>
+				<pathelement path="${dev}/BJD/bin" />
+			</classpath>
+	  	</javac>
+
+
+		<!-- 出力フォルダにjarファイルを生成 -->
+		<jar destfile="${out}/${target}.jar" filesetmanifest="mergewithoutmain">
+	        <fileset dir="${project}/bin"/>
+        </jar>
+	</target>
+</project>

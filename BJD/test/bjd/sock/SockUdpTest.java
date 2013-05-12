@@ -4,13 +4,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import bjd.Kernel;
 import bjd.ThreadBase;
 import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
-import bjd.test.TestUtil;
-import bjd.util.Util;
 
 //**************************************************
 // Echoサーバを使用したテスト
@@ -23,7 +22,7 @@ public final class SockUdpTest {
 
 		public EchoServer(String addr, int port) {
 			super(null);
-			sockServer = new SockServer(ProtocolKind.Udp);
+			sockServer = new SockServer(new Kernel(), ProtocolKind.Udp);
 			this.addr = addr;
 			this.port = port;
 		}
@@ -52,18 +51,15 @@ public final class SockUdpTest {
 				Assert.fail(ex.getMessage());
 			}
 			if (sockServer.bind(ip, port)) {
-				System.out.println(String.format("EchoServer bind"));
 				while (isLife()) {
 					final SockUdp child = (SockUdp) sockServer.select(this);
 					if (child == null) {
 						break;
 					}
-					System.out.println(String.format("EchoServer child"));
 					while (isLife() && child.getSockState() == SockState.CONNECT) {
 						int len = child.length();
 						if (len > 0) {
-							System.out.println(String.format("EchoServer len=%d", len));
-							byte[] buf = child.recv();
+							byte[] buf = child.getRecvBuf();
 							child.send(buf);
 							//送信が完了したら、この処理は終了
 							break;
@@ -74,106 +70,17 @@ public final class SockUdpTest {
 		}
 	}
 
-	/*
-		class EchoServer extends OneServer {
 
-			public EchoServer(Conf conf, OneBind oneBind) {
-				super(new Kernel(),"NAME",conf,oneBind);
-			}
 
-			@Override
-			public String getMsg(int messageNo) {
-				return null;
-			}
-
-			@Override
-			protected void onStopServer() {
-			}
-
-			@Override
-			protected boolean onStartServer() {
-				return true;
-			}
-
-			@Override
-			protected void onSubThread(SockObj sockObj) {
-				SockUdp sockUdp = (SockUdp) sockObj;
-				System.out.println(String.format("onSubThread"));
-
-				byte[] buf = sockUdp.recv();
-				sockUdp.send(buf);
-			}
-		}
-	*/
-
-	/*
 	@Test
-	public void a001() {
-
-		TestUtil.dispHeader("a001 Echoサーバに送信して、たまったデータサイズ（length）を確認する");
-
-		String addr = "127.0.0.1";
-		int port = 53; //TOCO DEBUG 9999^>53
-
-		OneBind oneBind = new OneBind(new Ip(addr), ProtocolKind.Udp);
-		OptionSample optionSample = new OptionSample(new Kernel(), "", "Sample");
-		Conf conf = new Conf(optionSample);
-		conf.set("port", port);
-		conf.set("multiple", 10);
-		conf.set("acl", new Dat(new CtrlType[0]));
-		conf.set("enableAcl", 1);
-		conf.set("timeOut", 3);
-		
-		EchoServer echoServer = new EchoServer(addr, port);
-		//EchoServer echoServer = new EchoServer(conf,oneBind);
-		echoServer.start();
-		
-		Util.sleep(1000);
-		
-		int max = 1000;
-		byte[] tmp = new byte[max];
-
-		int timeout = 100;
-		Ssl ssl = null;
-		SockUdp sock = new SockUdp(new Ip(addr), port, timeout, ssl, tmp);
-		TestUtil.prompt( "sock = new SockUdp()");
-
-		for (int i = 0; i < 10; i++) {
-			sock.send(tmp);
-			TestUtil.prompt( String.format("sock.send(%dbyte)", tmp.length));
-
-			//送信データが到着するまで、少し待機する
-			int sleep = 100; //あまり短いと、Testを全部一緒にまわしたときにエラーとなる
-			Util.sleep(sleep);
-			TestUtil.prompt( String.format("Thread.sleep(%d)", sleep));
-
-			TestUtil.prompt( String.format("sock.length()=%d", sock.length()));
-			Assert.assertEquals((i + 1) * max, sock.length());
-		}
-		TestUtil.prompt( String.format("sock.close()"));
-		sock.close();
-		echoServer.stop();
-	}
-	*/
-	@Test
-	public void Echoサーバにsendしてlength分ずつRecvする() {
-
+	public void Echoサーバにsendしてlength分ずつRecvする() throws Exception {
+		//setUp
 		String addr = "127.0.0.1";
 		int port = 53;
-
-		//		OneBind oneBind = new OneBind(new Ip(addr), ProtocolKind.Udp);
-		//		OptionSample optionSample = new OptionSample(new Kernel(), "", "Sample");
-		//		Conf conf = new Conf(optionSample);
-		//		conf.set("port", port);
-		//		conf.set("multiple", 10);
-		//		conf.set("acl", new Dat(new CtrlType[0]));
-		//		conf.set("enableAcl", 1);
-		//		conf.set("timeOut", 3);
-		//		EchoServer echoServer = new EchoServer(conf, oneBind);
 		EchoServer echoServer = new EchoServer(addr, port);
 		echoServer.start();
 
-		int timeout = 100;
+		int timeout = 3;
 		Ssl ssl = null;
 
 		int max = 1500;
@@ -183,28 +90,24 @@ public final class SockUdpTest {
 			tmp[i] = (byte) i;
 		}
 
-		Ip ip = null;
-		try {
-			ip = new Ip(addr);
-		} catch (ValidObjException ex) {
-			Assert.fail(ex.getMessage());
-		}
+		Ip ip = ip = new Ip(addr);
 		for (int i = 0; i < loop; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, timeout, ssl, tmp);
-			TestUtil.prompt(String.format("sockUdp = new SockUdp(%dbyte)", tmp.length));
-			int len = 0;
-			while (len == 0) {
-				len = sockUdp.length();
-				Util.sleep(0);
-			}
-			TestUtil.prompt(String.format("len=%d", len));
-			byte[] b = sockUdp.recv();
-			TestUtil.prompt(String.format("b=recv()  b.length=%d", b.length));
+			SockUdp sockUdp = new SockUdp(new Kernel(), ip, port, ssl, tmp);
+//			int len = 0;
+//			while (len == 0) {
+//				len = sockUdp.length();
+//				Util.sleep(0);
+//			}
+			byte[] b = sockUdp.recv(timeout);
+			
+			//verify
 			for (int m = 0; m < max; m += 10) {
 				Assert.assertEquals(b[m], tmp[m]); //送信したデータと受信したデータが同一かどうかのテスト
 			}
 			sockUdp.close();
 		}
+		
+		//TearDown
 		echoServer.stop();
 	}
 

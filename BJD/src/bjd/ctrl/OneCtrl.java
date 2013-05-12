@@ -267,10 +267,11 @@ public abstract class OneCtrl {
 	// ***********************************************************************
 	protected abstract boolean abstractIsComplete();
 	/**
-	 * CtrlDatで入力が入っているかどうかでボタン
+	 * CtrlDatで入力が入っているかどうかでボタン<br>
+	 * Override可能<br>
 	 * @return
 	 */
-	public final boolean isComplete() {
+	public boolean isComplete() {
 		if (panel != null) {
 			return abstractIsComplete();
 		}

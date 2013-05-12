@@ -1,12 +1,7 @@
 package bjd.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-
-import javax.mail.MessagingException;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import junit.framework.Assert;
 
@@ -15,8 +10,6 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-
-import bjd.test.TestUtil;
 
 @RunWith(Enclosed.class)
 public class CryptTest {
@@ -34,32 +27,26 @@ public class CryptTest {
 			};
 
 		static class Fixture {
-			private String actual;
+			private String str;
 
-			public Fixture(String actual) {
-				this.actual = actual;
+			public Fixture(String str) {
+				this.str = str;
 			}
 		}
 
 		@Theory
-		public void test(Fixture fx) throws MessagingException, IOException {
-			
-			String s = "";
-			String expected = "";
-			try {
-				s = Crypt.encrypt(fx.actual);
-				expected = Crypt.decrypt(s);
-			} catch (Exception e) {
-				Assert.fail();
-			}
-			TestUtil.prompt(String.format("encrypt(%s)=%s  decrypt(%s)=%s", fx.actual, s, s, expected));
-			assertThat(expected, is(not("ERROR"))); //ERRORが出力された場合は、テスト失敗
-			assertThat(expected, is(expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.str;
+			//exercise
+			String actual = Crypt.decrypt(Crypt.encrypt(fx.str));
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class encryptの例外発生 {
+	public static final class encryptの例外テスト {
 
 
 		@DataPoints
@@ -69,29 +56,24 @@ public class CryptTest {
 		};
 
 		static class Fixture {
-			private String actual;
+			private String str;
 
-			public Fixture(String actual) {
-				this.actual = actual;
+			public Fixture(String str) {
+				this.str = str;
 			}
 		}
-
 		@Theory
-		public void test(Fixture fx) throws MessagingException, IOException {
+		public void test(Fixture fx) {
 			try {
-				Crypt.encrypt(fx.actual);
+				Crypt.encrypt(fx.str);
 				Assert.fail("この行が実行されたらエラー");
-			} catch (Exception e) {
-				//ここへ来ればテスト成功
-				TestUtil.prompt(String.format("encrypt(%s) => %s", fx.actual, e.getClass()));
-				return;
+			} catch (Exception ex) {
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class decryptのエラー発生 {
+	public static final class decryptの例外テスト {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -102,24 +84,19 @@ public class CryptTest {
 		};
 
 		static class Fixture {
-			private String actual;
+			private String str;
 
-			public Fixture(String actual) {
-				this.actual = actual;
+			public Fixture(String str) {
+				this.str = str;
 			}
 		}
-
 		@Theory
-		public void test(Fixture fx) throws MessagingException, IOException {
-
+		public void test(Fixture fx) {
 			try {
-				Crypt.decrypt(fx.actual);
+				Crypt.decrypt(fx.str);
 				Assert.fail("この行が実行されたらエラー");
-			} catch (Exception e) {
-				TestUtil.prompt(String.format("encrypt(%s) => %s", fx.actual, e.getClass()));
-				return;
+			} catch (Exception ex) {
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 

@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @param <T>
  */
-public abstract class ListBase<T extends IDispose> implements Iterable<T>,
+public abstract class ListBase<T extends IDisposable> implements Iterable<T>,
         Iterator<T> {
     private ArrayList<T> ar = new ArrayList<T>();
     private int index;

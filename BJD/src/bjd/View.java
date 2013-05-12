@@ -4,10 +4,10 @@ import java.awt.Color;
 
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class View implements IDispose {
+public final class View implements IDisposable {
 	private Kernel kernel;
 	private MainForm mainForm;
 	private ListView listView;

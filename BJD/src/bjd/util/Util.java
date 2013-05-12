@@ -112,11 +112,6 @@ public final class Util {
 		return null;
 	}
 
-	public enum ExistsKind {
-		FILE,
-		DIR,
-		NONE
-	}
 
 	/**
 	 * ファイル若しくはディレクトリが存在するかどうか<br>
@@ -238,4 +233,33 @@ public final class Util {
 			}
 		}
 	}
+
+	public static File createTempDirectory() throws IOException {
+		final File temp;
+		temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
+
+		if (!(temp.delete())) {
+			throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+		}
+
+		if (!(temp.mkdir())) {
+			throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+		}
+		return (temp);
+	}
+
+//	public static short htons(short i) {
+//		return (short) ((i << 8) + (i >> 8));
+//	}
+//
+//	public static int htonl(int i) {
+//		return (int) ((i & 0xff000000) >> 24 | (i & 0x00ff0000) >> 8 | (i & 0x0000ff00) << 8 | (i & 0x000000ff) << 24);
+//	}
+//
+//	public static long htonl(long i) {
+//		return i;
+//		//return (long)((i & 0xff00000000000000) >> 56 | (i & 0x00ff000000000000) >> 40 | (i & 0x0000ff0000000000) >> 24 | (i & 0x000000ff00000000) >> 8
+//		//               |( i & 0x00000000ff000000) << 8 | (i & 0x0000000000ff0000) << 24 | (i & 0x000000000000ff00) << 40 | (i & 0x00000000000000ff) << 56);
+//	}
+
 }

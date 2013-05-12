@@ -1,7 +1,7 @@
 package bjd.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -19,8 +19,11 @@ public class InetTest {
 	public static final class toBytes {
 
 		@DataPoints
-		public static Fixture[] datas = { new Fixture("本日は晴天なり", "feff672c65e5306f66745929306a308a"), new Fixture("12345", "feff00310032003300340035"),
-				new Fixture("", ""), new Fixture(null, ""), };
+		public static Fixture[] datas = {
+				new Fixture("本日は晴天なり", "feff672c65e5306f66745929306a308a"),
+				new Fixture("12345", "feff00310032003300340035"),
+				new Fixture("", ""),
+				new Fixture(null, ""), };
 
 		static class Fixture {
 			private String str;
@@ -33,16 +36,20 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.getBytes(\"%s\")=%s", fx.str, fx.byteStr));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.byteStr;
+			//exercise
 			byte[] bytes = Inet.toBytes(fx.str);
 			StringBuilder sb = new StringBuilder(bytes.length * 2);
 			for (byte b : bytes) {
 				sb.append(String.format("%02x", b & 0xFF));
 			}
-			assertThat(sb.toString(), is(fx.byteStr));
+			String actual = sb.toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
+
 	}
 
 	@RunWith(Theories.class)
@@ -63,15 +70,17 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.fromBytes(\"%s\")=%s", fx.byteStr, fx.str));
+		public void test(Fixture fx) throws Exception {
+			//setUp
 			byte[] bytes = new byte[fx.byteStr.length() / 2];
 			for (int index = 0; index < bytes.length; index++) {
 				bytes[index] = (byte) Integer.parseInt(fx.byteStr.substring(index * 2, (index + 1) * 2), 16);
 			}
-			String str = Inet.fromBytes(bytes);
-			assertThat(str, is(fx.str));
+			String expected = fx.str;
+			//exercise
+			String actual = Inet.fromBytes(bytes);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -93,11 +102,13 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.getLines(\"%s\") count=%d", TestUtil.toString(fx.str), fx.count));
-			ArrayList<String> lines = Inet.getLines(fx.str);
-			assertThat(lines.size(), is(fx.count));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			int expected = fx.count;
+			//exercise
+			int actual = Inet.getLines(fx.str).size();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -118,19 +129,21 @@ public class InetTest {
 				this.count = count;
 			}
 		}
-
+		
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.getLines(\"%s\") count=%d", TestUtil.toString(fx.buf), fx.count));
-			ArrayList<byte[]> lines = Inet.getLines(fx.buf);
-			assertThat(lines.size(), is(fx.count));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			int expected = fx.count;
+			//exercise
+			int actual = Inet.getLines(fx.buf).size();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
 	@RunWith(Theories.class)
 	public static final class trimCrlf_String {
-		
+
 		@DataPoints
 		public static Fixture[] datas = { new Fixture("1", "1"), new Fixture("1\r\n", "1"), new Fixture("1\r", "1\r"), new Fixture("1\n", "1"),
 				new Fixture("1\n2\n", "1\n2"), };
@@ -146,10 +159,13 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.trimCrlf(\"%s\") =%s", TestUtil.toString(fx.str), fx.expected));
-			assertThat(Inet.trimCrlf(fx.str), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.expected;
+			//exercise
+			String actual = Inet.trimCrlf(fx.str);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -173,11 +189,15 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.trimCrlf(%s) = %s", TestUtil.toString(fx.buf), TestUtil.toString(fx.expected)));
-			assertThat(Inet.trimCrlf(fx.buf), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			byte[] expected = fx.expected;
+			//exercise
+			byte[] actual = Inet.trimCrlf(fx.buf);
+			//verify
+			assertThat(actual, is(expected));
 		}
+		
 	}
 
 	@RunWith(Theories.class)
@@ -196,11 +216,15 @@ public class InetTest {
 			}
 		}
 
+		
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("Inet.Sanitize(\"%s\") = \"%s\"", fx.str, fx.expected));
-			assertThat(Inet.sanitize(fx.str), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.expected;
+			//exercise
+			String actual = Inet.sanitize(fx.str);
+			//verify
+			assertThat(actual, is(expected));
 		}
 
 	}
@@ -224,10 +248,13 @@ public class InetTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-			TestUtil.prompt(String.format("Inet.Md5Str(\"%s\") = \"%s\"\n", fx.str, fx.expected));
-			assertThat(Inet.md5Str(fx.str), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			String expected = fx.expected;
+			//exercise
+			String actual = Inet.md5Str(fx.str);
+			//verify
+			assertThat(actual, is(expected));
 		}
-
 	}
 }

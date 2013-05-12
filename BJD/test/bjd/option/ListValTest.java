@@ -1,7 +1,7 @@
 package bjd.option;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -17,7 +17,7 @@ import bjd.ctrl.OnePage;
  * @author SIN
  *
  */
-public class ListValTest {
+public final class ListValTest {
 
 	@Test
 	public void パターン１で作成したListValをgetListで取得する() throws Exception {

@@ -11,10 +11,10 @@ import bjd.net.OneBind;
 import bjd.option.Conf;
 import bjd.option.OneOption;
 import bjd.server.OneServer;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class OnePlugin implements IDispose {
+public final class OnePlugin implements IDisposable {
 	private File file;
 	private String classNameOption;
 	private String classNameServer;
@@ -67,18 +67,26 @@ public final class OnePlugin implements IDispose {
 	 */
 	public OneOption createOption(Kernel kernel) {
 		try {
-			//URL url = file.getCanonicalFile().toURI().toURL();
-			//URLClassLoader loader = new URLClassLoader( new URL[] { url });
-			//Class cobj = loader.loadClass(classNameOption);
-			//return null;
-
-			//TODO Debug Print
-			//System.out.println(String.format("OnePlugin() cobj = %s",cobj));
-			//return null;
-
 			Constructor constructor = createConstructor(file, classNameOption,
 					new Class[] { Kernel.class, String.class });
 			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath() });
+		} catch (Exception e) {
+			//何の例外が発生しても、プラグインとしては受け付けない
+			Util.runtimeException(e.getMessage()/*e.getClass().getName()*/);
+			return null;
+		}
+	}
+
+	/**
+	 * プラグイン固有のOptionインスタンスの生成
+	 * @param kernel
+	 * @return
+	 */
+	public OneOption createOption(Kernel kernel, String className, String nameTag) {
+		try {
+			Constructor constructor = createConstructor(file, className,
+					new Class[] { Kernel.class, String.class, String.class });
+			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath(), nameTag });
 		} catch (Exception e) {
 			//何の例外が発生しても、プラグインとしては受け付けない
 			Util.runtimeException(e.getMessage()/*e.getClass().getName()*/);
@@ -104,18 +112,5 @@ public final class OnePlugin implements IDispose {
 			return null;
 		}
 	}
-
-	//	private OneOption createOption(File file, String className, Kernel kernel) {
-	//		try {
-	//			URL url = file.getCanonicalFile().toURI().toURL();
-	//			URLClassLoader loader = new URLClassLoader(new URL[] { url });
-	//			Class cobj = loader.loadClass(className);
-	//			Constructor constructor = cobj.getConstructor(new Class[] { Kernel.class, String.class });
-	//			return (OneOption) constructor.newInstance(new Object[] { kernel, file.getPath() });
-	//		} catch (Exception e) {
-	//			//何の例外が発生しても、プラグインとしては受け付けない
-	//			return null;
-	//		}
-	//	}
 
 }

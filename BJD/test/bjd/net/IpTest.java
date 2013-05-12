@@ -1,8 +1,7 @@
 package bjd.net;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -23,7 +22,7 @@ public class IpTest {
 
 	@RunWith(Theories.class)
 	public static final class 文字列のコンストラクタで生成してtoStringで確認する {
-		
+
 		@DataPoints
 		public static Fixture[] datas = {
 				// コンストラクタ文字列,toString()出力
@@ -45,26 +44,24 @@ public class IpTest {
 		};
 
 		static class Fixture {
-			private String actual;
+			private String ipStr;
 			private String expected;
 
-			public Fixture(String actual, String expected) {
-				this.actual = actual;
+			public Fixture(String ipStr, String expected) {
+				this.ipStr = ipStr;
 				this.expected = expected;
 			}
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("new Ip(\"%s\") toString()=\"%s\"", fx.actual, fx.expected));
-			Ip ip = null;
-			try {
-				ip = new Ip(fx.actual);
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-			assertThat(ip.toString(), is(fx.expected));
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			String expected = fx.expected;
+			//exercise
+			String actual = sut.toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -90,34 +87,26 @@ public class IpTest {
 		};
 
 		static class Fixture {
-			private String actual;
+			private String ipStr;
 			private String expected;
 
-			public Fixture(String actual, String expected) {
-				this.actual = actual;
+			public Fixture(String ipStr, String expected) {
+				this.ipStr = ipStr;
 				this.expected = expected;
 			}
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("new Ip(\"%s\") IP.getInetAddress().toString()=\"%s\"", fx.actual, fx.expected));
-
-			Ip ip = null;
-			try {
-				ip = new Ip(fx.actual);
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-
-			}
-			try {
-				InetAddress inetAddress = ip.getInetAddress();
-				assertThat(inetAddress.toString(), is(fx.expected));
-			} catch (UnknownHostException ex) {
-				Assert.fail("InetAddressの取得に失敗しました");
-			}
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			String expected = fx.expected;
+			//exercise
+			String actual = sut.getInetAddress().toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
+
 	}
 
 	@RunWith(Theories.class)
@@ -125,7 +114,6 @@ public class IpTest {
 
 		@DataPoints
 		public static Fixture[] datas = {
-				// コンストラクタ文字列,toString()出力
 				new Fixture(192, 168, 0, 1),
 				new Fixture(127, 0, 0, 1),
 				new Fixture(0, 0, 0, 0),
@@ -149,26 +137,17 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
+		public void xxx(Fixture fx) throws Exception {
+			//setUp
 			String ipStr = String.format("%d.%d.%d.%d", fx.n1, fx.n2, fx.n3, fx.n4);
-
-			Ip ip = null;
-			try {
-				ip = new Ip(ipStr);
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-
-			byte[] ipV4 = ip.getIpV4();
-
-			TestUtil.prompt(String.format("new Ip(\"%s\") ipV4[0]=%d ipV4[1]=%d ipV4[2]=%d ipV4[3]=%d", ipStr, ipV4[0], ipV4[1], ipV4[2], ipV4[3]));
-
-			assertSame(((byte) fx.n1) == ipV4[0], true);
-			assertSame(((byte) fx.n2) == ipV4[1], true);
-			assertSame(((byte) fx.n3) == ipV4[2], true);
-			assertSame(((byte) fx.n4) == ipV4[3], true);
-
+			Ip sut = new Ip(ipStr);
+			//exercise
+			byte[] p = sut.getIpV4();
+			//verify
+			assertThat(p[0], is((byte) fx.n1));
+			assertThat(p[1], is((byte) fx.n2));
+			assertThat(p[2], is((byte) fx.n3));
+			assertThat(p[3], is((byte) fx.n4));
 		}
 	}
 
@@ -180,7 +159,7 @@ public class IpTest {
 				// コンストラクタ文字列,toString()出力
 				new Fixture("1234:56::1234:5678:90ab", 0x12, 0x34, 0x00, 0x56, 0, 0, 0, 0, 0, 0, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab),
 				new Fixture("1::1", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-				new Fixture("ff04::f234", 0xff, 0xff04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xf2, 0x34),
+				new Fixture("ff04::f234", 0xff, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xf2, 0x34),
 				new Fixture("1::1%16", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
 				new Fixture("[1::1]", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
 
@@ -228,41 +207,35 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			Ip ip = TestUtil.createIp(fx.ipStr);
-
-			byte[] ipV6 = ip.getIpV6();
-
-			TestUtil.prompt(String.format("new Ip(\"%s\")", fx.ipStr));
-			for (int i = 0; i < 16; i++) {
-				System.out.printf("%d:", ipV6[i]);
-			}
-			System.out.printf("");
-
-			assertSame(((byte) fx.n1) == ipV6[0], true);
-			assertSame(((byte) fx.n2) == ipV6[1], true);
-			assertSame(((byte) fx.n3) == ipV6[2], true);
-			assertSame(((byte) fx.n4) == ipV6[3], true);
-			assertSame(((byte) fx.n5) == ipV6[4], true);
-			assertSame(((byte) fx.n6) == ipV6[5], true);
-			assertSame(((byte) fx.n7) == ipV6[6], true);
-			assertSame(((byte) fx.n8) == ipV6[7], true);
-			assertSame(((byte) fx.n9) == ipV6[8], true);
-			assertSame(((byte) fx.n10) == ipV6[9], true);
-			assertSame(((byte) fx.n11) == ipV6[10], true);
-			assertSame(((byte) fx.n12) == ipV6[11], true);
-			assertSame(((byte) fx.n13) == ipV6[12], true);
-			assertSame(((byte) fx.n14) == ipV6[13], true);
-			assertSame(((byte) fx.n15) == ipV6[14], true);
-			assertSame(((byte) fx.n16) == ipV6[15], true);
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			//exercise
+			byte[] p = sut.getIpV6();
+			//verify
+			assertThat(p[0], is((byte) fx.n1));
+			assertThat(p[1], is((byte) fx.n2));
+			assertThat(p[2], is((byte) fx.n3));
+			assertThat(p[3], is((byte) fx.n4));
+			assertThat(p[4], is((byte) fx.n5));
+			assertThat(p[5], is((byte) fx.n6));
+			assertThat(p[6], is((byte) fx.n7));
+			assertThat(p[7], is((byte) fx.n8));
+			assertThat(p[8], is((byte) fx.n9));
+			assertThat(p[9], is((byte) fx.n10));
+			assertThat(p[10], is((byte) fx.n11));
+			assertThat(p[11], is((byte) fx.n12));
+			assertThat(p[12], is((byte) fx.n13));
+			assertThat(p[13], is((byte) fx.n14));
+			assertThat(p[14], is((byte) fx.n15));
+			assertThat(p[15], is((byte) fx.n16));
 		}
+
 	}
 
 	@RunWith(Theories.class)
-	public static final class 演算子イコールイコールの判定_null判定 {
+	public static final class 演算子イコールの判定_null判定 {
 
-		
 		@DataPoints
 		public static Fixture[] datas = {
 				// IP1.IP2,==の判定
@@ -277,46 +250,33 @@ public class IpTest {
 		};
 
 		static class Fixture {
-			private Ip ip0;
-			private Ip ip1;
+			private String ipStr;
+			private Ip ip = null;
 			private boolean expected;
 
-			public Fixture(String ip0, String ip1, boolean expected) {
-				try {
-					this.ip0 = (ip0 == null) ? null : new Ip(ip0);
-					this.ip1 = (ip1 == null) ? null : new Ip(ip1);
-				} catch (ValidObjException ex) {
-					Assert.fail(ex.getMessage());
+			public Fixture(String ipStr, String target, boolean expected) {
+				this.ipStr = ipStr;
+				if (target != null) {
+					ip = TestUtil.createIp(target);
 				}
 				this.expected = expected;
 			}
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-			
-			String ipStr0 = null;
-			if (fx.ip0 != null) {
-				ipStr0 = fx.ip0.toString();
-			}
-			String ipStr1 = null;
-			if (fx.ip1 != null) {
-				ipStr0 = fx.ip1.toString();
-			}
-
-			TestUtil.prompt(String.format("Ip(%s) ip.equals(%s) => %s", ipStr0, ipStr1, fx.expected));
-
-			if (fx.ip0 == null) {
-				assert false : "fx.ip0 is null";
-			}
-			assertSame(fx.ip0.equals(fx.ip1), fx.expected);
-
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			boolean expected = fx.expected;
+			//exercise
+			boolean actual = sut.equals(fx.ip);
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
 	@RunWith(Theories.class)
 	public static final class getAddrV4で取得した値からIpオブジェクトを再構築する {
-
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -336,20 +296,18 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			try {
-				Ip p1 = new Ip(fx.ipStr);
-				int i = p1.getAddrV4();
-				Ip p2 = new Ip(i);
-				TestUtil.prompt(String.format("Ip(%s) => ip.getAddrV4()=0x%x(%d) => new Ip(0x%x) => %s ", fx.ipStr, i, i, i, p2.toString()));
-
-				assertThat(p2.toString(), is(fx.ipStr));
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip ip = new Ip(fx.ipStr);
+			int n = ip.getAddrV4();
+			Ip sut = new Ip(n);
+			String expected = fx.ipStr;
+			//exercise
+			String actual = sut.toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
+
 	}
 
 	@RunWith(Theories.class)
@@ -373,26 +331,22 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			try {
-				Ip p1 = new Ip(fx.ipStr);
-				long h = p1.getAddrV6H();
-				long l = p1.getAddrV6L();
-				Ip p2 = new Ip(h, l);
-				TestUtil.prompt(String.format("Ip(%s) => ip.getAddrV6H()=0x%x  ip.getAddrV6L()=0x%x => new Ip(0x%x,0x%x) => %s ", fx.ipStr, h, l, h, l, p2.toString()));
-
-				assertThat(p2.toString(), is(fx.ipStr));
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip ip = new Ip(fx.ipStr);
+			long h = ip.getAddrV6H();
+			long l = ip.getAddrV6L();
+			Ip sut = new Ip(h, l);
+			String expected = fx.ipStr;
+			//exercise
+			String actual = sut.toString();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
 	@RunWith(Theories.class)
-	public static final class 文字列によるコンストラクタで例外_IllegalArgumentException_が発生することを確認する {
-
+	public static final class 無効な文字列で初期化すると例外_IllegalArgumentException_が発生することを確認する_例外テスト {
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -415,22 +369,16 @@ public class IpTest {
 
 		@Theory
 		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("new Ip(%s) => throw ValidObjException", fx.ipStr));
-
 			try {
 				new Ip(fx.ipStr);
 				Assert.fail("この行が実行されたらエラー");
 			} catch (ValidObjException ex) {
-				return;
 			}
-			Assert.fail("この行が実行されたらエラー");
 		}
 	}
 
 	@RunWith(Theories.class)
 	public static final class getAddrV4の検証 {
-
 
 		@DataPoints
 		public static Fixture[] datas = {
@@ -449,18 +397,14 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("ip = new Ip(%s) => ip.getAddrV4()=%x", fx.ipStr, fx.addr));
-
-			try {
-				Ip ip = new Ip(fx.ipStr);
-				int x1 = ip.getAddrV4();
-				Assert.assertEquals(x1, fx.addr);
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
-
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			int expected = fx.addr;
+			//exercise
+			int actual = sut.getAddrV4();
+			//verify
+			assertThat(actual, is(expected));
 		}
 	}
 
@@ -486,19 +430,15 @@ public class IpTest {
 		}
 
 		@Theory
-		public void test(Fixture fx) {
-
-			TestUtil.prompt(String.format("ip = new Ip(%s) => ip.getAddrV6H()=%x ip.getAddrV6L()=%x", fx.ipStr, fx.h, fx.l));
-
-			try {
-				Ip ip = new Ip(fx.ipStr);
-				long h = ip.getAddrV6H();
-				Assert.assertEquals(h, fx.h);
-				long l = ip.getAddrV6L();
-				Assert.assertEquals(l, fx.l);
-			} catch (ValidObjException ex) {
-				Assert.fail(ex.getMessage());
-			}
+		public void test(Fixture fx) throws Exception {
+			//setUp
+			Ip sut = new Ip(fx.ipStr);
+			//exercise
+			long h = sut.getAddrV6H();
+			long l = sut.getAddrV6L();
+			//verify
+			assertThat(h, is(fx.h));
+			assertThat(l, is(fx.l));
 		}
 	}
 

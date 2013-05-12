@@ -1,9 +1,10 @@
 package bjd;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
+
 import javax.swing.JFrame;
 
 import org.junit.AfterClass;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
+import bjd.option.OneOption;
 import bjd.test.TestUtil;
 import bjd.util.Util;
 
@@ -42,6 +44,9 @@ public final class WindowSizeTest {
 	 */
 	private Conf createConf() {
 		Conf conf = TestUtil.createConf("OptionBasic");
+//		Kernel kernel = new Kernel();
+//		OneOption op = kernel.getListOption().get("Basic");
+//		Conf conf = new Conf(op);
 		conf.set("useLastSize", true);
 		return conf;
 	}

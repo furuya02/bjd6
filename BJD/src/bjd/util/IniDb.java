@@ -159,21 +159,26 @@ public final class IniDb {
 		}
 	}
 
-	private LineObject readLine(String str) throws Exception {
+	/**
+	 * 
+	 * @param str
+	 * @return 解釈に失敗した場合はnullを返す
+	 */
+	private LineObject readLine(String str) {
 		int index = str.indexOf("=");
 		if (index == -1) {
-			throw new Exception();
+			return null;
 		}
 		//		CtrlType ctrlType = str2CtrlType(str.substring(0, index));
 		str = str.substring(index + 1);
 		index = str.indexOf("=");
 		if (index == -1) {
-			throw new Exception();
+			return null;
 		}
 		String buf = str.substring(0, index);
 		String[] tmp = buf.split("\b");
 		if (tmp.length != 2) {
-			throw new Exception();
+			return null;
 		}
 		String nameTag = tmp[0];
 		String name = tmp[1];
@@ -192,8 +197,8 @@ public final class IniDb {
 				Util.runtimeException(String.format("InitDb.read() IOException %s", e.getMessage()));
 			}
 			for (String s : lines) {
-				try {
-					LineObject o = readLine(s);
+				LineObject o = readLine(s);
+				if (o != null) {
 					if (o.getNameTag().equals(nameTag)) {
 						OneVal oneVal = listVal.search(o.getName());
 						if (oneVal != null) {
@@ -201,8 +206,6 @@ public final class IniDb {
 							isRead = true; // 1件でもデータを読み込んだ場合にtrue
 						}
 					}
-				} catch (Exception e1) {
-					Util.runtimeException(e1.getMessage());
 				}
 			}
 		}
@@ -286,11 +289,11 @@ public final class IniDb {
 				}
 			}
 			// 対象のValListを書き込む
-			for (OneVal o : listVal.getList(null)) {
+			for (OneVal o : listVal.getSaveList(null)) {
 				// nullで初期化され、実行中に一度も設定されていない値は、保存の対象外となる
-				if (o.getValue() == null) {
-					continue;
-				}
+				//if (o.getValue() == null) {
+				//	continue;
+				//}
 
 				// データ保存の必要のない型は省略する（下位互換のため）
 				CtrlType ctrlType = o.getOneCtrl().getCtrlType();

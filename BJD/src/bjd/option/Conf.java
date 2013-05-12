@@ -15,8 +15,12 @@ import bjd.util.Util;
  */
 public final class Conf {
 	private HashMap<String, Object> ar = new HashMap<>();
+	private String nameTag = "";
 
 	public Conf(OneOption oneOption) {
+		
+		nameTag = oneOption.getNameTag();
+		
 		ArrayList<OneVal> list = oneOption.getListVal().getList(null);
 		for (OneVal o : list) {
 			CtrlType ctrlType = o.getOneCtrl().getCtrlType();
@@ -45,6 +49,10 @@ public final class Conf {
 					Util.runtimeException(String.format("未定義 %s", ctrlType));
 			}
 		}
+	}
+	
+	public String getNameTag(){
+		return nameTag;
 	}
 
 	/**

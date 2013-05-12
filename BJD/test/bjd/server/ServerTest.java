@@ -20,7 +20,7 @@ public final class ServerTest {
 	//サーバ動作確認用
 	class MyServer extends OneServer {
 		public MyServer(Conf conf, OneBind oneBind) {
-			super(new Kernel(), "TEST-SERVER", conf, oneBind);
+			super(new Kernel(), conf, oneBind);
 		}
 
 		@Override
@@ -60,11 +60,11 @@ public final class ServerTest {
 		protected void onSubThread(SockObj sockObj) {
 			for (int i = 3; i >= 0 && isLife(); i--) {
 				if (sockObj.getSockState() != SockState.CONNECT) {
-					TestUtil.prompt(String.format("接続中...sockAccept.getSockState!=Connect"));
+					//TestUtil.prompt(String.format("接続中...sockAccept.getSockState!=Connect"));
 					break;
 				}
 
-				TestUtil.prompt(String.format("接続中...あと%d回待機", i));
+				//TestUtil.prompt(String.format("接続中...あと%d回待機", i));
 				Util.sleep(1000);
 			}
 		}
@@ -86,7 +86,6 @@ public final class ServerTest {
 		MyServer myServer = new MyServer(conf, oneBind);
 		myServer.start();
 		for (int i = 10; i > 0; i--) {
-			TestUtil.prompt(String.format("test() loop..あと%d回 isRunning()=%s Count()=%d", i, myServer.isRunnig(), myServer.count()));
 			Util.sleep(1);
 		}
 		myServer.dispose();

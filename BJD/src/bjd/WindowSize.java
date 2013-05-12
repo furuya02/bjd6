@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
 /**
@@ -17,7 +17,7 @@ import bjd.util.Util;
  * 
  * @author SIN
 s */
-public final class WindowSize implements IDispose {
+public final class WindowSize implements IDisposable {
 
 	//Windowの外観を保存・復元する
 	private Conf conf;

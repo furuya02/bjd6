@@ -9,7 +9,7 @@ import bjd.sock.SockTcp;
 
 public final class Server extends OneServer {
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
-		super(kernel, "Sample", conf, oneBind);
+		super(kernel, conf, oneBind);
 		
 		//Option.javaで定義したものが、読み込めているかどうかのチェック
 		//String tag = "sampleText";

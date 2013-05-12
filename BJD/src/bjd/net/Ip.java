@@ -3,6 +3,7 @@ package bjd.net;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
@@ -142,6 +143,13 @@ public final class Ip extends ValidObj {
 			//InetAddressからの生成では、原則として例外は発生しないはず
 			Util.runtimeException(this, e);
 		}
+	}
+	/**
+	 * InetSockAddressによるコンストラクタ
+	 * @param inetSockAddress
+	 */
+	public Ip(InetSocketAddress inetSockAddress) {
+		this(inetSockAddress.getAddress());
 	}
 
 	/**

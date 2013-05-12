@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import bjd.ILife;
+import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.Ssl;
 import bjd.util.Bytes;
@@ -24,13 +25,20 @@ public final class SockTcp extends SockObj {
 	private SockQueue sockQueue = new SockQueue();
 	private ByteBuffer recvBuf = ByteBuffer.allocate(sockQueue.getMax());
 
+	//***************************************************************************
+	//パラメータのKernelはSockObjにおけるTrace()のためだけに使用されているので、
+	//Traceしない場合は削除することができる
+	//***************************************************************************
+
 	@SuppressWarnings("unused")
-	private SockTcp() {
+	private SockTcp(Kernel kernel) {
+		super(kernel);
 		//隠蔽
 	}
 
 	//CLIENT
-	public SockTcp(Ip ip, int port, int timeout, Ssl ssl) {
+	public SockTcp(Kernel kernel, Ip ip, int port, int timeout, Ssl ssl) {
+		super(kernel);
 		//SSL通信を使用する場合は、このオブジェクトがセットされる 通常の場合は、null
 		//this.ssl = ssl;
 
@@ -90,7 +98,8 @@ public final class SockTcp extends SockObj {
 	}
 
 	//ACCEPT
-	public SockTcp(SocketChannel channel) {
+	public SockTcp(Kernel kernel, SocketChannel channel) {
+		super(kernel);
 
 		//************************************************
 		//selector/channel生成
@@ -151,7 +160,7 @@ public final class SockTcp extends SockObj {
 	private void doRead(SocketChannel channel) {
 		//キューのスペース確認
 		int space = sockQueue.getSpace();
-		if (space <20000) {
+		if (space < 20000) {
 			Util.sleep(10);
 			return;
 		}
@@ -170,7 +179,7 @@ public final class SockTcp extends SockObj {
 			recvBuf.get(buf);
 
 			int q = sockQueue.enqueue(buf, buf.length);
-			if(q!=buf.length){
+			if (q != buf.length) {
 				Util.runtimeException("SockTcp.doRead() sockQueue.enqueue()!=buf.length");
 			}
 
@@ -381,9 +390,13 @@ public final class SockTcp extends SockObj {
 	 * @return 送信バイト数
 	 */
 	public int lineSend(byte[] buf) {
-		int s1 = send(buf);
-		int s2 = send(new byte[] { 0x0d, 0x0a });
-		return s1 + s2;
+
+		byte[] b = new byte[buf.length + 2];
+
+		System.arraycopy(buf, 0, b, 0, buf.length);
+		b[buf.length] = 0x0d;
+		b[buf.length + 1] = 0x0a;
+		return send(b);
 	}
 
 	/**

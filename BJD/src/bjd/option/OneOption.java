@@ -17,7 +17,7 @@ import bjd.net.BindAddr;
 import bjd.net.Ip;
 import bjd.net.LocalAddress;
 import bjd.net.ProtocolKind;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.IniDb;
 import bjd.util.Util;
 
@@ -26,7 +26,7 @@ import bjd.util.Util;
  * @author SIN
  *
  */
-public abstract class OneOption implements ICtrlEventListener, IDispose {
+public abstract class OneOption implements ICtrlEventListener, IDisposable {
 
 	private ListVal listVal = new ListVal();
 	private boolean isJp;

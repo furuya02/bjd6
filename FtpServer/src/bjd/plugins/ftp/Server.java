@@ -2,11 +2,8 @@ package bjd.plugins.ftp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.annotation.processing.FilerException;
 
 import bjd.Kernel;
 import bjd.ValidObjException;
@@ -22,9 +19,9 @@ import bjd.sock.SockObj;
 import bjd.sock.SockServer;
 import bjd.sock.SockState;
 import bjd.sock.SockTcp;
+import bjd.util.ExistsKind;
 import bjd.util.Inet;
 import bjd.util.Util;
-import bjd.util.Util.ExistsKind;
 
 public final class Server extends OneServer {
 
@@ -33,7 +30,7 @@ public final class Server extends OneServer {
 	private ListMount listMount;
 
 	public Server(Kernel kernel, Conf conf, OneBind oneBind) {
-		super(kernel, "Ftp", conf, oneBind);
+		super(kernel, conf, oneBind);
 
 		bannerMessage = kernel.changeTag((String) getConf().get("bannerMessage"));
 		//ユーザ情報
@@ -116,11 +113,11 @@ public final class Server extends OneServer {
 				break;
 			}
 
-//			//これは、ログイン中しか受け付けないコマンドかも？
-//			//RNFRで指定されたパスの無効化
-//			if (ftpCmd != FtpCmd.Rnfr) {
-//				session.setRnfrName("");
-//			}
+			//			//これは、ログイン中しか受け付けないコマンドかも？
+			//			//RNFRで指定されたパスの無効化
+			//			if (ftpCmd != FtpCmd.Rnfr) {
+			//				session.setRnfrName("");
+			//			}
 
 			// コマンド組替え
 			if (ftpCmd == FtpCmd.Cdup) {
@@ -130,7 +127,8 @@ public final class Server extends OneServer {
 
 			//不正アクセス対処 パラメータに極端に長い文字列を送り込まれた場合
 			if (param.length() > 128) {
-				getLogger().set(LogKind.SECURE, session.getSockCtrl(), 1, String.format("%s Length=%d", ftpCmd, param.length()));
+				getLogger().set(LogKind.SECURE, session.getSockCtrl(), 1,
+						String.format("%s Length=%d", ftpCmd, param.length()));
 				break;
 			}
 
@@ -147,7 +145,8 @@ public final class Server extends OneServer {
 
 				if (ftpCmd == FtpCmd.User) {
 					if (param.equals("")) {
-						session.stringSend(String.format("500 %s: command requires a parameter.", ftpCmd.toString().toUpperCase()));
+						session.stringSend(String.format("500 %s: command requires a parameter.", ftpCmd.toString()
+								.toUpperCase()));
 						continue;
 					}
 					result = jobUser(session, param);
@@ -161,11 +160,13 @@ public final class Server extends OneServer {
 			} else {
 				// パラメータの確認(パラメータが無い場合はエラーを返す)
 				if (param.equals("")) {
-					if (ftpCmd == FtpCmd.Cwd || ftpCmd == FtpCmd.Type || ftpCmd == FtpCmd.Mkd || ftpCmd == FtpCmd.Rmd || ftpCmd == FtpCmd.Dele
+					if (ftpCmd == FtpCmd.Cwd || ftpCmd == FtpCmd.Type || ftpCmd == FtpCmd.Mkd || ftpCmd == FtpCmd.Rmd
+							|| ftpCmd == FtpCmd.Dele
 							|| ftpCmd == FtpCmd.Port || ftpCmd == FtpCmd.Rnfr
 							|| ftpCmd == FtpCmd.Rnto || ftpCmd == FtpCmd.Stor || ftpCmd == FtpCmd.Retr) {
 						//session.stringSend("500 command not understood:");
-						session.stringSend(String.format("500 %s: command requires a parameter.", ftpCmd.toString().toUpperCase()));
+						session.stringSend(String.format("500 %s: command requires a parameter.", ftpCmd.toString()
+								.toUpperCase()));
 						continue;
 					}
 				}
@@ -180,12 +181,14 @@ public final class Server extends OneServer {
 				// ユーザのアクセス権にエラーとなるコマンド
 				if (session.getOneUser() != null) {
 					if (session.getOneUser().getFtpAcl() == FtpAcl.Down) {
-						if (ftpCmd == FtpCmd.Stor || ftpCmd == FtpCmd.Dele || ftpCmd == FtpCmd.Rnfr || ftpCmd == FtpCmd.Rnto || ftpCmd == FtpCmd.Rmd || ftpCmd == FtpCmd.Mkd) {
+						if (ftpCmd == FtpCmd.Stor || ftpCmd == FtpCmd.Dele || ftpCmd == FtpCmd.Rnfr
+								|| ftpCmd == FtpCmd.Rnto || ftpCmd == FtpCmd.Rmd || ftpCmd == FtpCmd.Mkd) {
 							session.stringSend("550 Permission denied.");
 							continue;
 						}
 					} else if (session.getOneUser().getFtpAcl() == FtpAcl.Up) {
-						if (ftpCmd == FtpCmd.Retr || ftpCmd == FtpCmd.Dele || ftpCmd == FtpCmd.Rnfr || ftpCmd == FtpCmd.Rnto || ftpCmd == FtpCmd.Rmd || ftpCmd == FtpCmd.Mkd) {
+						if (ftpCmd == FtpCmd.Retr || ftpCmd == FtpCmd.Dele || ftpCmd == FtpCmd.Rnfr
+								|| ftpCmd == FtpCmd.Rnto || ftpCmd == FtpCmd.Rmd || ftpCmd == FtpCmd.Mkd) {
 							session.stringSend("550 Permission denied.");
 							continue;
 						}
@@ -201,7 +204,8 @@ public final class Server extends OneServer {
 				if (ftpCmd == FtpCmd.Noop) {
 					session.stringSend("200 NOOP command successful.");
 				} else if (ftpCmd == FtpCmd.Pwd) {
-					session.stringSend(String.format("257 \"%s\" is current directory.", session.getCurrentDir().getPwd()));
+					session.stringSend(String.format("257 \"%s\" is current directory.", session.getCurrentDir()
+							.getPwd()));
 				} else if (ftpCmd == FtpCmd.Cwd) {
 					result = jobCwd(session, param);
 				} else if (ftpCmd == FtpCmd.Syst) {
@@ -230,7 +234,8 @@ public final class Server extends OneServer {
 		//ログインしている場合は、ログアウトのログを出力する
 		if (session.getCurrentDir() != null) {
 			//logout
-			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 13, String.format("%s", session.getOneUser().getUserName()));
+			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 13,
+					String.format("%s", session.getOneUser().getUserName()));
 		}
 		session.getSockCtrl().close();
 		if (session.getSockData() != null) {
@@ -263,17 +268,20 @@ public final class Server extends OneServer {
 
 		if (session.getOneUser() == null) {
 			//無効なユーザの場合
-			getLogger().set(LogKind.SECURE, session.getSockCtrl(), 14, String.format("USER:%s PASS:%s", session.getUserName(), password));
+			getLogger().set(LogKind.SECURE, session.getSockCtrl(), 14,
+					String.format("USER:%s PASS:%s", session.getUserName(), password));
 		} else {
 			//パスワード確認
 			boolean success = false;
 			// *の場合、Anonymous接続として処理する
 			if (session.getOneUser().getPassword().equals("*")) {
 				//oneUser.getUserName() = String.format("{0}(ANONYMOUS)",oneUser.getUserName());
-				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 5, String.format("%s(ANONYMOUS) %s", session.getOneUser().getUserName(), password));
+				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 5,
+						String.format("%s(ANONYMOUS) %s", session.getOneUser().getUserName(), password));
 				success = true;
 			} else if (session.getOneUser().getPassword().equals(password)) {
-				getLogger().set(LogKind.SECURE, session.getSockCtrl(), 6, String.format("%s", session.getOneUser().getUserName()));
+				getLogger().set(LogKind.SECURE, session.getSockCtrl(), 6,
+						String.format("%s", session.getOneUser().getUserName()));
 				success = true;
 			}
 
@@ -283,7 +291,12 @@ public final class Server extends OneServer {
 				//サーバ起動（運営）中にディレクトリが削除されている可能性があるので、この時点で確認する
 				if (Util.exists(session.getOneUser().getHomeDir()) != ExistsKind.DIR) {
 					//ホームディレクトリが存在しません（処理が継続できないため切断しました
-					getLogger().set(LogKind.ERROR, session.getSockCtrl(), 2, String.format("userName=%s hoemDir=%s", session.getOneUser().getUserName(), session.getOneUser().getHomeDir()));
+					getLogger().set(
+							LogKind.ERROR,
+							session.getSockCtrl(),
+							2,
+							String.format("userName=%s hoemDir=%s", session.getOneUser().getUserName(), session
+									.getOneUser().getHomeDir()));
 					return false;
 				}
 
@@ -294,7 +307,8 @@ public final class Server extends OneServer {
 				return true;
 			}
 			//以下認証失敗処理
-			getLogger().set(LogKind.SECURE, session.getSockCtrl(), 15, String.format("USER:%s PASS:%s", session.getUserName(), password));
+			getLogger().set(LogKind.SECURE, session.getSockCtrl(), 15,
+					String.format("USER:%s PASS:%s", session.getUserName(), password));
 		}
 		int reservationTime = (int) getConf().get("reservationTime");
 
@@ -311,17 +325,17 @@ public final class Server extends OneServer {
 	private boolean jobType(Session session, String param) {
 		String resStr = "";
 		switch (param.toUpperCase().charAt(0)) {
-			case 'A':
-				session.setFtpType(FtpType.ASCII);
-				resStr = "200 Type set 'A'";
-				break;
-			case 'I':
-				session.setFtpType(FtpType.BINARY);
-				resStr = "200 Type set 'I'";
-				break;
-			default:
-				resStr = "500 command not understood.";
-				break;
+		case 'A':
+			session.setFtpType(FtpType.ASCII);
+			resStr = "200 Type set 'A'";
+			break;
+		case 'I':
+			session.setFtpType(FtpType.BINARY);
+			resStr = "200 Type set 'I'";
+			break;
+		default:
+			resStr = "500 command not understood.";
+			break;
 		}
 		session.stringSend(resStr);
 		return true;
@@ -362,12 +376,14 @@ public final class Server extends OneServer {
 			}
 			if (retCode != -1) {
 				//成功
-				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 7, String.format("User:%s Cmd:%s Path:%s", session.getOneUser().getUserName(), ftpCmd, path));
+				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 7,
+						String.format("User:%s Cmd:%s Path:%s", session.getOneUser().getUserName(), ftpCmd, path));
 				session.stringSend(String.format("%s %s command successful.", retCode, ftpCmd));
 				return true;
 			} else { //失敗
 				//コマンド処理でエラーが発生しました
-				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 3, String.format("User:%s Cmd:%s Path:%s", session.getOneUser().getUserName(), ftpCmd, path));
+				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 3,
+						String.format("User:%s Cmd:%s Path:%s", session.getOneUser().getUserName(), ftpCmd, path));
 			}
 		}
 		session.stringSend(String.format("451 %s error.", ftpCmd));
@@ -388,6 +404,8 @@ public final class Server extends OneServer {
 				}
 				if (p.toUpperCase().indexOf("-L") == 0) {
 					wideMode = true;
+				}else if (p.toUpperCase().indexOf("-A") == 0) {
+						wideMode = true;
 				} else {
 					//ワイルドカード指定
 					if (p.indexOf('*') != -1 || p.indexOf('?') != -1) {
@@ -395,15 +413,18 @@ public final class Server extends OneServer {
 					} else { //フォルダ指定
 						ExistsKind existsKind = Util.exists(session.getCurrentDir().createPath(null, param, false));
 						switch (existsKind) {
-							case DIR:
-								mask = param + "\\*.*";
-								break;
-							case FILE:
-								mask = param;
-								break;
-							default:
-								Util.runtimeException(String.format("ExistsKind=%s", existsKind));
-								break;
+						case DIR:
+							mask = param + "\\*.*";
+							break;
+						case FILE:
+							mask = param;
+							break;
+						default:
+							session.stringSend(String.format("500 %s: command requires a parameter.", param));
+							session.setSockData(null);
+							return true;
+							//Util.runtimeException(String.format("ExistsKind=%s", existsKind));
+							//break;
 						}
 					}
 				}
@@ -457,7 +478,7 @@ public final class Server extends OneServer {
 		if (ip != null) {
 			Util.sleep(10);
 			Ssl ssl = null;
-			SockTcp sockData = Inet.connect(ip, port, getTimeout(), ssl, this);
+			SockTcp sockData = Inet.connect(getKernel(), ip, port, getTimeout(), ssl, this);
 			if (sockData != null) {
 				resStr = String.format("200 %s command successful.", ftpCmd.toString().toUpperCase());
 			}
@@ -478,16 +499,17 @@ public final class Server extends OneServer {
 				port = 2000;
 			}
 			//バインド可能かどうかの確認
-			if (SockServer.isAvailable(ip, port)) {
+			if (SockServer.isAvailable(getKernel(), ip, port)) {
 				//成功
 				if (ftpCmd == FtpCmd.Epsv) {
 					session.stringSend(String.format("229 Entering Extended Passive Mode. (|||%d|)", port));
 				} else {
 					String ipStr = ip.toString();
-					session.stringSend(String.format("227 Entering Passive Mode. (%s,%d,%d)", ipStr.replace(".", ","), port / 256, port % 256));
+					session.stringSend(String.format("227 Entering Passive Mode. (%s,%d,%d)", ipStr.replace(".", ","),
+							port / 256, port % 256));
 				}
 				//指定したアドレス・ポートで待ち受ける
-				SockTcp sockData = SockServer.createConnection(ip, port, this);
+				SockTcp sockData = SockServer.createConnection(getKernel(), ip, port, this);
 				if (sockData == null) {
 					//接続失敗
 					return false;
@@ -506,11 +528,10 @@ public final class Server extends OneServer {
 
 	private boolean jobRnto(Session session, String param, FtpCmd ftpCmd) {
 		String s = session.getRnfrName();
-		
+
 		if (!session.getRnfrName().equals("")) {
 			String path = session.getCurrentDir().createPath(null, param, false);
-			
-			
+
 			ExistsKind existsKind = Util.exists(path);
 			if (existsKind == ExistsKind.DIR) {
 				session.stringSend("550 rename: Is a derectory name.");
@@ -527,7 +548,8 @@ public final class Server extends OneServer {
 				//	File.Move(rnfrName, path);
 				//}
 				//"RENAME"
-				this.getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 8, String.format("%s %s -> %s", session.getOneUser().getUserName(), session.getRnfrName(), path));
+				this.getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 8,
+						String.format("%s %s -> %s", session.getOneUser().getUserName(), session.getRnfrName(), path));
 				session.stringSend("250 RNTO command successful.");
 				return true;
 			}
@@ -560,20 +582,24 @@ public final class Server extends OneServer {
 				}
 			}
 			//String str = String.format("150 Opening %s mode data connection for %s.", session.getFtpType(), param);
-			session.getSockCtrl().stringSend(String.format("150 Opening %s mode data connection for %s.", session.getFtpType(), param));
+			session.getSockCtrl().stringSend(
+					String.format("150 Opening %s mode data connection for %s.", session.getFtpType(), param));
 
 			//Up start
-			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 9, String.format("%s %s", session.getOneUser().getUserName(), param));
+			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 9,
+					String.format("%s %s", session.getOneUser().getUserName(), param));
 
 			try {
 				int size = recvBinary(session.getSockData(), path);
 				session.stringSend("226 Transfer complete.");
 				//Up end
-				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 10, String.format("%s %s %dbytes", session.getOneUser().getUserName(), param, size));
+				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 10,
+						String.format("%s %s %dbytes", session.getOneUser().getUserName(), param, size));
 			} catch (IOException e) {
 				session.stringSend("426 Transfer abort.");
 				//Up end
-				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 17, String.format("%s %s", session.getOneUser().getUserName(), param));
+				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 17,
+						String.format("%s %s", session.getOneUser().getUserName(), param));
 			}
 
 			session.getSockData().close();
@@ -589,20 +615,24 @@ public final class Server extends OneServer {
 		String path = session.getCurrentDir().createPath(null, param, false);
 		if (Util.exists(path) == ExistsKind.FILE) {
 			File file = new File(path);
-			String str = String.format("150 Opening %s mode data connection for %s (%d bytes).", session.getFtpType(), param, file.length());
+			String str = String.format("150 Opening %s mode data connection for %s (%d bytes).", session.getFtpType(),
+					param, file.length());
 			session.stringSend(str); //Shift-jisである必要がある？
 
 			//DOWN start
-			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 11, String.format("%s %s", session.getOneUser().getUserName(), param));
+			getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 11,
+					String.format("%s %s", session.getOneUser().getUserName(), param));
 			try {
 				int size = sendBinary(session.getSockData(), path);
 				session.stringSend("226 Transfer complete.");
 				//DOWN end
-				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 12, String.format("%s %s %dbytes", session.getOneUser().getUserName(), param, size));
+				getLogger().set(LogKind.NORMAL, session.getSockCtrl(), 12,
+						String.format("%s %s %dbytes", session.getOneUser().getUserName(), param, size));
 			} catch (IOException e) {
 				session.stringSend("426 Transfer abort.");
 				//DOWN end
-				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 16, String.format("%s %s", session.getOneUser().getUserName(), param));
+				getLogger().set(LogKind.ERROR, session.getSockCtrl(), 16,
+						String.format("%s %s", session.getOneUser().getUserName(), param));
 			}
 			session.getSockData().close();
 			session.setSockData(null);
@@ -631,8 +661,8 @@ public final class Server extends OneServer {
 			if (len < 0) {
 				break;
 			}
-			if(len==0){
-				if(sockTcp.getSockState() != SockState.CONNECT){
+			if (len == 0) {
+				if (sockTcp.getSockState() != SockState.CONNECT) {
 					break;
 				}
 				Util.sleep(10);
@@ -643,7 +673,7 @@ public final class Server extends OneServer {
 				throw new IOException("buf.length!=len");
 			}
 			ws.write(buf);
-			
+
 			//トレース表示
 			sb.append(String.format("Binary=%dbyte ", len));
 			size += len;
@@ -686,40 +716,42 @@ public final class Server extends OneServer {
 	@Override
 	public String getMsg(int messageNo) {
 		switch (messageNo) {
-			case 1:
-				return isJp() ? "パラメータが長すぎます（不正なリクエストの可能性があるため切断しました)" : "A parameter is too long (I cut it off so that there was possibility of an unjust request in it)";
-			case 2:
-				return isJp() ? "ホームディレクトリが存在しません（処理が継続できないため切断しました)" : "There is not a home directory (because I cannot continue processing, I cut it off)";
-			case 3:
-				return isJp() ? "コマンド処理でエラーが発生しました" : "An error occurred by command processing";
-			case 5:
-				return "login";
-			case 6:
-				return "login";
-			case 7:
-				return "success";
-			case 8:
-				return "RENAME";
-			case 9:
-				return "UP start";
-			case 10:
-				return "UP end";
-			case 11:
-				return "DOWN start";
-			case 12:
-				return "DOWN end";
-			case 13:
-				return "logout";
-			case 14:
-				return isJp() ? "ユーザ名が無効です" : "A user name is null and void";
-			case 15:
-				return isJp() ? "パスワードが違います" : "password is different";
-			case 16:
-				return "sendBinary() IOException";
-			case 17:
-				return "recvBinary() IOException";
-			default:
-				break;
+		case 1:
+			return isJp() ? "パラメータが長すぎます（不正なリクエストの可能性があるため切断しました)"
+					: "A parameter is too long (I cut it off so that there was possibility of an unjust request in it)";
+		case 2:
+			return isJp() ? "ホームディレクトリが存在しません（処理が継続できないため切断しました)"
+					: "There is not a home directory (because I cannot continue processing, I cut it off)";
+		case 3:
+			return isJp() ? "コマンド処理でエラーが発生しました" : "An error occurred by command processing";
+		case 5:
+			return "login";
+		case 6:
+			return "login";
+		case 7:
+			return "success";
+		case 8:
+			return "RENAME";
+		case 9:
+			return "UP start";
+		case 10:
+			return "UP end";
+		case 11:
+			return "DOWN start";
+		case 12:
+			return "DOWN end";
+		case 13:
+			return "logout";
+		case 14:
+			return isJp() ? "ユーザ名が無効です" : "A user name is null and void";
+		case 15:
+			return isJp() ? "パスワードが違います" : "password is different";
+		case 16:
+			return "sendBinary() IOException";
+		case 17:
+			return "recvBinary() IOException";
+		default:
+			break;
 		}
 		return null;
 	}

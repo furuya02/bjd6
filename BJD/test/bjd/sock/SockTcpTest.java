@@ -2,18 +2,17 @@ package bjd.sock;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import bjd.ILife;
+import bjd.Kernel;
 import bjd.ThreadBase;
 import bjd.ValidObjException;
 import bjd.net.Ip;
 import bjd.net.ProtocolKind;
 import bjd.net.Ssl;
-import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public final class SockTcpTest implements ILife {
@@ -29,7 +28,7 @@ public final class SockTcpTest implements ILife {
 
 		public EchoServer(String addr, int port) {
 			super(null);
-			sockServer = new SockServer(ProtocolKind.Tcp);
+			sockServer = new SockServer(new Kernel(), ProtocolKind.Tcp);
 			this.addr = addr;
 			this.port = port;
 		}
@@ -79,16 +78,16 @@ public final class SockTcpTest implements ILife {
 	public void Echoサーバに送信して溜まったデータサイズ_lengthを確認する() throws Exception {
 		//setUp
 		String addr = "127.0.0.1";
-		int port = 9992;
+		int port = 9982;
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
 
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		int max = 1000;
 		for (int i = 0; i < 3; i++) {
 			sut.send(new byte[max]);
 		}
-		Util.sleep(100);
+		Util.sleep(200);
 
 		int expected = max * 3;
 
@@ -106,7 +105,7 @@ public final class SockTcpTest implements ILife {
 	@Test
 	public void Echoサーバにsendで送信てtcpQueueのlength分ずつRecvする() {
 		String addr = "127.0.0.1";
-		int port = 9992;
+		int port = 9981;
 
 		EchoServer echoServer = new EchoServer(addr, port);
 		echoServer.start();
@@ -119,8 +118,7 @@ public final class SockTcpTest implements ILife {
 		} catch (ValidObjException ex) {
 			Assert.fail(ex.getMessage());
 		}
-		SockTcp sockTcp = new SockTcp(ip, port, timeout, ssl);
-		TestUtil.prompt("tcpObj = new TcpObj()");
+		SockTcp sockTcp = new SockTcp(new Kernel(), ip, port, timeout, ssl);
 
 		int max = 1000;
 		int loop = 3;
@@ -131,7 +129,6 @@ public final class SockTcpTest implements ILife {
 
 		int recvCount = 0;
 		for (int i = 0; i < loop; i++) {
-			TestUtil.prompt(String.format("tcpObj.send(%dbyte)", tmp.length));
 			int len = sockTcp.send(tmp);
 			Assert.assertEquals(len, tmp.length);
 
@@ -139,15 +136,12 @@ public final class SockTcpTest implements ILife {
 
 			byte[] b = sockTcp.recv(len, timeout, this);
 			recvCount += b.length;
-			TestUtil.prompt(String.format("len=%d  recv()=%d", len, b.length));
 			for (int m = 0; m < max; m += 10) {
 				Assert.assertEquals(b[m], tmp[m]); //送信したデータと受信したデータが同一かどうかのテスト
 			}
 		}
-		TestUtil.prompt(String.format("loop*max=%dbyte  recvCount:%d", loop * max, recvCount));
 		Assert.assertEquals(loop * max, recvCount); //送信したデータ数と受信したデータ数が一致するかどうかのテスト
 
-		TestUtil.prompt(String.format("tcpObj.close()"));
 		sockTcp.close();
 		echoServer.stop();
 	}
@@ -160,7 +154,7 @@ public final class SockTcpTest implements ILife {
 
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		sut.stringSend("本日は晴天なり", "UTF-8");
 		Util.sleep(10);
 
@@ -185,7 +179,7 @@ public final class SockTcpTest implements ILife {
 
 		EchoServer sv = new EchoServer(addr, port);
 		sv.start();
-		SockTcp sut = new SockTcp(new Ip(addr), port, 100, null);
+		SockTcp sut = new SockTcp(new Kernel(), new Ip(addr), port, 100, null);
 		sut.lineSend("本日は晴天なり".getBytes("UTF-8"));
 		Util.sleep(10);
 

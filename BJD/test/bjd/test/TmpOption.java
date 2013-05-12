@@ -1,21 +1,26 @@
 package bjd.test;
 
 import java.io.File;
+import java.io.IOException;
 
 import bjd.Kernel;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class TmpOption implements IDispose {
+public final class TmpOption implements IDisposable {
 	private Kernel kernel = new Kernel();
 	private File origin;
 	private File backup;
 	private File target = null;
 	private String testDataPath;
 
-	public TmpOption(String fileName) {
-		String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
-		testDataPath = String.format("%s\\testData", currentDir);
+	public TmpOption(String subDir, String fileName) throws IOException {
+		//String currentDir = new File(".").getAbsoluteFile().getParent(); // カレントディレクトリ
+		//testDataPath = String.format("%s\\testData", currentDir);
+		testDataPath = Util.createTempDirectory().getPath();
+
+		//TODO Debug Print
+		//System.out.println(String.format("□currentDir=%s",currentDir));
 
 		String originName = String.format("%s\\Option.ini", kernel.getProgDir());
 		String backupName = String.format("%s\\Option.bak", testDataPath);
@@ -25,7 +30,7 @@ public final class TmpOption implements IDispose {
 		//BACKUPファイル
 		backup = new File(backupName);
 		//上書きファイル
-		String targetName = String.format("%s\\%s", testDataPath, fileName);
+		String targetName = String.format("%s\\%s\\%s", TestUtil.getProhjectDirectory(), subDir, fileName);
 		target = new File(targetName);
 
 		if (!target.exists()) {

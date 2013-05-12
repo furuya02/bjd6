@@ -10,10 +10,10 @@ import javax.swing.JViewport;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
 @SuppressWarnings("serial")
-public final class ListView extends JScrollPane implements IDispose {
+public final class ListView extends JScrollPane implements IDisposable {
 
 	private JTable table = null;
 	private DefaultTableModel model;

@@ -18,6 +18,10 @@ public final class TestUtil {
 		//デフォルトコンストラクタの隠蔽
 	}
 
+	public static String getProhjectDirectory() {
+		return "c:\\dev\\bjd6";
+	}
+
 	/**
 	 * テンポラリディレクトリの作成<br>
 	 * 最初に呼ばれたとき、ディレクトリが存在しないので、新規に作成される
@@ -71,33 +75,33 @@ public final class TestUtil {
 	 * テスト用のプロンプト
 	 * @param str 詳細情報
 	 */
-	public static void prompt(String msg) {
-		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
-		String className = "";
-		String methodName = "";
-
-		String str = ste[2].getClassName();
-		String[] n = str.split("\\$");
-		if (n.length == 1) {
-			String[] m = str.split("\\.");
-			className = m[m.length - 1];
-			methodName = ste[2].getMethodName();
-
-		} else {
-			String[] m = n[0].split("\\.");
-			className = m[m.length - 1];
-			methodName = n[1];
-		}
-		String banner = String.format("%s %s", className, methodName);
-		if (!banner.equals(lastBanner)) {
-			lastBanner = banner;
-			System.out.println("-------------------------------------------------------------------");
-			System.out.println(banner);
-			System.out.println("-------------------------------------------------------------------");
-		}
-		System.out.println(msg);
-	}
+	//	public static void prompt(String msg) {
+	//		StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+	//
+	//		String className = "";
+	//		String methodName = "";
+	//
+	//		String str = ste[2].getClassName();
+	//		String[] n = str.split("\\$");
+	//		if (n.length == 1) {
+	//			String[] m = str.split("\\.");
+	//			className = m[m.length - 1];
+	//			methodName = ste[2].getMethodName();
+	//
+	//		} else {
+	//			String[] m = n[0].split("\\.");
+	//			className = m[m.length - 1];
+	//			methodName = n[1];
+	//		}
+	//		String banner = String.format("%s %s", className, methodName);
+	//		if (!banner.equals(lastBanner)) {
+	//			lastBanner = banner;
+	//			System.out.println("-------------------------------------------------------------------");
+	//			System.out.println(banner);
+	//			System.out.println("-------------------------------------------------------------------");
+	//		}
+	//		System.out.println(msg);
+	//	}
 
 	/**
 	 * テスト用のIpオブジェクトの生成<br>
@@ -113,6 +117,17 @@ public final class TestUtil {
 			Assert.fail(String.format("%s %s", e.getClass(), e.getMessage()));
 		}
 		return ip;
+	}
+
+	//************************************************
+	//パケットストリームの変換
+	//************************************************
+	public static byte[] hexStream2Bytes(String str) {
+		byte[] buf = new byte[str.length() / 2];
+		for (int i = 0; i < buf.length; i++) {
+			buf[i] = (byte) Integer.parseInt(str.substring(i * 2, (i + 1) * 2), 16);
+		}
+		return buf;
 	}
 
 	//************************************************
@@ -134,5 +149,33 @@ public final class TestUtil {
 		str = str.replaceAll("\r", "/r");
 		str = str.replaceAll("\n", "/n");
 		return str;
+	}
+
+	//************************************************
+	//待ち時間が長い場合に、コンソールの＊を表示する
+	//************************************************
+	/**
+	 * 待ち時間が長い場合に、コンソールの＊を表示する
+	 * @param msg msg==nullの時、改行のみ表示（TearDown用）
+	 */
+	public static void waitDisp(String msg) {
+		if (msg == null) {
+			System.out.println("");
+		} else {
+			System.out.print("\n" + msg);
+			Runnable r = new Runnable() {
+				public void run() {
+					while (true) {
+						System.out.print("*");
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+						}
+					}
+				}
+			};
+			Thread thr1 = new Thread(r);
+			thr1.start();
+		}
 	}
 }

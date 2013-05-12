@@ -1,7 +1,8 @@
 package bjd.ctrl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -9,11 +10,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import bjd.RunMode;
+import bjd.Kernel;
 import bjd.option.Crlf;
 import bjd.option.ListVal;
 import bjd.option.OneVal;
-import bjd.test.TestUtil;
 
 public class CtrlDatTest {
 
@@ -21,12 +21,11 @@ public class CtrlDatTest {
 	public final void privateメンバのimportDatとexportDatの整合性を確認する() {
 
 		boolean isJp = true;
-		RunMode runMode = RunMode.Normal;
-		boolean editBrowse = false;
+		Kernel kernel = new Kernel();
 
 		ListVal list = new ListVal();
 		list.add(new OneVal("combo", 0, Crlf.NEXTLINE, new CtrlComboBox("コンボボックス", new String[] { "DOWN", "PU", "FULL" }, 200)));
-		list.add(new OneVal("fileName2", "c:\\work", Crlf.NEXTLINE, new CtrlFolder(isJp, "フォルダ", 30, runMode, editBrowse)));
+		list.add(new OneVal("fileName2", "c:\\work", Crlf.NEXTLINE, new CtrlFolder("フォルダ", 30, kernel)));
 		list.add(new OneVal("text", "user1", Crlf.NEXTLINE, new CtrlTextBox("テキスト入力", 30)));
 		list.add(new OneVal("hidden", "123", Crlf.NEXTLINE, new CtrlHidden("パスワード", 30)));
 		CtrlDat sut = new CtrlDat("help", list, 100, isJp);
@@ -48,8 +47,8 @@ public class CtrlDatTest {
 			ArrayList<String> out = (ArrayList<String>) exportDat.invoke(sut);
 
 			for (int i = 0; i < in.size(); i++) {
-				TestUtil.prompt(String.format("import> %s", in.get(i)));
-				TestUtil.prompt(String.format("export> %s", out.get(i)));
+				//TestUtil.prompt(String.format("import> %s", in.get(i)));
+				//TestUtil.prompt(String.format("export> %s", out.get(i)));
 				
 				assertThat(in.get(i), is(out.get(i)));
 			}

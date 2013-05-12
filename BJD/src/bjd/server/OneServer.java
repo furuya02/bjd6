@@ -47,6 +47,13 @@ public abstract class OneServer extends ThreadBase {
 	private int timeout;
 	private boolean isJp;
 
+	//このKernelはTrace()のためだけに使用されているので、Traceしない場合は削除することができる
+	private Kernel kernel;
+
+	public Kernel getKernel() {
+		return kernel;
+	}
+
 	protected final Conf getConf() {
 		return conf;
 	}
@@ -78,7 +85,7 @@ public abstract class OneServer extends ThreadBase {
 	@Override
 	public final String toString() {
 		String stat = isJp() ? "+ サービス中 " : "+ In execution ";
-		if (!isRunnig()) {
+		if (!isRunning()) {
 			stat = isJp() ? "- 停止 " : "- Initialization failure ";
 		}
 		return String.format("%s\t%20s\t[%s\t:%s %s]\tThread %d/%d", stat, getNameTag(), oneBind.getAddr(), oneBind
@@ -108,10 +115,11 @@ public abstract class OneServer extends ThreadBase {
 	}
 
 	//コンストラクタ
-	protected OneServer(Kernel kernel, String nameTag, Conf conf, OneBind oneBind) {
-		super(kernel.createLogger(nameTag, true, null));
+	protected OneServer(Kernel kernel, Conf conf, OneBind oneBind) {
+		super(kernel.createLogger(conf.getNameTag(), true, null));
 
-		this.nameTag = nameTag;
+		this.kernel = kernel;
+		this.nameTag = conf.getNameTag();
 		this.conf = conf;
 		this.oneBind = oneBind;
 		this.isJp = kernel.isJp();
@@ -204,7 +212,7 @@ public abstract class OneServer extends ThreadBase {
 		//DOSを受けた場合、multiple数まで連続アクセスまでは記憶してしまう
 		//DOSが終わった後も、その分だけ復帰に時間を要する
 
-		sockServer = new SockServer(oneBind.getProtocol());
+		sockServer = new SockServer(getKernel(), oneBind.getProtocol());
 
 		if (sockServer.getSockState() != SockState.Error) {
 			if (sockServer.getProtocolKind() == ProtocolKind.Tcp) {
@@ -261,7 +269,7 @@ public abstract class OneServer extends ThreadBase {
 	private void runUdpServer(int port) {
 
 		if (!sockServer.bind(oneBind.getAddr(), port)) {
-			System.out.println(String.format("bind()=false %s", sockServer.getLastEror()));
+			logger.set(LogKind.ERROR, sockServer, 9000006, sockServer.getLastEror());
 		} else {
 
 			while (isLife()) {

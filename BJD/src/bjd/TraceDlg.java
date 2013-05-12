@@ -3,10 +3,10 @@ package bjd;
 import javax.swing.JFrame;
 
 import bjd.net.Ip;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 
 @SuppressWarnings("serial")
-public final class TraceDlg extends Dlg implements IDispose {
+public final class TraceDlg extends Dlg implements IDisposable {
 
 	private static int width = 300;
 	private static int height = 300;

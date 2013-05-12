@@ -1,7 +1,7 @@
 package bjd.log;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -11,64 +11,63 @@ import org.junit.Test;
 import bjd.ValidObjException;
 
 public final class OneLogTest {
-	
+
+	private String nameTag = "NAME";
+	private long threadId = 100;
+	private String remoteHostname = "127.0.0.1";
+	private int messageId = 200;
+	private String message = "MSG";
+	private String detailInfomation = "DETAIL";
+
+	private Calendar getCalendar() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date(0));
+		return calendar;
+	}
+
 	@Test(expected = ValidObjException.class)
 	public void 無効な文字列で初期化すると例外_ValidObjException_が発生する() throws Exception {
 		//exercise
 		new OneLog("xxx");
 	}
-	
+
 	@Test
 	public void toStringによる出力の確認() throws Exception {
 		//setUp
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date(0)); // 1970.1.1で初期化
-		LogKind logKind = LogKind.DEBUG;
-		String nameTag = "NAME";
-		long threadId = 100;
-		String remoteHostname = "127.0.0.1";
-		int messageId = 200;
-		String message = "MSG";
-		String detailInfomation = "DETAIL";
-		OneLog sut = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
-
+		OneLog sut = new OneLog(getCalendar(), LogKind.DEBUG, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
 		String expected = "1970/01/01 09:00:00\tDEBUG\t100\tNAME\t127.0.0.1\t0000200\tMSG\tDETAIL";
 		//exercise
-		String actual = sut.toString(); 
+		String actual = sut.toString();
 		//verify
 		assertThat(actual, is(expected));
 	}
 
 	@Test
-	public void セキュアログの確認() {
+	public void isSecureによる確認_LogKind_SECUREでtrueが返る() {
 
 		//setUp
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date(0)); // 1970.1.1で初期化
-		String nameTag = "NAME";
-		long threadId = 100;
-		String remoteHostname = "127.0.0.1";
-		int messageId = 200;
-		String message = "MSG";
-		String detailInfomation = "DETAIL";
-		
-		//exercise
-		LogKind logKind = LogKind.SECURE; //セキュアログの場合
+		LogKind logKind = LogKind.SECURE;
 		boolean expected = true;
-		OneLog sut = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
-		boolean actual = sut.isSecure(); 
-
-		//verify
-		assertThat(actual, is(expected));
-		
+		OneLog sut = new OneLog(getCalendar(), logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
 		//exercise
-		logKind = LogKind.DEBUG; //セキュアログ以外の場合
-		expected = false;
-		sut = new OneLog(calendar, logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
-		actual = sut.isSecure(); 
-		
+		boolean actual = sut.isSecure();
 		//verify
 		assertThat(actual, is(expected));
 
 	}
+
+	@Test
+	public void isSecureによる確認_LogKind_DEBUGでfalseが返る() {
+
+		//setUp
+		LogKind logKind = LogKind.DEBUG;
+		boolean expected = false;
+		OneLog sut = new OneLog(getCalendar(), logKind, nameTag, threadId, remoteHostname, messageId, message, detailInfomation);
+		//exercise
+		boolean actual = sut.isSecure();
+		//verify
+		assertThat(actual, is(expected));
+
+	}
+
 }

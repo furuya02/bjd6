@@ -18,7 +18,7 @@ import bjd.ctrl.OnePage;
 import bjd.net.BindAddr;
 import bjd.net.Ip;
 import bjd.util.Crypt;
-import bjd.util.IDispose;
+import bjd.util.IDisposable;
 import bjd.util.Msg;
 import bjd.util.MsgKind;
 
@@ -29,7 +29,7 @@ import bjd.util.MsgKind;
  * @author SIN
  *
  */
-public final class OneVal implements IDispose {
+public final class OneVal implements IDisposable {
 
 	private String name;
 	private Object value;
@@ -98,6 +98,29 @@ public final class OneVal implements IDispose {
 			ArrayList<OnePage> pageList = ((CtrlTabPage) oneCtrl).getPageList();
 			for (OnePage onePage : pageList) {
 				list = onePage.getListVal().getList(list);
+			}
+		}
+		list.add(this);
+		return list;
+	}
+	/**
+	 * 階層下のOneValを一覧する<br>
+	 * Datの階層下は再帰しない<br>
+	 * toREg()用に使用される<br>
+	 */
+	public ArrayList<OneVal> getSaveList(ArrayList<OneVal> list) {
+		if (list == null) {
+			list = new ArrayList<>();
+		}
+
+		//if (oneCtrl.getCtrlType() == CtrlType.DAT) {
+		//	list = ((CtrlDat) oneCtrl).getListVal().getList(list);
+		if (oneCtrl.getCtrlType() == CtrlType.GROUP) {
+			list = ((CtrlGroup) oneCtrl).getListVal().getList(list);
+		} else if (oneCtrl.getCtrlType() == CtrlType.TABPAGE) {
+			ArrayList<OnePage> pageList = ((CtrlTabPage) oneCtrl).getPageList();
+			for (OnePage onePage : pageList) {
+				list = onePage.getListVal().getSaveList(list);
 			}
 		}
 		list.add(this);
@@ -192,6 +215,10 @@ public final class OneVal implements IDispose {
 	public String toReg(boolean isSecret) {
 		switch (oneCtrl.getCtrlType()) {
 			case DAT:
+				if (value == null) {
+					Dat d = new Dat(((CtrlDat) oneCtrl).getCtrlTypeList());
+					return d.toReg(isSecret);
+				}
 				return ((Dat) value).toReg(isSecret);
 			case CHECKBOX:
 				return String.valueOf(value);
@@ -214,7 +241,7 @@ public final class OneVal implements IDispose {
 				} catch (Exception e) {
 					return "ERROR";
 				}
-				
+
 			case MEMO:
 				return ((String) value).replaceAll("\r\n", "\t");
 			case RADIO:
@@ -231,7 +258,7 @@ public final class OneVal implements IDispose {
 			default:
 				return ""; // "実装されていないCtrlTypeが指定されました OneVal.toReg()"
 		}
-	} 
+	}
 
 	/**
 	 * 出力ファイル(Option.ini)からの入力用<br>
@@ -361,5 +388,5 @@ public final class OneVal implements IDispose {
 		}
 		return true;
 	}
-
+	
 }

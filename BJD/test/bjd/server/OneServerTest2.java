@@ -1,8 +1,7 @@
 package bjd.server;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class OneServerTest2 implements ILife {
 		private ProtocolKind protocolKind;
 
 		public EchoServer(Conf conf, OneBind oneBind) {
-			super(new Kernel(), "EchoServer", conf, oneBind);
+			super(new Kernel(), conf, oneBind);
 
 			protocolKind = oneBind.getProtocol();
 		}
@@ -70,7 +69,7 @@ public class OneServerTest2 implements ILife {
 		}
 
 		private void udp(SockUdp sockUdp) {
-			byte[] buf = sockUdp.recv();
+			byte[] buf = sockUdp.getRecvBuf();
 			sockUdp.send(buf);
 			//echoしたらセッションを閉じる
 		}
@@ -105,21 +104,17 @@ public class OneServerTest2 implements ILife {
 		byte[] buf = new byte[max];
 		buf[8] = 100; //CheckData
 		for (int i = 0; i < 3; i++) {
-			SockTcp sockTcp = new SockTcp(ip, port, timeout, null);
-			TestUtil.prompt(String.format("[%d] sockTcp = new SockTcp(%s,%d)", i, addr, port));
+			SockTcp sockTcp = new SockTcp(new Kernel(), ip, port, timeout, null);
 
 			int len = sockTcp.send(buf);
-			TestUtil.prompt(String.format("sockTcp.send(%dbyte)", len));
 
 			while (sockTcp.length() == 0) {
 				Util.sleep(100);
-				TestUtil.prompt("Thread.sleep(100)");
 			}
 
 			len = sockTcp.length();
 			if (0 < len) {
 				byte[] b = sockTcp.recv(len, timeout, this);
-				TestUtil.prompt(String.format("sockTcp.recv()=%dbyte", b.length));
 				assertThat(b[8], is(buf[8])); //CheckData
 			}
 			assertThat(max, is(len));
@@ -162,17 +157,8 @@ public class OneServerTest2 implements ILife {
 		buf[8] = 100; //CheckData
 
 		for (int i = 0; i < 3; i++) {
-			SockUdp sockUdp = new SockUdp(ip, port, timeout, null, buf);
-			TestUtil.prompt(
-					String.format("[%d] sockUdp = new SockUdp(%s,%d,%dbytes)", i, addr, port, buf.length));
-
-			while (sockUdp.length() == 0) {
-				Util.sleep(100);
-				TestUtil.prompt("Thread.sleep(100)");
-			}
-
-			byte[] b = sockUdp.recv();
-			TestUtil.prompt(String.format("sockUdp.recv()=%dbyte", b.length));
+			SockUdp sockUdp = new SockUdp(new Kernel(), ip, port, null, buf);
+			byte[] b = sockUdp.recv(timeout);
 			assertThat(b[8], is(buf[8])); //CheckData
 			assertThat(max, is(b.length));
 
