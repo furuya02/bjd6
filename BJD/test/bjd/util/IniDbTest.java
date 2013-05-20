@@ -103,9 +103,7 @@ public class IniDbTest {
 			//verify
 			assertThat(actual, is(expected));
 			//tearDown
-			sut.deleteIni();
-			sut.deleteTxt();
-			sut.deleteBak();
+			sut.delete();
 		}
 	}
 
@@ -146,9 +144,7 @@ public class IniDbTest {
 			String path = String.format("%s\\%s.ini", progDir, fileName);
 
 			IniDb sut = new IniDb(progDir, fileName);
-			sut.deleteIni();
-			sut.deleteTxt();
-			sut.deleteBak();
+			sut.delete();
 
 			String expected = fx.value;
 			//exercise
@@ -167,9 +163,7 @@ public class IniDbTest {
 			assertThat(actual, is(expected));
 
 			//TearDown
-			sut.deleteIni();
-			sut.deleteTxt();
-			sut.deleteBak();
+			sut.delete();
 		}
 	}
 	

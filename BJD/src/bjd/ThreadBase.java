@@ -14,7 +14,9 @@ import bjd.util.Util;
  */
 public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	private MyThread myThread = null;
-	private boolean isRunning = false;
+
+	//private boolean isRunning = false;
+	private ThreadBaseKind threadBaseKind = ThreadBaseKind.Before;
 	private boolean life;
 	private Logger logger;
 
@@ -27,11 +29,11 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	}
 
 	/**
-	 * スレッドが動作中かどうか
+	 * スレッドの状態
 	 * @return
 	 */
-	public final boolean isRunning() {
-		return isRunning;
+	public final ThreadBaseKind getThreadBaseKind() {
+		return threadBaseKind;
 	}
 
 	/**
@@ -62,19 +64,21 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	 * Override可能<br>
 	 */
 	public void start() {
-		if (isRunning()) {
+		if (threadBaseKind == ThreadBaseKind.Running) {
 			return;
 		}
 		if (!onStartThread()) {
 			return;
 		}
 		//try {
-			life = true;
-			myThread = new MyThread();
-			myThread.start();
-			while (!isRunning()) { //start()を抜けた時点でisRunnigがtrueになるように、スレッド処理を待つ
-				Util.sleep(10);
-			}
+		threadBaseKind = ThreadBaseKind.Before;
+		
+		life = true;
+		myThread = new MyThread();
+		myThread.start();
+		while (threadBaseKind == ThreadBaseKind.Before) {
+			Util.sleep(10);
+		}
 
 		//} catch (Exception ex) {
 		//	ex.printStackTrace();
@@ -91,9 +95,19 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	 * Override可能<br>
 	 */
 	public void stop() {
-		life = false; //スイッチを切るとLoop内の無限ループからbreakする
-		while (isRunning()) { //stop()を抜けた時点でisRunnigがfalseになるように、処理が終了するまで待つ
-			Util.sleep(100);
+		//		life = false; //スイッチを切るとLoop内の無限ループからbreakする
+		//		while (threadBaseKind == ThreadBaseKind.Running) { //stop()を抜けた時点でisRunnigがfalseになるように、処理が終了するまで待つ
+		//			//Util.sleep(100);
+		//			while (threadBaseKind!=ThreadBaseKind.After) {
+		//				Util.sleep(100);//breakした時点でAfterになるので、ループを抜けるまでここで待つ
+		//            }
+		//		}
+
+		if (myThread != null && threadBaseKind == ThreadBaseKind.Running) {
+			life = false; //スイッチを切るとLoop内の無限ループからbreakする
+			while (threadBaseKind != ThreadBaseKind.After) {
+				Util.sleep(100); //breakした時点でAfterになるので、ループを抜けるまでここで待つ
+			}
 		}
 		onStopThread();
 		myThread = null;
@@ -107,7 +121,8 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 	private class MyThread extends Thread {
 		@Override
 		public void run() {
-			isRunning = true;
+			//isRunning = true;
+			threadBaseKind = ThreadBaseKind.Running;
 			try {
 				onRunThread();
 			} catch (Exception ex) {
@@ -116,7 +131,8 @@ public abstract class ThreadBase implements IDisposable, ILogger, ILife {
 				}
 			}
 			//	kernel.getView().setColor();
-			isRunning = false;
+			//isRunning = false;
+			threadBaseKind = ThreadBaseKind.After;
 		}
 	}
 }

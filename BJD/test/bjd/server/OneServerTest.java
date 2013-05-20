@@ -12,6 +12,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import bjd.Kernel;
+import bjd.ThreadBaseKind;
 import bjd.ValidObjException;
 import bjd.ctrl.CtrlType;
 import bjd.net.Ip;
@@ -127,11 +128,11 @@ public class OneServerTest {
 
 			//			Util.sleep(500);
 
-			assertThat(myServer.isRunning(), is(true));
+			assertThat(myServer.getThreadBaseKind(), is(ThreadBaseKind.Running));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			assertThat(myServer.isRunning(), is(false));
+			assertThat(myServer.getThreadBaseKind(), is(ThreadBaseKind.After));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 		}
@@ -155,11 +156,11 @@ public class OneServerTest {
 			MyServer myServer = new MyServer(conf, oneBind);
 
 			myServer.start();
-			assertThat(myServer.isRunning(), is(true));
+			assertThat(myServer.getThreadBaseKind(), is(ThreadBaseKind.Running));
 			assertThat(myServer.getSockState(), is(SockState.Bind));
 
 			myServer.stop();
-			assertThat(myServer.isRunning(), is(false));
+			assertThat(myServer.getThreadBaseKind(), is(ThreadBaseKind.After));
 			assertThat(myServer.getSockState(), is(SockState.Error));
 
 			myServer.dispose();

@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import bjd.test.TestUtil;
 import bjd.util.Util;
 
 public final class ThreadBaseTest {
@@ -40,12 +39,12 @@ public final class ThreadBaseTest {
 	}
 
 	@Test
-	public void startする前はisRunningはfalseとなる() throws Exception {
+	public void startする前はThreadBaeKindはBeforeとなる() throws Exception {
 		//setUp
 		MyThread sut = new MyThread();
-		boolean expected = false;
+		ThreadBaseKind expected = ThreadBaseKind.Before;
 		//exercise
-		boolean actual = sut.isRunning();
+		ThreadBaseKind actual = sut.getThreadBaseKind();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -56,10 +55,10 @@ public final class ThreadBaseTest {
 	public void startするとisRunningはtrueとなる() throws Exception {
 		//setUp
 		MyThread sut = new MyThread();
-		boolean expected = true;
+		ThreadBaseKind expected = ThreadBaseKind.Running;
 		//exercise
 		sut.start();
-		boolean actual = sut.isRunning();
+		ThreadBaseKind actual = sut.getThreadBaseKind();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -70,11 +69,11 @@ public final class ThreadBaseTest {
 	public void startは重複しても問題ない() throws Exception {
 		//setUp
 		MyThread sut = new MyThread();
-		boolean expected = true;
+		ThreadBaseKind expected = ThreadBaseKind.Running;
 		//exercise
 		sut.start();
 		sut.start(); //重複
-		boolean actual = sut.isRunning();
+		ThreadBaseKind actual = sut.getThreadBaseKind();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -85,13 +84,13 @@ public final class ThreadBaseTest {
 	public void stopは重複しても問題ない() throws Exception {
 		//setUp
 		MyThread sut = new MyThread();
-		boolean expected = false;
+		ThreadBaseKind expected = ThreadBaseKind.After;
 		//exercise
 		sut.stop(); //重複
 		sut.start();
 		sut.stop();
 		sut.stop(); //重複
-		boolean actual = sut.isRunning();
+		ThreadBaseKind actual = sut.getThreadBaseKind();
 		//verify
 		assertThat(actual, is(expected));
 		//tearDown
@@ -106,9 +105,9 @@ public final class ThreadBaseTest {
 		//exercise verify 
 		for (int i = 0; i < 5; i++) {
 			sut.start();
-			assertThat(sut.isRunning(), is(true));
+			assertThat(sut.getThreadBaseKind(), is(ThreadBaseKind.Running));
 			sut.stop();
-			assertThat(sut.isRunning(), is(false));
+			assertThat(sut.getThreadBaseKind(), is(ThreadBaseKind.After));
 		}
 		//tearDown
 		sut.dispose();
@@ -121,9 +120,9 @@ public final class ThreadBaseTest {
 		for (int i = 0; i < 3; i++) {
 			MyThread sut = new MyThread();
 			sut.start();
-			assertThat(sut.isRunning(), is(true));
+			assertThat(sut.getThreadBaseKind(), is(ThreadBaseKind.Running));
 			sut.stop();
-			assertThat(sut.isRunning(), is(false));
+			assertThat(sut.getThreadBaseKind(), is(ThreadBaseKind.After));
 			sut.dispose();
 		}
 	}

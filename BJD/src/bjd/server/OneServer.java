@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import bjd.Kernel;
 import bjd.ThreadBase;
+import bjd.ThreadBaseKind;
 import bjd.acl.AclKind;
 import bjd.acl.AclList;
 import bjd.ctrl.CtrlType;
@@ -85,7 +86,7 @@ public abstract class OneServer extends ThreadBase {
 	@Override
 	public final String toString() {
 		String stat = isJp() ? "+ サービス中 " : "+ In execution ";
-		if (!isRunning()) {
+		if (getThreadBaseKind() != ThreadBaseKind.Running) {
 			stat = isJp() ? "- 停止 " : "- Initialization failure ";
 		}
 		return String.format("%s\t%20s\t[%s\t:%s %s]\tThread %d/%d", stat, getNameTag(), oneBind.getAddr(), oneBind
