@@ -1,60 +1,36 @@
 package bjd.menu;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 
 import bjd.Kernel;
 import bjd.RunMode;
-import bjd.util.IDisposable;
 
 /**
  * メニューを管理するクラス
  * @author SIN
  *
  */
-public final class Menu implements ActionListener, IDisposable {
+public final class Menu extends MenuBase {
 	private Kernel kernel;
-	private JMenuBar menuBar;
-	private ArrayList<JMenuItem> ar = new ArrayList<>();
+//	private JMenuBar menuBar;
 
 	/**
 	 * @param kernel
 	 * @param menuBar
 	 */
 	public Menu(Kernel kernel, JMenuBar menuBar) {
+		super(kernel,menuBar);
 		this.kernel = kernel;
-		this.menuBar = menuBar;
 	}
 
-	/**
-	 * 終了処理
-	 */
-	@Override
-	public void dispose() {
-		while (menuBar.getMenuCount() > 0) {
-			JMenu m = menuBar.getMenu(0);
-			m.removeAll();
-			menuBar.remove(m);
-		}
-		menuBar.invalidate();
-	}
 
 	/**
 	 * メニュー構築（内部テーブルの初期化） リモート用
 	 */
 	public void initializeRemote() {
-		if (menuBar == null) {
-			return;
-		}
-
 		//全削除
-		menuBar.removeAll();
+		removeAll();
 
 		ListMenu subMenu = new ListMenu();
 		subMenu.add(new OneMenu("File_Exit", "終了", "Exit", 'X', null));
@@ -68,13 +44,7 @@ public final class Menu implements ActionListener, IDisposable {
 	 * メニュー構築（内部テーブルの初期化） 通常用
 	 */
 	public void initialize() {
-		if (menuBar == null) {
-			return;
-		}
-
-		//全削除
-		ar.clear();
-		dispose();
+		removeAll();
 
 		//「ファイル」メニュー
 		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
@@ -96,84 +66,16 @@ public final class Menu implements ActionListener, IDisposable {
 		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null));
 		addListMenu(m, helpMenu());
 
-		menuBar.updateUI(); //メニューバーの再描画
+		refresh();//メニューバーの再描画
 	}
 
-	/**
-	 * ListMenuの追加 (再帰)
-	 * @param owner 追加される親メニュ－
-	 * @param subMenu 追加する子メニューのリスト
-	 */
-	void addListMenu(JMenu owner, ListMenu subMenu) {
-		for (OneMenu o : subMenu) {
-			addSubMenu(owner, o);
-		}
-	}
 
-	/**
-	 * OneMenuの追加
-	 * @param owner 追加される親メニュ－
-	 * @param oneMenu 追加する子メニュー
-	 */
-	void addSubMenu(JMenu owner, OneMenu oneMenu) {
 
-		if (oneMenu.getName().equals("-")) {
-			owner.addSeparator();
-			return;
-		}
-		if (oneMenu.getSubMenu().size() != 0) {
-			JMenu m = createMenu(oneMenu);
-			addListMenu(m, oneMenu.getSubMenu()); //再帰処理
-			owner.add(m);
-		} else {
-			JMenuItem menuItem = createMenuItem(oneMenu);
-			JMenuItem item = (JMenuItem) owner.add(menuItem);
-			ar.add(item);
-		}
-	}
-
-	JMenu createMenu(OneMenu oneMenu) {
-		JMenu m = new JMenu(oneMenu.getTitle(kernel.isJp()));
-		m.setActionCommand(oneMenu.getName());
-		m.setMnemonic(oneMenu.getMnemonic());
-		//		JMenuにはアクセラレータを設定できない
-		//		if (oneMenu.getStrAccelerator() != null) {
-		//			m.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
-		//		}
-		m.addActionListener(this);
-		m.setName(oneMenu.getTitle(kernel.isJp()));
-		return m;
-	}
-
-	JMenuItem createMenuItem(OneMenu oneMenu) {
-		JMenuItem menuItem = new JMenuItem(oneMenu.getTitle(kernel.isJp()));
-		menuItem.setActionCommand(oneMenu.getName());
-		menuItem.setMnemonic(oneMenu.getMnemonic());
-		if (oneMenu.getStrAccelerator() != null) {
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
-		}
-		menuItem.addActionListener(this);
-		menuItem.setName(oneMenu.getTitle(kernel.isJp()));
-		return menuItem;
-	}
-
-	/**
-	 * メニューバーへの追加
-	 * @param oneMenu 追加する子メニュー
-	 * @return
-	 */
-	JMenu addTopMenu(OneMenu oneMenu) {
-		JMenu menu = new JMenu(oneMenu.getTitle(kernel.isJp()));
-		menu.setMnemonic(oneMenu.getMnemonic());
-		menuBar.add(menu);
-		return menu;
-	}
-
-	//メニュー選択時のイベント処理
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		kernel.menuOnClick(e.getActionCommand());
-	}
+//	//メニュー選択時のイベント処理
+//	@Override
+//	public void actionPerformed(ActionEvent e) {
+//		kernel.menuOnClick(e.getActionCommand());
+//	}
 
 	/**
 	 * 状況に応じた有効/無効のセット
@@ -210,20 +112,6 @@ public final class Menu implements ActionListener, IDisposable {
 			setEnabled("File_LogCopy", true);
 			setEnabled("File_Trace", true);
 			setEnabled("Tool", true);
-		}
-	}
-
-	/**
-	 * 有効/無効
-	 * @param name アクションコマンドに指定した名前
-	 * @param enabled 有効無効
-	 */
-	void setEnabled(String name, boolean enabled) {
-		for (JMenuItem m : ar) {
-			String s = m.getActionCommand(); //ActionCommandは、OneMenuのnameで初期化されている
-			if (s.equals(name)) {
-				m.setEnabled(enabled);
-			}
 		}
 	}
 

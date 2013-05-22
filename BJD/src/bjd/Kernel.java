@@ -23,11 +23,13 @@ import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.ListOption;
 import bjd.option.OneOption;
+import bjd.option.OptionDlg;
 import bjd.option.OptionIni;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
+import bjd.trace.TraceDlg;
 import bjd.util.IDisposable;
 import bjd.util.Util;
 

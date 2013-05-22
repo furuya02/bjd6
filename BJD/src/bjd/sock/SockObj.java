@@ -6,12 +6,12 @@ import java.util.ArrayList;
 
 import bjd.Kernel;
 import bjd.RunMode;
-import bjd.TraceKind;
 import bjd.ValidObjException;
 import bjd.log.LogKind;
 import bjd.log.Logger;
 import bjd.net.Ip;
 import bjd.net.IpKind;
+import bjd.trace.TraceKind;
 import bjd.util.Inet;
 import bjd.util.MLang;
 
