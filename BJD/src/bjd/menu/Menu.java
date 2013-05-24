@@ -12,23 +12,23 @@ import bjd.RunMode;
  *
  */
 public final class Menu extends MenuBase {
-	private Kernel kernel;
-//	private JMenuBar menuBar;
+	//private Kernel kernel;
+
+	//	private JMenuBar menuBar;
 
 	/**
 	 * @param kernel
 	 * @param menuBar
 	 */
-	public Menu(Kernel kernel, JMenuBar menuBar) {
-		super(kernel,menuBar);
-		this.kernel = kernel;
+	public Menu(Kernel kernel, IMenu iMenu, JMenuBar menuBar) {
+		super(iMenu, menuBar);
+		//this.kernel = kernel;
 	}
-
 
 	/**
 	 * メニュー構築（内部テーブルの初期化） リモート用
 	 */
-	public void initializeRemote() {
+	public void initializeRemote(boolean isJp) {
 		//全削除
 		removeAll();
 
@@ -36,52 +36,51 @@ public final class Menu extends MenuBase {
 		subMenu.add(new OneMenu("File_Exit", "終了", "Exit", 'X', null));
 
 		//「ファイル」メニュー
-		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
-		addListMenu(m, subMenu);
+		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null), isJp);
+		addListMenu(m, subMenu, isJp);
 	}
 
 	/**
 	 * メニュー構築（内部テーブルの初期化） 通常用
 	 */
-	public void initialize() {
+	public void initialize(ListMenu optionMenu, boolean isJp) {
 		removeAll();
 
 		//「ファイル」メニュー
-		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
-		addListMenu(m, fileMenu());
+		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null), isJp);
+		addListMenu(m, fileMenu(), isJp);
 
 		//「オプション」メニュー
-		m = addTopMenu(new OneMenu("Option", "オプション", "Option", 'O', null));
-		addListMenu(m, kernel.getListOption().getListMenu());
+		m = addTopMenu(new OneMenu("Option", "オプション", "Option", 'O', null), isJp);
+		//addListMenu(m, kernel.getListOption().getListMenu(), isJp);
+		addListMenu(m, optionMenu, isJp);
 
 		//「ツール」メニュー
-		m = addTopMenu(new OneMenu("Tool", "ツール", "Tool", 'T', null));
+		m = addTopMenu(new OneMenu("Tool", "ツール", "Tool", 'T', null), isJp);
 		//addListMenu(m, kernel.getListTool()getListMenu());
 
 		//「起動/停止」メニュー
-		m = addTopMenu(new OneMenu("StartStop", "起動/停止", "Start/Stop", 'S', null));
-		addListMenu(m, startStopMenu());
+		m = addTopMenu(new OneMenu("StartStop", "起動/停止", "Start/Stop", 'S', null), isJp);
+		addListMenu(m, startStopMenu(), isJp);
 
 		//「ヘルプ」メニュー
-		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null));
-		addListMenu(m, helpMenu());
+		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null), isJp);
+		addListMenu(m, helpMenu(), isJp);
 
 		refresh();//メニューバーの再描画
 	}
 
-
-
-//	//メニュー選択時のイベント処理
-//	@Override
-//	public void actionPerformed(ActionEvent e) {
-//		kernel.menuOnClick(e.getActionCommand());
-//	}
+	//	//メニュー選択時のイベント処理
+	//	@Override
+	//	public void actionPerformed(ActionEvent e) {
+	//		kernel.menuOnClick(e.getActionCommand());
+	//	}
 
 	/**
 	 * 状況に応じた有効/無効のセット
 	 */
-	public void setEnable() {
-		if (kernel.getRunMode() == RunMode.NormalRegist) { //サービス登録されている場合
+	public void setEnable(RunMode runMode, boolean isRunning) {
+		if (runMode == RunMode.NormalRegist) { //サービス登録されている場合
 			//サーバの起動停止はできない
 			setEnabled("StartStop_Start", false);
 			setEnabled("StartStop_Stop", false);
@@ -91,7 +90,7 @@ public final class Menu extends MenuBase {
 			setEnabled("File_LogCopy", false);
 			setEnabled("File_Trace", false);
 			setEnabled("Tool", false);
-		} else if (kernel.getRunMode() == RunMode.Remote) { //リモートクライアント
+		} else if (runMode == RunMode.Remote) { //リモートクライアント
 			//サーバの再起動のみ
 			setEnabled("StartStop_Start", false);
 			setEnabled("StartStop_Stop", false);
@@ -103,7 +102,7 @@ public final class Menu extends MenuBase {
 			setEnabled("Tool", true);
 		} else { //通常起動
 			//Util.sleep(0); //起動・停止が全部完了してから状態を取得するため
-			boolean isRunning = kernel.getListServer().isRunnig();
+			//			boolean isRunning = kernel.getListServer().isRunnig();
 			setEnabled("StartStop_Start", !isRunning);
 			setEnabled("StartStop_Stop", isRunning);
 			setEnabled("StartStop_Restart", isRunning);

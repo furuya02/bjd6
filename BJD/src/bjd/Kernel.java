@@ -16,6 +16,7 @@ import bjd.log.LogLimit;
 import bjd.log.LogView;
 import bjd.log.Logger;
 import bjd.log.TmpLogger;
+import bjd.menu.IMenu;
 import bjd.menu.Menu;
 import bjd.net.DnsCache;
 import bjd.net.LocalAddress;
@@ -33,7 +34,7 @@ import bjd.trace.TraceDlg;
 import bjd.util.IDisposable;
 import bjd.util.Util;
 
-public final class Kernel implements IDisposable {
+public final class Kernel implements IDisposable, IMenu {
 
 	//プロセス起動時に初期化される変数
 	private RunMode runMode = RunMode.Normal; //通常起動;
@@ -142,7 +143,7 @@ public final class Kernel implements IDisposable {
 		view = new View(this, mainForm, listViewLog);
 		logView = new LogView(listViewLog);
 		traceDlg = new TraceDlg(this, (mainForm != null) ? mainForm.getFrame() : null); //トレース表示
-		menu = new Menu(this, menuBar); //ここでは、オブジェクトの生成のみ、menu.Initialize()は、listInitialize()の中で呼び出される
+		menu = new Menu(this, this, menuBar); //ここでは、オブジェクトの生成のみ、menu.Initialize()は、listInitialize()の中で呼び出される
 		dnsCache = new DnsCache();
 		//ver = new Ver();//バージョン管理
 
@@ -316,7 +317,7 @@ public final class Kernel implements IDisposable {
 		remoteServer = listServer.get("RemoteServer");
 
 		view.setColumnText(); //Logビューのカラムテキストの初期化
-		menu.initialize(); //メニュー構築（内部テーブルの初期化）
+		menu.initialize(listOption.getListMenu(), isJp()); //メニュー構築（内部テーブルの初期化）
 
 	}
 
@@ -540,7 +541,7 @@ public final class Kernel implements IDisposable {
 
 			}
 			view.setColor(); //ウインドのカラー初期化
-			menu.setEnable(); //状態に応じた有効・無効
+			menu.setEnable(getRunMode(),listServer.isRunnig()); //状態に応じた有効・無効
 		} else {
 			switch (cmd) {
 				case "File_LogClear":

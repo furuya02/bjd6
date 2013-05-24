@@ -9,7 +9,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import bjd.Kernel;
 import bjd.util.IDisposable;
 
 /**
@@ -21,13 +20,13 @@ import bjd.util.IDisposable;
 public class MenuBase implements ActionListener, IDisposable {
 	private ArrayList<JMenuItem> ar = new ArrayList<>();
 
-	private Kernel kernel;
+	private IMenu iMenu;
 	private JMenuBar menuBar;
 
-	protected MenuBase(Kernel kernel, JMenuBar menuBar) {
-		this.kernel = kernel;
+	protected MenuBase(IMenu iMenu, JMenuBar menuBar) {
+		this.iMenu = iMenu;
 		this.menuBar = menuBar;
-				
+
 	}
 
 	/**
@@ -43,15 +42,15 @@ public class MenuBase implements ActionListener, IDisposable {
 			}
 		}
 	}
-	
+
 	/**
 	 * ListMenuの追加 (再帰)
 	 * @param owner 追加される親メニュ－
 	 * @param subMenu 追加する子メニューのリスト
 	 */
-	protected final void addListMenu(JMenu owner, ListMenu subMenu) {
+	protected final void addListMenu(JMenu owner, ListMenu subMenu, boolean isJp) {
 		for (OneMenu o : subMenu) {
-			addSubMenu(owner, o);
+			addSubMenu(owner, o, isJp);
 		}
 	}
 
@@ -60,25 +59,25 @@ public class MenuBase implements ActionListener, IDisposable {
 	 * @param owner 追加される親メニュ－
 	 * @param oneMenu 追加する子メニュー
 	 */
-	final void addSubMenu(JMenu owner, OneMenu oneMenu) {
+	final void addSubMenu(JMenu owner, OneMenu oneMenu, boolean isJp) {
 
 		if (oneMenu.getName().equals("-")) {
 			owner.addSeparator();
 			return;
 		}
 		if (oneMenu.getSubMenu().size() != 0) {
-			JMenu m = createMenu(oneMenu);
-			addListMenu(m, oneMenu.getSubMenu()); //再帰処理
+			JMenu m = createMenu(oneMenu, isJp);
+			addListMenu(m, oneMenu.getSubMenu(), isJp); //再帰処理
 			owner.add(m);
 		} else {
-			JMenuItem menuItem = createMenuItem(oneMenu);
+			JMenuItem menuItem = createMenuItem(oneMenu, isJp);
 			JMenuItem item = (JMenuItem) owner.add(menuItem);
 			ar.add(item);
 		}
 	}
 
-	final JMenu createMenu(OneMenu oneMenu) {
-		JMenu m = new JMenu(oneMenu.getTitle(kernel.isJp()));
+	final JMenu createMenu(OneMenu oneMenu, boolean isJp) {
+		JMenu m = new JMenu(oneMenu.getTitle(isJp));
 		m.setActionCommand(oneMenu.getName());
 		m.setMnemonic(oneMenu.getMnemonic());
 		//		JMenuにはアクセラレータを設定できない
@@ -86,19 +85,19 @@ public class MenuBase implements ActionListener, IDisposable {
 		//			m.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
 		//		}
 		m.addActionListener(this);
-		m.setName(oneMenu.getTitle(kernel.isJp()));
+		m.setName(oneMenu.getTitle(isJp));
 		return m;
 	}
 
-	final JMenuItem createMenuItem(OneMenu oneMenu) {
-		JMenuItem menuItem = new JMenuItem(oneMenu.getTitle(kernel.isJp()));
+	final JMenuItem createMenuItem(OneMenu oneMenu, boolean isJp) {
+		JMenuItem menuItem = new JMenuItem(oneMenu.getTitle(isJp));
 		menuItem.setActionCommand(oneMenu.getName());
 		menuItem.setMnemonic(oneMenu.getMnemonic());
 		if (oneMenu.getStrAccelerator() != null) {
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(oneMenu.getStrAccelerator()));
 		}
 		menuItem.addActionListener(this);
-		menuItem.setName(oneMenu.getTitle(kernel.isJp()));
+		menuItem.setName(oneMenu.getTitle(isJp));
 		return menuItem;
 	}
 
@@ -107,8 +106,8 @@ public class MenuBase implements ActionListener, IDisposable {
 	 * @param oneMenu 追加する子メニュー
 	 * @return
 	 */
-	protected final JMenu addTopMenu(OneMenu oneMenu) {
-		JMenu menu = new JMenu(oneMenu.getTitle(kernel.isJp()));
+	protected final JMenu addTopMenu(OneMenu oneMenu, boolean isJp) {
+		JMenu menu = new JMenu(oneMenu.getTitle(isJp));
 		menu.setMnemonic(oneMenu.getMnemonic());
 		menuBar.add(menu);
 		return menu;
@@ -117,28 +116,27 @@ public class MenuBase implements ActionListener, IDisposable {
 	//メニュー選択時のイベント処理
 	@Override
 	public final void actionPerformed(ActionEvent e) {
-		kernel.menuOnClick(e.getActionCommand());
+		iMenu.menuOnClick(e.getActionCommand());
 	}
 
 	//final void clear() {
 	//	ar.clear();
 	//}
-	
-	protected final void removeAll(){
+
+	protected final void removeAll() {
 		if (menuBar == null) {
 			return;
 		}
-		
+
 		//全削除
 		menuBar.removeAll();
 		ar.clear();
 		dispose();
 	}
-	
-	protected final void refresh(){
+
+	protected final void refresh() {
 		menuBar.updateUI(); //メニューバーの再描画
 	}
-	
 
 	/**
 	 * 終了処理

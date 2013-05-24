@@ -3,45 +3,43 @@ package bjd.trace;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import bjd.Kernel;
+import bjd.menu.IMenu;
 import bjd.menu.ListMenu;
 import bjd.menu.MenuBase;
 import bjd.menu.OneMenu;
 
 public class Menu extends MenuBase {
-	private Kernel kernel;
 
 	/**
 	 * @param kernel
 	 * @param menuBar
 	 */
-	public Menu(Kernel kernel, JMenuBar menuBar) {
-		super(kernel, menuBar);
-		this.kernel = kernel;
+	public Menu(IMenu iMenu, JMenuBar menuBar) {
+		super(iMenu, menuBar);
 	}
+
 	/**
 	 * メニュー構築（内部テーブルの初期化） 通常用
 	 */
-	public void initialize() {
+	public final void initialize(boolean isJp) {
 		removeAll();
 
 		//「ファイル」メニュー
-		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null));
-		addListMenu(m, fileMenu());
+		JMenu m = addTopMenu(new OneMenu("File", "ファイル", "File", 'F', null), isJp);
+		addListMenu(m, fileMenu(), isJp);
 
 		//「編集」メニュー
-		m = addTopMenu(new OneMenu("Edit", "編集", "Edit", 'E', null));
-		addListMenu(m, editMenu());
+		m = addTopMenu(new OneMenu("Edit", "編集", "Edit", 'E', null), isJp);
+		addListMenu(m, editMenu(), isJp);
 
-
-		refresh();//メニューバーの再描画
+		refresh(); //メニューバーの再描画
 	}
 
 	/**
 	 * 「ファイル」のサブメニュー
 	 * @return ListMenu
 	 */
-	ListMenu fileMenu() {
+	final ListMenu fileMenu() {
 		ListMenu subMenu = new ListMenu();
 		subMenu.add(new OneMenu("File_Close", "閉じる", "Close", 'C', null));
 		return subMenu;
@@ -51,7 +49,7 @@ public class Menu extends MenuBase {
 	 * 「編集」のサブメニュー
 	 * @return ListMenu
 	 */
-	ListMenu editMenu() {
+	final ListMenu editMenu() {
 		ListMenu subMenu = new ListMenu();
 		subMenu.add(new OneMenu("Edit_Copy", "コピー", "Copy", 'C', null));
 		subMenu.add(new OneMenu("Edit_Clear", "クリア", "Clear", 'L', null));
