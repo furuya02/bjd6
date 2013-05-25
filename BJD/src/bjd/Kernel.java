@@ -28,6 +28,7 @@ import bjd.option.OptionDlg;
 import bjd.option.OptionIni;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
+import bjd.remote.RemoteConnect;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
 import bjd.trace.TraceDlg;
@@ -56,6 +57,8 @@ public final class Kernel implements IDisposable, IMenu {
 	//private Lang lang = Lang.JP;
 	private boolean isJp = true;
 	private Logger logger = null;
+	private RemoteConnect remoteConnect = null; //リモート制御で接続されている時だけ初期化される
+	
 
 	//private MailBox mailBox = null; //実際に必要になった時に生成される(SMTPサーバ若しくはPOP3サーバの起動時)
 
@@ -108,6 +111,11 @@ public final class Kernel implements IDisposable, IMenu {
 		return "";
 	}
 
+	public RemoteConnect getRemoteConnect() {
+		return remoteConnect;
+	}
+	
+
 	/**
 	 * テスト用コンストラクタ
 	 */
@@ -136,6 +144,10 @@ public final class Kernel implements IDisposable, IMenu {
 	 */
 	private void defaultInitialize(MainForm mainForm, ListView listViewLog, JMenuBar menuBar) {
 
+		runMode = RunMode.Normal;
+		remoteConnect = null; //リモート制御で接続されている時だけ初期化される
+
+        
 		//loggerが生成されるまでのログを一時的に保管する
 		//ArrayList<LogTemporary> tmpLogger = new ArrayList<>();
 
@@ -362,7 +374,7 @@ public final class Kernel implements IDisposable, IMenu {
 		LogLimit logLimit = new LogLimit(dat, isDisplay);
 
 		boolean useLimitString = (boolean) conf.get("useLimitString");
-		return new Logger(logLimit, logFile, logView, isJp(), nameTag, useDetailsLog, useLimitString, logger);
+		return new Logger(this, logLimit, logFile, logView, isJp(), nameTag, useDetailsLog, useLimitString, logger);
 	}
 
 	/**
@@ -541,7 +553,7 @@ public final class Kernel implements IDisposable, IMenu {
 
 			}
 			view.setColor(); //ウインドのカラー初期化
-			menu.setEnable(getRunMode(),listServer.isRunnig()); //状態に応じた有効・無効
+			menu.setEnable(getRunMode(), listServer.isRunnig()); //状態に応じた有効・無効
 		} else {
 			switch (cmd) {
 				case "File_LogClear":

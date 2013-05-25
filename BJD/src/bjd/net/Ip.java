@@ -144,6 +144,7 @@ public final class Ip extends ValidObj {
 			Util.runtimeException(this, e);
 		}
 	}
+
 	/**
 	 * InetSockAddressによるコンストラクタ
 	 * @param inetSockAddress
@@ -159,34 +160,34 @@ public final class Ip extends ValidObj {
 	public Ip(IpKind ipKind) {
 		String ipStr = "";
 		switch (ipKind) {
-		case V4_0:
-			ipStr = "0.0.0.0";
-			break;
-		case V4_255:
-			ipStr = "255.255.255.255";
-			break;
-		case V6_0:
-			ipStr = "::";
-			break;
-		case V6_FF:
-			ipStr = "FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF";
-			break;
-		case INADDR_ANY:
-			ipStr = "INADDR_ANY";
-			break;
-		case IN6ADDR_ANY_INIT:
-			ipStr = "IN6ADDR_ANY_INIT";
-			break;
-		case V4_LOCALHOST:
-			ipStr = "127.0.0.1";
-			break;
-		case V6_LOCALHOST:
-			ipStr = "::1";
-			break;
-		default:
-			//定義が不足している場合
-			Util.runtimeException(String.format("Ip(IpKind) ipKind=%s", ipKind));
-			break;
+			case V4_0:
+				ipStr = "0.0.0.0";
+				break;
+			case V4_255:
+				ipStr = "255.255.255.255";
+				break;
+			case V6_0:
+				ipStr = "::";
+				break;
+			case V6_FF:
+				ipStr = "FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF";
+				break;
+			case INADDR_ANY:
+				ipStr = "INADDR_ANY";
+				break;
+			case IN6ADDR_ANY_INIT:
+				ipStr = "IN6ADDR_ANY_INIT";
+				break;
+			case V4_LOCALHOST:
+				ipStr = "127.0.0.1";
+				break;
+			case V6_LOCALHOST:
+				ipStr = "::1";
+				break;
+			default:
+				//定義が不足している場合
+				Util.runtimeException(String.format("Ip(IpKind) ipKind=%s", ipKind));
+				break;
 		}
 		try {
 			init(ipStr);
@@ -243,6 +244,11 @@ public final class Ip extends ValidObj {
 			init(InetKind.V6);
 			any = true;
 		} else if (ipStr.indexOf('.') > 0) { // IPV4
+			//java only
+			if (ipStr.charAt(0) == '/') {
+				ipStr = ipStr.substring(1);
+			}
+
 			// 名前で指定された場合は、例外に頼らずここで処理する（高速化）
 			for (int i = 0; i < ipStr.length(); i++) {
 				char c = ipStr.charAt(i);
@@ -270,6 +276,11 @@ public final class Ip extends ValidObj {
 			}
 		} else if (ipStr.indexOf(":") >= 0) { // IPV6
 			init(InetKind.V6);
+
+			//java only
+			if (ipStr.charAt(0) == '/') {
+				ipStr = ipStr.substring(1);
+			}
 
 			String[] tmp = ipStr.split("\\[|\\]");
 			if (tmp.length == 2) {

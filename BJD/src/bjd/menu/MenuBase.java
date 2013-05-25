@@ -109,7 +109,9 @@ public class MenuBase implements ActionListener, IDisposable {
 	protected final JMenu addTopMenu(OneMenu oneMenu, boolean isJp) {
 		JMenu menu = new JMenu(oneMenu.getTitle(isJp));
 		menu.setMnemonic(oneMenu.getMnemonic());
-		menuBar.add(menu);
+		if(menuBar!=null){
+			menuBar.add(menu);
+		}
 		return menu;
 	}
 
@@ -135,7 +137,9 @@ public class MenuBase implements ActionListener, IDisposable {
 	}
 
 	protected final void refresh() {
-		menuBar.updateUI(); //メニューバーの再描画
+		if(menuBar!=null){
+			menuBar.updateUI(); //メニューバーの再描画
+		}
 	}
 
 	/**
@@ -143,6 +147,9 @@ public class MenuBase implements ActionListener, IDisposable {
 	 */
 	@Override
 	public final void dispose() {
+		if (menuBar == null) {
+			return;
+		}
 		while (menuBar.getMenuCount() > 0) {
 			JMenu m = menuBar.getMenu(0);
 			m.removeAll();
