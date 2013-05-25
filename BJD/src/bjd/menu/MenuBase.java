@@ -109,7 +109,7 @@ public class MenuBase implements ActionListener, IDisposable {
 	protected final JMenu addTopMenu(OneMenu oneMenu, boolean isJp) {
 		JMenu menu = new JMenu(oneMenu.getTitle(isJp));
 		menu.setMnemonic(oneMenu.getMnemonic());
-		if(menuBar!=null){
+		if (menuBar != null) {
 			menuBar.add(menu);
 		}
 		return menu;
@@ -137,7 +137,7 @@ public class MenuBase implements ActionListener, IDisposable {
 	}
 
 	protected final void refresh() {
-		if(menuBar!=null){
+		if (menuBar != null) {
 			menuBar.updateUI(); //メニューバーの再描画
 		}
 	}

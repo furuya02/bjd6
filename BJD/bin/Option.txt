@@ -5,7 +5,7 @@ BOOL=BasicuseAdminPassword=false
 HIDE_STRING=Basicpassword=***
 STRING=BasicserverName=
 BOOL=BasiceditBrowse=false
-LIST=Basiclang=1
+LIST=Basiclang=0
 LIST=BasicprotocolKind=0
 INT=Basicport=80
 BINDADDR=BasicbindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT

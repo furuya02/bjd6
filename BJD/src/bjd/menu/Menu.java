@@ -67,7 +67,7 @@ public final class Menu extends MenuBase {
 		m = addTopMenu(new OneMenu("Help", "ヘルプ", "Help", 'H', null), isJp);
 		addListMenu(m, helpMenu(), isJp);
 
-		refresh();//メニューバーの再描画
+		refresh(); //メニューバーの再描画
 	}
 
 	//	//メニュー選択時のイベント処理

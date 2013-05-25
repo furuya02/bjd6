@@ -338,7 +338,7 @@ public class OneValTest {
 					if (val == null) {
 						val = "c:\temp";
 					}
-					oneCtrl = new CtrlFolder( help, 200, kernel);
+					oneCtrl = new CtrlFolder(help, 200, kernel);
 					break;
 				case TEXTBOX:
 					if (val == null) {

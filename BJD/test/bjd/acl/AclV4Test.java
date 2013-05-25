@@ -2,7 +2,6 @@ package bjd.acl;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-
 import junit.framework.Assert;
 
 import org.junit.experimental.runners.Enclosed;
@@ -117,13 +116,14 @@ public class AclV4Test {
 
 		static class Fixture {
 			private String aclStr;
+
 			public Fixture(String aclStr) {
 				this.aclStr = aclStr;
 			}
 		}
-		
+
 		@Theory
-		public void 例外テスト(Fixture fx){
+		public void 例外テスト(Fixture fx) {
 			//exercise
 			try {
 				new AclV4("TAG", fx.aclStr);

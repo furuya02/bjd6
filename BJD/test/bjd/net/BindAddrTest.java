@@ -232,32 +232,32 @@ public final class BindAddrTest {
 		}
 
 		@Theory
-		public void 生成されるOneBindの数の確認(Fixture fx) throws Exception{
+		public void 生成されるOneBindの数の確認(Fixture fx) throws Exception {
 			//stUp
 			BindAddr sut = new BindAddr(fx.bindStr);
 			int expected = fx.count;
-			
+
 			//exercise
 			OneBind[] ar = sut.createOneBind(fx.protocolKind);
 			int actual = ar.length;
 			//verify
 			assertThat(actual, is(expected));
-			
+
 		}
-		
+
 		@Theory
-		public void 生成される最初のOneBindの確認(Fixture fx) throws Exception{
+		public void 生成される最初のOneBindの確認(Fixture fx) throws Exception {
 			//stUp
 			BindAddr sut = new BindAddr(fx.bindStr);
 			String expected = fx.firstOneBind;
-			
+
 			//exercise
 			OneBind[] ar = sut.createOneBind(fx.protocolKind);
 			String actual = ar[0].toString();
-			
+
 			//verify
 			assertThat(actual, is(expected));
-			
+
 		}
 
 	}

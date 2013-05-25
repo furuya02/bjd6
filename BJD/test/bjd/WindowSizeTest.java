@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import bjd.ctrl.ListView;
 import bjd.option.Conf;
-import bjd.option.OneOption;
 import bjd.test.TestUtil;
 import bjd.util.Util;
 

@@ -11,7 +11,6 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import bjd.ValidObjException;
-import bjd.acl.AclV4Test.getStart及びgetEndの確認.Fixture;
 import bjd.net.Ip;
 import bjd.test.TestUtil;
 
@@ -120,7 +119,7 @@ public class AclV6Test {
 		}
 		
 		@Theory
-		public void 例外テスト(Fixture fx){
+		public void 例外テスト(Fixture fx) {
 			//exercise
 			try {
 				new AclV6("TAG", fx.aclStr);

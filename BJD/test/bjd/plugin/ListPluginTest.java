@@ -17,7 +17,6 @@ import bjd.net.ProtocolKind;
 import bjd.option.Conf;
 import bjd.option.OneOption;
 import bjd.server.OneServer;
-import bjd.test.TestUtil;
 
 public final class ListPluginTest {
 	

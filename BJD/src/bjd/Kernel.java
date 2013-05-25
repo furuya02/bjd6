@@ -34,6 +34,7 @@ import bjd.server.OneServer;
 import bjd.trace.TraceDlg;
 import bjd.util.IDisposable;
 import bjd.util.Util;
+import bjd.ver.Ver;
 
 public final class Kernel implements IDisposable, IMenu {
 
@@ -43,7 +44,7 @@ public final class Kernel implements IDisposable, IMenu {
 	private OneServer remoteServer = null; //クライアントへ接続中のみオブジェクトが存在する
 	private TraceDlg traceDlg = null; //トレース表示
 	private DnsCache dnsCache;
-	//private Ver ver=null;
+	private Ver ver = null;
 	private View view = null;
 	private LogView logView = null;
 	private WindowSize windowSize = null;
@@ -157,7 +158,7 @@ public final class Kernel implements IDisposable, IMenu {
 		traceDlg = new TraceDlg(this, (mainForm != null) ? mainForm.getFrame() : null); //トレース表示
 		menu = new Menu(this, this, menuBar); //ここでは、オブジェクトの生成のみ、menu.Initialize()は、listInitialize()の中で呼び出される
 		dnsCache = new DnsCache();
-		//ver = new Ver();//バージョン管理
+		ver = new Ver(getProgDir()); //バージョン管理
 
 		//RunModeの初期化
 		//if (mainForm == null) {
@@ -611,7 +612,7 @@ public final class Kernel implements IDisposable, IMenu {
 						}
 						break;
 					case "$v":
-						tmp2 = Ver.getVersion();
+						tmp2 = ver.getVersion();
 						break;
 					case "$p":
 						tmp2 = Define.getApplicationName();
