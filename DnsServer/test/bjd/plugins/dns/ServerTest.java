@@ -378,14 +378,14 @@ public final class ServerTest {
 		assertThat(ar.get(2), is("Ns sapporoworks.ne.jp. TTL=86400 www.sapporoworks.ne.jp."));
 
 		ar.clear();
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++) {
 			ar.add(print(p, RrKind.AR, i));
+		}
 		Collections.sort(ar);
 		assertThat(ar.get(0), is("A ns1.dns.ne.jp. TTL=86400 210.188.224.9"));
 		assertThat(ar.get(1), is("A ns2.dns.ne.jp. TTL=86400 210.224.172.13"));
 		assertThat(ar.get(2), is("A www.sapporoworks.ne.jp. TTL=86400 59.106.27.208"));
-		
-		
+
 	}
 
 	@Test

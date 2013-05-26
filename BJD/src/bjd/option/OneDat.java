@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import bjd.ValidObj;
 import bjd.ValidObjException;
 import bjd.util.IDisposable;
-import bjd.util.Util;
 
 /**
  * オリジナルデータ型<br>

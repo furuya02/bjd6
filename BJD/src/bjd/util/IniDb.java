@@ -26,21 +26,12 @@ public final class IniDb {
 	private String fileIni;
 	private String fileDef;
 	private String fileTxt;
-	private String fileBak;
 	
 	public IniDb(String progDir, String fileName) {
 		this.fileIni = progDir + "\\" + fileName + ".ini";
 		this.fileDef = progDir + "\\" + fileName + ".def";
 		this.fileTxt = progDir + "\\" + fileName + ".txt";
-		//this.fileDef = progDir + "\\Option.def";
-		//this.fileTxt = progDir + "\\Option.txt";
-		this.fileBak = fileIni + ".bak";
 
-		// 前回、iniファイルの削除後にハングアップした場合は、
-		// iniファイルが無く、bakファイルのみ残っている場合は、bakファイルに戻す
-		if (!(new File(fileIni)).exists() && (new File(fileBak)).exists()) {
-			Util.fileCopy(new File(fileBak), new File(fileIni));
-		}
 	}
 
 	private String ctrlType2Str(CtrlType ctrlType) {
@@ -212,32 +203,15 @@ public final class IniDb {
 		return isRead;
 	}
 
-	// iniファイルの削除
-	public void deleteIni() {
-		File file = new File(fileIni);
-		if (file.exists()) {
-			Util.fileCopy(file, new File(fileBak));
-			file.delete();
+	// ファイルの削除
+	public void delete() {
+		File ini = new File(fileIni);
+		if (ini.exists()) {
+			ini.delete();
 		}
-	}
-
-	/**
-	 * bakファイルの削除
-	 */
-	public void deleteBak() {
-		File file = new File(fileBak);
-		if (file.exists()) {
-			file.delete();
-		}
-	}
-
-	/**
-	 * txtファイルの削除
-	 */
-	public void deleteTxt() {
-		File file = new File(fileTxt);
-		if (file.exists()) {
-			file.delete();
+		File txt = new File(fileTxt);
+		if (txt.exists()) {
+			txt.delete();
 		}
 	}
 

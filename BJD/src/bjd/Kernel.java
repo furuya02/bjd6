@@ -16,6 +16,7 @@ import bjd.log.LogLimit;
 import bjd.log.LogView;
 import bjd.log.Logger;
 import bjd.log.TmpLogger;
+import bjd.menu.IMenu;
 import bjd.menu.Menu;
 import bjd.net.DnsCache;
 import bjd.net.LocalAddress;
@@ -23,15 +24,19 @@ import bjd.option.Conf;
 import bjd.option.Dat;
 import bjd.option.ListOption;
 import bjd.option.OneOption;
+import bjd.option.OptionDlg;
 import bjd.option.OptionIni;
 import bjd.plugin.ListPlugin;
 import bjd.plugin.OnePlugin;
+import bjd.remote.RemoteConnect;
 import bjd.server.ListServer;
 import bjd.server.OneServer;
+import bjd.trace.TraceDlg;
 import bjd.util.IDisposable;
 import bjd.util.Util;
+import bjd.ver.Ver;
 
-public final class Kernel implements IDisposable {
+public final class Kernel implements IDisposable, IMenu {
 
 	//プロセス起動時に初期化される変数
 	private RunMode runMode = RunMode.Normal; //通常起動;
@@ -39,7 +44,7 @@ public final class Kernel implements IDisposable {
 	private OneServer remoteServer = null; //クライアントへ接続中のみオブジェクトが存在する
 	private TraceDlg traceDlg = null; //トレース表示
 	private DnsCache dnsCache;
-	//private Ver ver=null;
+	private Ver ver = null;
 	private View view = null;
 	private LogView logView = null;
 	private WindowSize windowSize = null;
@@ -53,6 +58,8 @@ public final class Kernel implements IDisposable {
 	//private Lang lang = Lang.JP;
 	private boolean isJp = true;
 	private Logger logger = null;
+	private RemoteConnect remoteConnect = null; //リモート制御で接続されている時だけ初期化される
+	
 
 	//private MailBox mailBox = null; //実際に必要になった時に生成される(SMTPサーバ若しくはPOP3サーバの起動時)
 
@@ -105,6 +112,11 @@ public final class Kernel implements IDisposable {
 		return "";
 	}
 
+	public RemoteConnect getRemoteConnect() {
+		return remoteConnect;
+	}
+	
+
 	/**
 	 * テスト用コンストラクタ
 	 */
@@ -133,6 +145,10 @@ public final class Kernel implements IDisposable {
 	 */
 	private void defaultInitialize(MainForm mainForm, ListView listViewLog, JMenuBar menuBar) {
 
+		runMode = RunMode.Normal;
+		remoteConnect = null; //リモート制御で接続されている時だけ初期化される
+
+        
 		//loggerが生成されるまでのログを一時的に保管する
 		//ArrayList<LogTemporary> tmpLogger = new ArrayList<>();
 
@@ -140,9 +156,9 @@ public final class Kernel implements IDisposable {
 		view = new View(this, mainForm, listViewLog);
 		logView = new LogView(listViewLog);
 		traceDlg = new TraceDlg(this, (mainForm != null) ? mainForm.getFrame() : null); //トレース表示
-		menu = new Menu(this, menuBar); //ここでは、オブジェクトの生成のみ、menu.Initialize()は、listInitialize()の中で呼び出される
+		menu = new Menu(this, this, menuBar); //ここでは、オブジェクトの生成のみ、menu.Initialize()は、listInitialize()の中で呼び出される
 		dnsCache = new DnsCache();
-		//ver = new Ver();//バージョン管理
+		ver = new Ver(getProgDir()); //バージョン管理
 
 		//RunModeの初期化
 		//if (mainForm == null) {
@@ -314,7 +330,7 @@ public final class Kernel implements IDisposable {
 		remoteServer = listServer.get("RemoteServer");
 
 		view.setColumnText(); //Logビューのカラムテキストの初期化
-		menu.initialize(); //メニュー構築（内部テーブルの初期化）
+		menu.initialize(listOption.getListMenu(), isJp()); //メニュー構築（内部テーブルの初期化）
 
 	}
 
@@ -359,7 +375,7 @@ public final class Kernel implements IDisposable {
 		LogLimit logLimit = new LogLimit(dat, isDisplay);
 
 		boolean useLimitString = (boolean) conf.get("useLimitString");
-		return new Logger(logLimit, logFile, logView, isJp(), nameTag, useDetailsLog, useLimitString, logger);
+		return new Logger(this, logLimit, logFile, logView, isJp(), nameTag, useDetailsLog, useLimitString, logger);
 	}
 
 	/**
@@ -538,7 +554,7 @@ public final class Kernel implements IDisposable {
 
 			}
 			view.setColor(); //ウインドのカラー初期化
-			menu.setEnable(); //状態に応じた有効・無効
+			menu.setEnable(getRunMode(), listServer.isRunnig()); //状態に応じた有効・無効
 		} else {
 			switch (cmd) {
 				case "File_LogClear":
@@ -596,7 +612,7 @@ public final class Kernel implements IDisposable {
 						}
 						break;
 					case "$v":
-						tmp2 = Ver.getVersion();
+						tmp2 = ver.getVersion();
 						break;
 					case "$p":
 						tmp2 = Define.getApplicationName();

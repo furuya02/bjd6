@@ -13,6 +13,8 @@ import bjd.ILife;
 import bjd.Kernel;
 import bjd.net.Ip;
 import bjd.net.Ssl;
+import bjd.trace.TraceKind;
+import bjd.util.Buffer;
 import bjd.util.Bytes;
 import bjd.util.Timeout;
 import bjd.util.Util;
@@ -245,7 +247,7 @@ public final class SockTcp extends SockObj {
 			ex.printStackTrace();
 			return null;
 		}
-		//trace(TraceKind.Recv, buffer, false);//noEncode = false;テキストかバイナリかは不明
+        trace(TraceKind.Recv, buffer, false);
 
 		return buffer;
 	}
@@ -313,7 +315,8 @@ public final class SockTcp extends SockObj {
 			}
 			byte[] buf = sockQueue.dequeueLine();
 			//noEncode = false;//テキストである事が分かっている
-			//Trace(TraceKind.Recv, buf, false);//トレース表示
+            trace(TraceKind.Recv, buf, false);
+			
 			if (buf.length != 0) {
 				return buf;
 			}
@@ -371,6 +374,10 @@ public final class SockTcp extends SockObj {
 				}
 				size += written;
 			}
+				
+			byte [] b = Buffer.BlockCopy(buf, start, length);
+			trace(TraceKind.Send, b, false);
+			
 			return size;
 		} catch (Exception ex) {
 			setException(ex);

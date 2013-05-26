@@ -3,11 +3,9 @@ package bjd.net;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import bjd.sock.SockQueue;
-import bjd.test.TestUtil;
 
 public final class SockQueueTest {
 

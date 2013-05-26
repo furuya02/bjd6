@@ -3,7 +3,6 @@ package bjd.option;
 import java.util.ArrayList;
 
 import bjd.Kernel;
-import bjd.OptionDlg;
 import bjd.ctrl.CtrlCheckBox;
 import bjd.ctrl.CtrlComboBox;
 import bjd.ctrl.CtrlDat;

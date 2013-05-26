@@ -18,9 +18,9 @@ public final class Conf {
 	private String nameTag = "";
 
 	public Conf(OneOption oneOption) {
-		
+
 		nameTag = oneOption.getNameTag();
-		
+
 		ArrayList<OneVal> list = oneOption.getListVal().getList(null);
 		for (OneVal o : list) {
 			CtrlType ctrlType = o.getOneCtrl().getCtrlType();
@@ -50,8 +50,8 @@ public final class Conf {
 			}
 		}
 	}
-	
-	public String getNameTag(){
+
+	public String getNameTag() {
 		return nameTag;
 	}
 

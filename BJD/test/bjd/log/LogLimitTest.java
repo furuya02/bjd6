@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import bjd.ctrl.CtrlType;
 import bjd.option.Dat;
-import bjd.test.TestUtil;
 
 public final class LogLimitTest {
 

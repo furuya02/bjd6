@@ -39,9 +39,7 @@ public class IniDbTest2 {
 		//verify
 		assertThat(actual, is("DAT=Basic\bmime="));
 		//tearDown
-		sut.deleteIni();
-		sut.deleteTxt();
-		sut.deleteBak();
+		sut.delete();
 		
 	}
 }

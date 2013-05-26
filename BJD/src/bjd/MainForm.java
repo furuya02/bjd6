@@ -51,6 +51,8 @@ public final class MainForm implements WindowListener {
 	 * Create the application.
 	 */
 	private MainForm() {
+		
+	
 		initialize();
 
 		//*************************************************
@@ -104,6 +106,9 @@ public final class MainForm implements WindowListener {
 		// kernel初期化
 		//*************************************************
 		kernel = new Kernel(this, listView, menuBar);
+		
+		frame.setTitle("BlackJumboDog");
+
 	}
 
 	/**

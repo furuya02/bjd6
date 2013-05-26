@@ -1,6 +1,7 @@
 package bjd.server;
 
 import bjd.Kernel;
+import bjd.ThreadBaseKind;
 import bjd.net.BindAddr;
 import bjd.net.BindStyle;
 import bjd.net.OneBind;
@@ -127,7 +128,7 @@ public final class ListServer extends ListBase<OneServer> implements IDisposable
 	public boolean isRunnig() {
 		//全スレッドの状態確認
 		for (OneServer sv : getAr()) {
-			if (sv.isRunning()) {
+			if (sv.getThreadBaseKind() == ThreadBaseKind.Running) {
 				return true;
 			}
 		}

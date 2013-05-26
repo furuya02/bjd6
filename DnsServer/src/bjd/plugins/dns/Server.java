@@ -203,7 +203,7 @@ public final class Server extends OneServer {
 		PacketDns sp = new PacketDns(rp.getId(), qr, aa, rp.getRd(), ra);
 
 		// (B)「質問セクション」の追加
-		appendRr(sp, RrKind.QD, new RrQuery(rp.getRequestName(), rp.getDnsType()));//質問フィールドの追加
+		appendRr(sp, RrKind.QD, new RrQuery(rp.getRequestName(), rp.getDnsType())); //質問フィールドの追加
 		if (!aa) {
 			//ドメインオーソリティ（権威サーバ）で無い場合
 			//ルートキャッシュにターゲットのデータが蓄積されるまで、再帰的に検索する

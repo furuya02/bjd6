@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import bjd.OptionDlg;
+import bjd.option.OptionDlg;
 import bjd.util.Msg;
 import bjd.util.MsgKind;
 /**
