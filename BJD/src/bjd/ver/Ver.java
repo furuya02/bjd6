@@ -23,6 +23,9 @@ public class Ver {
 		//this.kernel = kernel;
 
 		File f = new File(progDir + "\\plugins");
+		if(!f.exists()){
+			f.mkdir();
+		}
 		File[] files = f.listFiles();
 		for (File file : files) {
 			ar.add(file.getPath());
