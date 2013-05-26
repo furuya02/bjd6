@@ -422,7 +422,7 @@ public final class ServerTest implements ILife {
 		cl.stringSend("SYST");
 		//assertThat(cl.stringRecv(1, this), is("215 Windows 8\r\n"));
 		String str = cl.stringRecv(1, this);
-		if (str.equals("215 Windows 7\r\n") || str.equals("215 Windows 8\r\n")) {
+		if (str.equals("215 Windows 7\r\n") || str.equals("215 Windows 8\r\n") || str.equals("215 Windows NT (unknown)\r\n")) {
 			return;
 		}
 		Assert.fail();
@@ -440,7 +440,7 @@ public final class ServerTest implements ILife {
 		cl.stringSend("SYST");
 		//assertThat(cl.stringRecv(1, this), is("215 Windows 8\r\n"));
 		String str = cl.stringRecv(1, this);
-		if (str.equals("215 Windows 7\r\n") || str.equals("215 Windows 8\r\n")) {
+		if (str.equals("215 Windows 7\r\n") || str.equals("215 Windows 8\r\n") || str.equals("215 Windows NT (unknown)\r\n")) {
 			return;
 		}
 		Assert.fail();

@@ -17,7 +17,7 @@ RADIO=BasicenableAcl=0
 DAT=Basicacl=
 LIST=LognormalLogKind=2
 LIST=LogsecureLogKind=2
-FOLDER=LogsaveDirectory=C:\dev
+FOLDER=LogsaveDirectory=
 BOOL=LoguseLogFile=true
 BOOL=LoguseLogClear=false
 INT=LogsaveDays=31
@@ -27,7 +27,7 @@ FONT=Logfont=
 RADIO=LogisDisplay=1
 DAT=LoglimitString=
 BOOL=LoguseLimitString=false
-BOOL=DnsuseServer=true
+BOOL=DnsuseServer=false
 LIST=DnsprotocolKind=1
 INT=Dnsport=53
 BINDADDR=DnsbindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT
@@ -41,13 +41,12 @@ STRING=DnssoaMail=postmaster
 INT=DnssoaSerial=1
 INT=DnssoaRefresh=3600
 INT=DnssoaRetry=300
-INT=DnssoaExpire=2400
-INT=DnssoaMinimum=1200
-RADIO=DnsenableAcl=1
+INT=DnssoaExpire=360000
+INT=DnssoaMinimum=3600
+RADIO=DnsenableAcl=0
 DAT=Dnsacl=
-DAT=DnsDomaindomainList=	aaa.com
-DAT=Resource-aaa.comresourceList=	0	www		192.168.0.10	0	1	ns		192.168.0.1	0	0	ws0		192.168.0.1	0	4	www		fe80::3882:6dac:af18:cba6	0	2	smtp		192.168.0.2	15	3	www	www2		0
-BOOL=FtpuseServer=true
+DAT=DnsDomaindomainList=
+BOOL=FtpuseServer=false
 LIST=FtpprotocolKind=0
 INT=Ftpport=21
 BINDADDR=FtpbindAddress2=V4ONLY,INADDR_ANY,IN6ADDR_ANY_INIT
@@ -59,8 +58,8 @@ STRING=FtpbannerMessage=FTP ( $p Version $v ) ready
 BOOL=FtpuseSyst=false
 INT=FtpreservationTime=5000
 DAT=FtpmountList=
-DAT=Ftpuser=	0	C:\tmp2	1	***
-RADIO=FtpenableAcl=1
+DAT=Ftpuser=
+RADIO=FtpenableAcl=0
 DAT=Ftpacl=
 BOOL=SampleuseServer=false
 LIST=SampleprotocolKind=0

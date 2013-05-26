@@ -29,9 +29,12 @@
 		<!--
 		<property  name="junit.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
 		<property  name="hamcrest.jar" value="C:\eclipse_juno_java\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
-		-->
+		
 		<property  name="junit.jar" value="D:\eclipse\eclipse\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
 		<property  name="hamcrest.jar" value="D:\eclipse\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+-->
+		<property  name="junit.jar" value="C:\eclipse-juno\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900\junit.jar"/>
+		<property  name="hamcrest.jar" value="C:\eclipse-juno\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar"/>
 		
 		<javac fork="true" encoding="utf-8" srcdir="${project}/test" 
 	  		destdir="${project}/bin" includeantruntime="false" >
